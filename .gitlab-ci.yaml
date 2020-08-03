@@ -1,0 +1,25 @@
+stages:
+  - Static Analysis
+
+pylint:
+  stage: Static Analysis
+  image: "python:3.8"
+  before_script:
+    - python --version
+    - pip install -r requirements.txt
+    - pip install pylint
+  tags:
+    - shared
+  script:
+    - pylint src
+
+black:
+  stage: Static Analysis
+  image: "python:3.8"
+  before_script:
+    - pip install -r requirements.txt
+    - pip install black
+  tags:
+    - shared
+  script:
+    - black --check src
