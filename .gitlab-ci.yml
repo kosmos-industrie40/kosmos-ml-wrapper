@@ -1,5 +1,7 @@
 stages:
   - Static Analysis
+  - Unit Test
+  - Build
 
 pylint:
   stage: Static Analysis
@@ -7,11 +9,14 @@ pylint:
   before_script:
     - python --version
     - pip install -r requirements.txt
+    - pip install -r tests/testrequirements.txt
     - pip install pylint
   tags:
     - shared
   script:
-    - pylint src
+    - pylint ml_wrapper
+    - pylint --rcfile tests/.pylintrc tests
+    - pylint examples
 
 black:
   stage: Static Analysis
@@ -22,4 +27,27 @@ black:
   tags:
     - shared
   script:
-    - black --check src
+    - black --check .
+
+test:
+  stage: Unit Test
+  image: "python:3.8"
+  before_script:
+    - python --version
+    - pip install -r requirements.txt
+    - pip install -r tests/testrequirements.txt
+  tags:
+    - shared
+  script:
+    - python -m unittest discover
+
+build:
+  stage: Build
+  image: "python:3.8"
+  before_script:
+    - pip install -r requirements.txt
+    - pip install wheel
+  tags:
+    - shared
+  script:
+    - python setup.py sdist bdist_wheel
