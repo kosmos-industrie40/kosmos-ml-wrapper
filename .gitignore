@@ -1,2 +1,7 @@
 env/
 .idea/
+**/__pycache__
+htmlcov/
+build/
+dist/
+mlwrapper.egg-info/
