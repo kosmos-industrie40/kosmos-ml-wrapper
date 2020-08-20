@@ -10,14 +10,14 @@ with open("README.md", "r") as fh:
 
 REQS = []
 with open("requirements.txt", "r") as requirements:
-    REQS = requirements.read().split('\n')
+    REQS = requirements.read().split("\n")
 
 for req_, req in enumerate(REQS):
-    if 'git+' in req:
-        REQS[req_] = req.split('/')[-1]
-        if req.endswith('.git'):
-            REQS[req_] = REQS[req_].strip('.git')
-        REQS[req_] += ' @ ' + req
+    if "git+" in req:
+        REQS[req_] = req.split("/")[-1]
+        if req.endswith(".git"):
+            REQS[req_] = REQS[req_].strip(".git")
+        REQS[req_] += " @ " + req
 
 REQUIREMENTS = [package.strip() for package in REQS]
 
