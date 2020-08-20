@@ -20,7 +20,14 @@ Afterwards, the results of the analysis tool are itself parsed to conform to the
 # Installation
 You can install the ML Wrapper package from this repository directly:
 
-    pip install git+https://gitlab.inovex.de/proj-kosmos/kosmos-mqtt-reaction.git
+```
+pip install git+https://gitlab.inovex.de/proj-kosmos/kosmos-mqtt-reaction.git
+```
+After the installation - assuming you are using a virtualenv `env` - you can execute 
+```
+env/bin/python env/lib/python3.7/site-packages/ml_wrapper/create_config_md.py
+```
+in your directory, to create the env_ml_wrapper.md file in your repository, if required.
     
 
 # How to use
