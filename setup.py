@@ -3,11 +3,26 @@ This module sets up the package when it is installed
 """
 import configparser
 import setuptools
-from ml_wrapper.create_config_md import create_config
 
 # Read the Readme as long description
 with open("README.md", "r") as fh:
     LONG_DESCRIPTION = fh.read()
+
+REQS = []
+with open("requirements.txt", "r") as requirements:
+    REQS = requirements.read().split('\n')
+
+for req_, req in enumerate(REQS):
+    if 'git+' in req:
+        REQS[req_] = req.split('/')[-1]
+        if req.endswith('.git'):
+            REQS[req_] = REQS[req_].strip('.git')
+        REQS[req_] += ' @ ' + req
+
+REQUIREMENTS = [package.strip() for package in REQS]
+
+
+print(REQUIREMENTS)
 
 # Read the package config from the package_config.ini
 CONFIG = configparser.ConfigParser()
@@ -32,7 +47,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    install_requires=REQUIREMENTS,
     python_requires=PACKAGE["python_requires"],
 )
-
-create_config()
