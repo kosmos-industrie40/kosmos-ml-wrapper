@@ -170,7 +170,7 @@ class MLWrapper(abc.ABC):
     # Can be reimplemented by user, and can then gain self-use
     def retrieve_payload_data(
         self, payload: str
-    ) -> (Union[pd.DataFrame, None], list, list, Union[dict, list, None], int):
+    ) -> (Union[pd.DataFrame, None], list, list, Union[dict, list, None], str):
         """
         Convert the data contained in an MQTT message payload
         to a usable format for ML applications.
@@ -236,7 +236,7 @@ class MLWrapper(abc.ABC):
         columns: List[dict] = None,
         data: List[dict] = None,
         metadada: Union[List[dict], None] = None,
-        timestamp: int = None,
+        timestamp: str = None,
     ) -> Union[str, pd.DataFrame]:
         """
         Interface for ML function.

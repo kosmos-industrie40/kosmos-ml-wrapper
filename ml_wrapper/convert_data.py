@@ -94,7 +94,7 @@ def retrieve_data(
 
         metadata = payload_dict.get("meta")
 
-        timestamp = int(payload_dict.get("timestamp"))
+        timestamp = payload_dict.get("timestamp")
     else:
         raise Exception(f"Error while reading payload type {payload_type}")
 
