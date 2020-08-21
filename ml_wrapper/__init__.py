@@ -141,7 +141,8 @@ class MLWrapper(abc.ABC):
         """
         Callback function for erroneous execution of run().
         """
-        self.logger.debug("There was an error while calling the run() method.")
+        self.logger.error("There was an error while calling the run() method.")
+        self.logger.error(err)
         self.thread_pool.terminate()
         self.thread_pool = ThreadPool(
             int(self.config["config"]["threading"]["pool_num"])
