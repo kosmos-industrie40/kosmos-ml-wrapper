@@ -1,16 +1,15 @@
 """ This module tests the threading behaviour """
 import unittest
 import json
-import os
+from os.path import dirname, join
 
 from paho.mqtt.client import MQTTMessage
 
 from tests.mock_ml_function import SlowMLTool
 
-JSON_PATH = os.path.join(os.path.dirname(__file__), "../docs/MqttPayloads/")
+JSON_PATH = join(dirname(__file__), "..", "docs", "MqttPayloads")
 
-
-with open(JSON_PATH + "analyses-example-time_series.json") as f:
+with open(join(JSON_PATH, "analyses-example-time_series.json")) as f:
     schema = json.load(f)
 
 

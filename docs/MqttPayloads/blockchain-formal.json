@@ -1,0 +1,91 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+  	"title":"Payload: kosmos/bc/<contractId>",
+	"description":"definition of the payload for the topic kosmos/bc/<contractId>",
+	"properties": {
+		"from": {
+			"type": "string",
+			"description": "The service, which send this message"
+		},
+		"date": {
+			"type": "integer",
+			"description": "current time stamp in unix time format (based on seconds"
+		},
+		"calculation": {
+			"type": "object",
+			"$ref": "#/definitions/Calculation",
+			"description": "defines the time frame for the calculation"
+		},
+		"result": {
+			"type": "object",
+			"$ref": "#/definitions/Result",
+			"description": "the result of the calculation"
+		},
+		"signature": {
+			"type": "string",
+			"description": "base64 encoded signature about all other fields in the message"
+		}
+	},
+	"required": ["from", "date", "calculation", "result"],
+	"definitions": {
+		"Calculation": {
+			"type": "object",
+			"properties": {
+				"start": {
+					"description": "timestamp on which the current calculation has started in millisecond and unix time format",
+					"type": "integer"
+				},
+				"end": {
+					"description": "timestamp on which the current calculation has stopped in millisecond and unix time format",
+					"type": "integer"
+				}
+			},
+			"required": ["start", "end"]
+		},
+		"Result": {
+			"type": "object",
+			"properties": {
+              	"currency": {
+					  "type": "string",
+					  "description": "defines the used currency"
+			  	},
+				"clear": {
+					"type": "number",
+					"description": "total value without tax"
+				},
+				"tax": {
+					"type": "number",
+					"description": "total tax"
+				},
+				"parts": {
+					"type": "array",
+					"description": "parts of the result split by the result of each machine",
+                  	"items": {
+						"definitions": {
+							"machine": {
+								"type": "string",
+								"description": "defines the machine"
+							},
+							"results": {
+								"type": "object",
+								"description": "the result of the calculation of this machine",
+								"definitions": {
+									"clear": {
+										"type": "number",
+										"description": "the result of the calculation without tax"
+									},
+									"tax": {
+										"type": "number",
+										"description": "the tax of this machine"
+									}
+								},
+								"required": ["clear", "tax"]
+							}
+						}
+					},
+					"minItems": 1
+				}
+			}
+		}
+	}
+}

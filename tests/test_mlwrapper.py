@@ -4,17 +4,19 @@ This module is testing the general ML Wrapper behaviour
 import logging
 import unittest
 import json
-import os
+from os.path import dirname, join
 
 from paho.mqtt.client import MQTTMessage
 from pandas import DataFrame
 from ml_wrapper import MLWrapper, ResultType
 from tests.mock_ml_function import FFT, ResultTypeTool, BadMLTool
 
-JSON_PATH = os.path.join(os.path.dirname(__file__), "../docs/MqttPayloads/")
+
+JSON_PATH = join(dirname(__file__), "..", "docs", "MqttPayloads")
+
 
 mlw = FFT()
-with open(JSON_PATH + "analyses-example-time_series.json") as file:
+with open(join(JSON_PATH, "analyses-example-time_series.json")) as file:
     analyse_example_payload_ts = json.load(file)
 
 logging.basicConfig(level=logging.DEBUG)
@@ -34,13 +36,14 @@ class TestMLWrapper(unittest.TestCase):
         mlw._react_to_message(None, None, msg)
 
     def test_run(self):
-        data_frame, _, _, _, _ = mlw.retrieve_payload_data(
-            json.dumps(analyse_example_payload_ts)
+        data_frame, _, _, _, _, _ = mlw.retrieve_payload_data(
+            "kosmos/machine-data/203041/sensor/1/update",
+            json.dumps(analyse_example_payload_ts),
         )
         self.assertIsInstance(data_frame, DataFrame)
         payload = mlw._run(data_frame, None, None, None, None)
-        self.assertTrue(payload["results"] is not None)
-        self.assertTrue(payload["date"] is not None)
+        self.assertIsNotNone(payload["results"])
+        self.assertIsNotNone(payload["timestamp"])
 
     def test_erroneous_run(self):
         bad_ml = BadMLTool()

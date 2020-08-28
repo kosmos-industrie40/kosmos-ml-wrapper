@@ -1,0 +1,39 @@
+@startuml
+start
+
+partition "KOSMoS Global" {
+	:Vertrag wird als Deaktiviert makiert von Partner A;
+	:Vertrag Deaktivierung wird von Partner B bestätigt;
+}
+fork
+partition "Edge/SCADA" {
+	:Vertrag Deaktivierung wird von der Contract Engine abgerufen;
+	:Vertrag Deaktivierung wird über MQTT publiziert;
+	fork
+	if (Blockchain Node auf der Edge) then (ja)
+		:Vertrag Deaktivierung wird über MQTT empfangen;
+		:Smart Contract wird deaktiviert;
+	else (nein)
+	endif
+	fork again
+	if (Analyse Cloud Connector existiert) then (ja)
+		:Vertrag Deaktivierung wird über MQTT empfangen;
+		:Vertrag Deaktivierung wird an Analyse Cloud übergeben;
+	else (nein)
+	endif
+	fork again
+	:alle zum Vertrag gehörten Objecte werden, soweit sie nicht von anderen
+	Verträgen verwendet werden gelöscht;
+	end fork
+	:Bestätigung über Deaktivierung wird an KOSMoS Global übertragen;
+}
+fork again
+partition "KOSMoS Global" {
+	:Smart Contract wird deaktiviert;
+}
+end fork
+partition "KOSMoS Global" {
+	:Vertrag wird als erfolgreich Deaktiviert markiert;
+}
+stop
+@enduml

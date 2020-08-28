@@ -27,7 +27,7 @@ class MockAnalysisTool(AnalysisTool):
 
     def __init__(self):
         """ Constructor """
-        super(MockAnalysisTool, self).__init__()
+        super().__init__()
 
     def _init_mqtt(self):
         """ Mock the mqtt client on init """

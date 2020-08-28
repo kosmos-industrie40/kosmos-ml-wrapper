@@ -32,6 +32,7 @@ black:
 test:
   stage: Unit Test
   image: "python:3.8"
+  needs: []
   before_script:
     - python --version
     - pip install -r requirements.txt
@@ -44,10 +45,17 @@ test:
 build:
   stage: Build
   image: "python:3.8"
+  needs:
+    - test
+    - black
+    - pylint
   before_script:
     - pip install -r requirements.txt
     - pip install wheel
   tags:
     - shared
+  artifacts:
+    paths:
+      - dist/*.whl
   script:
     - python setup.py sdist bdist_wheel
