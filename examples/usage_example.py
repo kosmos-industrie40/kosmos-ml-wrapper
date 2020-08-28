@@ -10,7 +10,6 @@ if __name__ == "__main__" and __package__ is None:
     path.append(dir(path[0]))
     __package__ = "examples"
 
-
 # This is required for you to write in order to create your own ML Tool
 import logging
 from typing import Union, List
@@ -20,6 +19,7 @@ from ml_wrapper import MLWrapper
 # This level should be set according to your needs (development, production, ...)
 logging.basicConfig(level=logging.DEBUG)
 
+
 # Create child class of MLWrappers
 class AnalysisTool(MLWrapper):
     """ My wonderful analysis tool """
@@ -27,7 +27,7 @@ class AnalysisTool(MLWrapper):
     # Implementation required
     def __init__(self):
         # Instantiation of super required
-        super(AnalysisTool, self).__init__(log_level=logging.DEBUG)
+        super().__init__(log_level=logging.DEBUG)
 
     # Implementation required
     def run(
@@ -36,7 +36,8 @@ class AnalysisTool(MLWrapper):
         columns: List[dict] = None,
         data: List[dict] = None,
         metadada: Union[List[dict], None] = None,
-        timestamp: int = None,
+        timestamp: str = None,
+        topic: str = None,
     ) -> Union[str, pd.DataFrame]:
         # perform your ML magic here
         data = pd.DataFrame({"ind": [list(range(10))]})
@@ -48,7 +49,7 @@ class AnalysisTool(MLWrapper):
     # Default implementation returns
     # dataframe, columns, data, metadada, timestamp
     def retrieve_payload_data(
-        self, payload: str
+        self, topic: str, payload: str
     ) -> (Union[pd.DataFrame, None], list, list, Union[dict, list, None], int):
         # retrieve data from payload
         # or request historical data from database
@@ -59,6 +60,6 @@ class AnalysisTool(MLWrapper):
 
 # Usage of AnalysisTool class
 if __name__ == "__main__":
-    analysis_tool = AnalysisTool()  # instantiate
-    analysis_tool.logger.info("Starting my wonderful ml tool")
-    analysis_tool.start()  # start infinite loop to listen to MQTT messages
+    ANALYSIS_TOOL = AnalysisTool()  # instantiate
+    ANALYSIS_TOOL.logger.info("Starting my wonderful ml tool")
+    ANALYSIS_TOOL.start()  # start infinite loop to listen to MQTT messages

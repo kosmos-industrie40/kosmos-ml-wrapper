@@ -10,6 +10,7 @@ class MockMqttClient:
         self.on_message = None
         self.connect = lambda *args, **kwargs: None
         self.subscribe = lambda *args, **kwargs: None
+        self.last_published = None
 
     def mock_a_message(self, client, message: str):
         """ This function can be used to inject a mocked message """
@@ -23,4 +24,5 @@ class MockMqttClient:
 
     def publish(self, topic, payload):
         """ Provides a publish function """
-        self.logger.info("{}:\t{}".format(str(topic), str(payload)))
+        self.logger.debug("{}:\t{}".format(str(topic), str(payload)))
+        self.last_published = payload

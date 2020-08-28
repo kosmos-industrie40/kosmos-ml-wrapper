@@ -3,11 +3,12 @@ Utility Module to convert data to and from json-usable format.
 """
 import datetime
 import json
+import re
 from datetime import timezone
 from typing import Union, List
 import pandas as pd
 
-JSON_TYPES = {"number": "float64", "string": "str"}
+JSON_TYPES = {"number": "float64", "string": "str", "rfctime": "datetime64"}
 
 
 def retrieve_dataframe(results: dict) -> (pd.DataFrame, List[dict], List[dict]):
@@ -34,7 +35,7 @@ def retrieve_dataframe(results: dict) -> (pd.DataFrame, List[dict], List[dict]):
 
 def retrieve_data(
     payload: str,
-) -> (Union[pd.DataFrame, None], List[dict], List[dict], Union[List[dict], None], int):
+) -> (Union[pd.DataFrame, None], List[dict], List[dict], Union[List[dict], None], str):
     """
     Convert the data contained in an MQTT message payload
     to a usable format for ML applications.
@@ -56,9 +57,8 @@ def retrieve_data(
         results = payload_dict.get("results")
         if results is not None:
             dataframe, columns, data = retrieve_dataframe(results)
-            timestamp = int(
-                payload_dict.get("date")
-            )  # NB: timestamp should never be None
+            timestamp = payload_dict.get("timestamp")
+            # NB: timestamp should never be None
 
         else:
             raise Exception("Error! No Results obtained.")
@@ -71,7 +71,7 @@ def retrieve_data(
             dataframe = pd.DataFrame(data=results_string, columns=column_name)
             data = results
 
-            timestamp = int(payload_dict.get("date"))
+            timestamp = payload_dict.get("timestamp")
 
     elif payload_type == "multiple_time_series":
         results = payload_dict.get("results")
@@ -101,24 +101,34 @@ def retrieve_data(
     return dataframe, columns, data, metadata, timestamp
 
 
-def convert_datatypes(datatype: str) -> str:
+def resolve_data_frame(dataframe: pd.DataFrame) -> (list, list):
     """
-    The defined json schema only accepts datatypes 'number' or 'string'.
-    Based on the present python datatype, this function maps that datatype
-    to either of 'number' or 'string'.
+    Turns a data_frame into two list usable as a json payload.
+    First list is the columns, second list is the data.
+    """
+    # pylint: disable=fixme
+    # TODO: Take the mapping information out of the docs git module
+    assert isinstance(
+        dataframe, pd.DataFrame
+    ), "Only dataframes are allowed in function resolve_data_frame"
+    column = [
+        {"name": name, "type": type_}
+        for name, type_ in list(
+            zip(dataframe.dtypes.keys(), [str(a) for a in dataframe.dtypes.values])
+        )
+    ]
+    data = dataframe.astype(str).values.tolist()
+    for col_dict_i, col_dict in enumerate(column):
+        type_ = col_dict["type"]
+        if re.findall("(int.*)|(float.*)", type_):
+            type_ = "number"
+        elif re.findall("(datetime.*)", type_):
+            type_ = "rfctime"
+        else:
+            type_ = "string"
+        column[col_dict_i]["type"] = type_
 
-    :param datatype: The python datatype of any result
-    :return analysis_datatype: Json schema-conform datatype.
-        Can either be "number" or "string"
-    """
-    # else-case for better readability
-    # pylint: disable=no-else-return
-    if "float" in datatype or "int" in datatype or "double" in datatype:
-        return "number"
-    if "str" in datatype or "string" in datatype or "object" in datatype:
-        return "string"
-    else:
-        raise Exception(f"Error! Datatype {datatype} is not supported.")
+    return column, data
 
 
 def resolve_data(
@@ -140,17 +150,11 @@ def resolve_data(
     if resulttype == "time_series":
         schema = {}
         schema["type"] = resulttype
-        values = data.astype(str).values.T.tolist()
-        columns = data.columns.to_list()
-        dtypes = data.dtypes.values
+        columns, data_ = resolve_data_frame(data)
 
         schema["results"] = {}
-        schema["results"]["data"] = values
-        schema["results"]["columns"] = []
-        for i, col in enumerate(columns):
-            schema["results"]["columns"].append(
-                {"name": col, "type": convert_datatypes(dtypes[i].name)}
-            )
+        schema["results"]["data"] = data_
+        schema["results"]["columns"] = columns
 
     elif resulttype == "text":
         total = data.get("total")
@@ -169,22 +173,16 @@ def resolve_data(
 
         assert isinstance(data, list)
         for i, dataframe in enumerate(data):
-            values = dataframe.astype(str).values.T.tolist()
-            columns = dataframe.columns.to_list()
-            dtypes = dataframe.dtypes.values
+            columns, data_ = resolve_data_frame(dataframe)
 
             schema["results"].append({})
-            schema["results"][i]["data"] = values
-            schema["results"][i]["columns"] = []
-            for j, col in enumerate(columns):
-                schema["results"][i]["columns"].append(
-                    {"name": col, "type": convert_datatypes(dtypes[j].name)}
-                )
+            schema["results"][i]["data"] = data_
+            schema["results"][i]["columns"] = columns
 
     else:
         raise Exception(f"Error! Resulttype {resulttype} is not supported.")
 
-    schema["date"] = (
+    schema["timestamp"] = (
         datetime.datetime.utcnow().astimezone(timezone.utc).isoformat(sep="T")
     )
     return schema

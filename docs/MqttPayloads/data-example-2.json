@@ -1,0 +1,27 @@
+{
+  "$schema": "data-formal.json",
+  "timestamp": "2020-08-15T15:33:44.897Z",
+  "columns": [
+    {
+      "name": "value",
+      "type": "integer"
+    },
+    {
+      "name": "quality",
+      "type": "integer"
+    }
+  ],
+  "data": [
+    ["15"],
+    ["2"]
+  ],
+  "meta": [
+    {
+      "name": "location",
+      "description": "defines the location where the metric is created",
+      "type": "string",
+      "value": "hall 1"
+    }
+  ],
+  "signature": "iQJNBAABCAA3FiEEs9+aTrHmy7aElz5+uqd9AltsqzQFAl6JosoZHGphbi51bnRlcmJyaW5rQGlub3ZleC5kZQAKCRC6p30CW2yrNN+2EACV1cf/J723nFkJbnjI4qG8noy63UEzG05ez1I/R6+Cut2gIEnrOO0NV0KxgBRjB2YHszBB/RPXFE+qTv6mIiqw28CAjTHBwtWvJqETuMR8XVNucj6lL34FXSWHkLx9nhASx/CVjCxTgdJYD+5Zgzdl8QYd5SrX7onacu4I9TdLsgKBf4TytFf4iHehdcGqO2ecTs0Z5XXeVLjJPN4AcFUnOTzDzfmQFGP27WlpYBHJOFs8f/JwIklRjw0yxV0bmKNAeEsX+uoZCQJln56KrUVIZ9kke5rCWjNu1R5ejNoXAyBquy//5yhVSZPyFm86xQIK70YpDsOjxScIfFfp7YhPtYLvzL1l/VjZzAw+SDduhH3urKI/ESRMZD0+/5AxS4sS2a+p3hUEFyHwqaqdV1CUqDLZLStBiZVKklAPFKp23sEccJsT8aYLzA+1rHUnGHBqwvWZvAomirreehS5ukQan1f7I5LpWY6Q/Tp4wnURv8sIswI8sC2n4clowUL8yhv/fY9Pc9iqPq3GnGaR40TUEnxygHYomM9akHL5B8wtX2JcAmfE8YL/fbEabfsmZ1Zh1dZcrZiXLe/r0m34UzS17dbneJbz8krtl3eUWQhHm/wFvAyJmAtvMm3b28rtMIaIJDzahseRahWpYvdFvLAPdO7BZ4zkZH9r9XrSJkq3UQ=="
+}

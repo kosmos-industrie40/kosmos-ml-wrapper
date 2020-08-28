@@ -1,0 +1,24 @@
+{
+	"$schema":"blockchain-formal.json",
+	"from": "blockchain-client",
+	"date": 1585758170,
+	"calculation": {
+		"start": 1583020800000,
+		"end": 1585699199000
+	},
+	"result": {
+		"currency": "euro",
+		"clear": 1088.99,
+		"tax": 55.77,
+		"parts": [
+			{
+				"machine": "machine1",
+				"results": {
+					"clear": 1088.99,
+					"tax": 55.77
+				}
+			}
+		]
+	},
+	"signature": "iQJNBAABCAA3FiEEs9+aTrHmy7aElz5+uqd9AltsqzQFAl6JnhUZHGphbi51bnRlcmJyaW5rQGlub3ZleC5kZQAKCRC6p30CW2yrNBOVEACcdm95Qqgl66DAvG4aKlbFp5e0Kln9yuFWRLEM/xYNvCzttEAn6+70ecI+mjdgURleXM8mYvJh/3zSJ/rsYkIevsnpnd0kC8Cg/3T+hbRNWHlwQibIM06P+ITBYJ+K3chaDkX1rk3XY3wPMtjakaj0cVvTRXkgbNK0Nznx8jquOjIKdf9eXyG+bu0/FJ3cecs8FeYYRLfLOZuwFcTM0C7Xy8c7nzt6sWwKZ1adjK1AtEeSS/G4pHpHMNJnMZIVWRNaIWWXrPDeJpHZW3bD9NdclUs/c24pVLdE1MZTpkTOj2JDK8cGGPR4NGaGUfMmXxcHqokj3PkPswYwAKdVU2JRGRXPQjCmTQD5yK2d2Hu0rpTh6XtVXPwJedaz1Wpx84JqVUCNgzxeu7cN/+q2aJ2VQFkm7vnBq1DVq0d//WU7U3gSfVr0RwzCRUDRuKaA84+MI4sarUVR8G8Y3GwEqr5niKVSZIuNNfUsYB0oaLqLpRS+5qW6VlSUZvpcSTe0a2WtHWs7TZ7kCf0iYD9I9rKgUCHbRmhCr3tmk689JhD4d9fFZBIrdKbuwYf7e/KfxBjs6BAgHwHgXjQxy/ecR1SW8B9J0bnEiCfnNu5/Ik4dZTjCsL2X77fXm7O2tRBDyiUkWXtIbRX6TDdGqF1w9Z4Fk+5LtYH78ZB3rRyIYKnDZA=="
+}

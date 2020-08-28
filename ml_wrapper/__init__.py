@@ -83,15 +83,18 @@ class MLWrapper(abc.ABC):
         )
         self.resulttype = result_type
         self.config = Config(mode="all_allowed").scan(FILE_DIR, True).read()
-        self.logger = logging.getLogger(logger_name or __name__)
-        handler = logging.StreamHandler(sys.stdout)
-        handler.setLevel(log_level)
-        handler.setFormatter(
-            logging.Formatter(
-                "%(asctime)s\t%(levelname)-10s %(processName)s\t%(name)s:\t%(message)s"
+        self.logger_ = logging.getLogger(logger_name or __name__)
+        if not self.logger_.handlers:
+            handler = logging.StreamHandler(sys.stdout)
+            handler.setLevel(log_level)
+            handler.setFormatter(
+                logging.Formatter(
+                    "%(asctime)s\t%(levelname)-10s"
+                    " %(processName)s\t%(name)s:\t%(message)s"
+                )
             )
-        )
-        self.logger.addHandler(handler)
+            self.logger_.addHandler(handler)
+        self.logger_.propagate = False
         self.logger.debug("The config is: %s", str(self.config.config_rendered))
         self.config = self.config.config_rendered
         self.client = None
@@ -99,9 +102,17 @@ class MLWrapper(abc.ABC):
             int(self.config["config"]["threading"]["pool_num"])
         )
         self.thread_pool.daemon = True
+        self.async_result = None
         self._init_mqtt()
         self.client.on_message = self._react_to_message
         self._subscribe()
+
+    @property
+    def logger(self):
+        """
+        Returns the logger instance
+        """
+        return self.logger_
 
     def _init_mqtt(self):
         """ Initialise the mqtt client """
@@ -147,6 +158,7 @@ class MLWrapper(abc.ABC):
         self.thread_pool = ThreadPool(
             int(self.config["config"]["threading"]["pool_num"])
         )
+        self.async_result = None
         traceback.print_exception(type(err), err, err.__traceback__)
         raise type(err)(err)
 
@@ -157,9 +169,9 @@ class MLWrapper(abc.ABC):
     ) -> Union[str, pd.DataFrame]:
         """ This method is the entry point when a message is received. """
         self.logger.debug("Message received: %s", format(str(message.payload)))
-        retrieved_data = self.retrieve_payload_data(message.payload)
+        retrieved_data = self.retrieve_payload_data(message.topic, message.payload)
         self.logger.debug("Start the threaded run of the ML Tool")
-        self.thread_pool.apply_async(
+        self.async_result = self.thread_pool.apply_async(
             self._run,
             retrieved_data,
             callback=self.prompt,
@@ -170,12 +182,13 @@ class MLWrapper(abc.ABC):
 
     # Can be reimplemented by user, and can then gain self-use
     def retrieve_payload_data(
-        self, payload: str
-    ) -> (Union[pd.DataFrame, None], list, list, Union[dict, list, None], str):
+        self, topic: str, payload: str
+    ) -> (Union[pd.DataFrame, None], list, list, Union[dict, list, None], str, str):
         """
         Convert the data contained in an MQTT message payload
         to a usable format for ML applications.
 
+        :param topic: MQTT message topic as a string
         :param payload: MQTT message payload as a string
         :returns dataframe: Payload results converted to Dataframe
         :return columns: Specification about column types and names
@@ -183,9 +196,10 @@ class MLWrapper(abc.ABC):
         :return metadata: List of dictionaries containing metadata about
             the data and data acquisition
         :return timestamp: Timestamp the trigger message
+        :return topic: MQTT message topic as a string
         """
         dataframe, columns, data, metadada, timestamp = retrieve_data(payload)
-        return dataframe, columns, data, metadada, timestamp
+        return dataframe, columns, data, metadada, timestamp, topic
 
     # Can be reimplemented by user, and can then gain self-use
     def resolve_result_data(
@@ -238,6 +252,7 @@ class MLWrapper(abc.ABC):
         data: List[dict] = None,
         metadada: Union[List[dict], None] = None,
         timestamp: str = None,
+        topic: str = None,
     ) -> Union[str, pd.DataFrame]:
         """
         Interface for ML function.
@@ -257,7 +272,8 @@ class MLWrapper(abc.ABC):
         :param data: Data from payload in list-representation
         :param metadata: List of dictionaries containing metadata about
             the data and data acquisition
-        :param timestamp: Timestamp of the trigger message?
+        :param timestamp: Timestamp of the trigger message
+        :param topic: Topic of the trigger message
         :return data: Analysis result data
         :return resulttype: Type of the analysis result. Enum ResultType is used
         """

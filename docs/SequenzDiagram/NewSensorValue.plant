@@ -1,0 +1,52 @@
+@startuml
+partition "Edge/SCADA" {
+	start
+	
+	:Mapper publiziert die Nachricht über MQTT;
+	fork
+	if (Leasing Use Case) then (ja)
+		:Empfangen der Daten über MQTT;
+		:Leasing Parameter wird bestimmt;
+		:Parameter werden Blockchain Tool übergeben um Leasing Rate zu bestimmen;
+	else (nein)
+	endif
+	
+	fork again
+	if (Connector Analyse Platform) then (vorhanden)
+		:Empfangen der Daten über MQTT;
+		:Sensor Daten werden ggf. bereinigt und aggregiert;
+		:Sensor Daten werden an Analyse Platform gesendet;
+	else (abwesend)
+	endif
+	
+	fork again
+	:Empfangen der Daten über MQTT;
+	:Schreiben der Daten in lokale DB zum 'Cachen' der Daten;
+	
+	fork again
+	if (sollen lokale Analyse durchgeführt werden) then (ja)
+		:Empfangen der Daten über MQTT;
+		:Analyse / ML wird durchgeführt;
+		:Ergebnis wird über MQTT publiziert;
+		fork
+		:Empfangen der Daten über MQTT;
+		:Ergebnis wird in lokale DB gespeichert;
+		fork again
+		if (Connector Analyse Platform) then (vorhanden)
+			:Empfangen der Daten über MQTT;
+			:Senden Ergebnis der Analyse zur Analyse Platform;
+		else (abwesend)
+		endif
+		fork again
+		:Anzeige Tool kann Ergebnisse anzeigen (ggf erst nach Eintrag in DB);
+		end fork
+	else (nein)
+	endif
+	
+	fork again
+	:lokale Anzeige der Maschinen Daten (ggf. über eingetragenen Daten);
+	
+	end fork
+	stop
+}
+@enduml

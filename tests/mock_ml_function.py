@@ -15,7 +15,7 @@ class FFT(MLWrapper):
 
     def __init__(self):
         """Constructor"""
-        super(FFT, self).__init__(log_level=logging.INFO, logger_name="Mock FFT")
+        super().__init__(log_level=logging.INFO, logger_name="Mock FFT")
         self.logger.debug(type(self))
         self.logger.debug(self.config)
 
@@ -29,7 +29,8 @@ class FFT(MLWrapper):
         columns: List[dict] = None,
         data: List[dict] = None,
         metadada: Union[List[dict], None] = None,
-        timestamp: int = None,
+        timestamp: str = None,
+        topic: str = None,
     ) -> Union[str, pd.DataFrame]:
         """Simple run step"""
         self.logger.debug("Starting run method")
@@ -44,7 +45,7 @@ class SlowMLTool(MLWrapper):
 
     def __init__(self):
         """ Constructor """
-        super(SlowMLTool, self).__init__()
+        super().__init__()
 
     def _init_mqtt(self):
         """ Inits mock Client """
@@ -56,7 +57,8 @@ class SlowMLTool(MLWrapper):
         columns: List[dict] = None,
         data: List[dict] = None,
         metadada: Union[List[dict], None] = None,
-        timestamp: int = None,
+        timestamp: str = None,
+        topic: str = None,
     ) -> Union[str, pd.DataFrame]:
         """ Run method implementation """
         time.sleep(5)
@@ -68,7 +70,7 @@ class ResultTypeTool(MLWrapper):
 
     def __init__(self):
         """ Constructor """
-        super(ResultTypeTool, self).__init__(
+        super().__init__(
             result_type=ResultType.MULTIPLE_TIME_SERIES,
             log_level=logging.INFO,
             logger_name="Result Type Logger",
@@ -84,7 +86,8 @@ class ResultTypeTool(MLWrapper):
         columns: List[dict] = None,
         data: List[dict] = None,
         metadada: Union[List[dict], None] = None,
-        timestamp: int = None,
+        timestamp: str = None,
+        topic: str = None,
     ) -> Union[str, pd.DataFrame]:
         """ Run method implementation """
         return "Done"
@@ -95,7 +98,7 @@ class BadMLTool(MLWrapper):
 
     def __init__(self):
         """ Constructor """
-        super(BadMLTool, self).__init__(log_level=logging.INFO)
+        super().__init__(log_level=logging.INFO)
 
     def _init_mqtt(self):
         """ Initialise a mock mqtt client """
@@ -107,7 +110,8 @@ class BadMLTool(MLWrapper):
         columns: List[dict] = None,
         data: List[dict] = None,
         metadada: Union[List[dict], None] = None,
-        timestamp: int = None,
+        timestamp: str = None,
+        topic: str = None,
     ) -> Union[str, pd.DataFrame]:
         """ Run method implementation """
         self.logger.debug(dataframe, columns)

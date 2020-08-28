@@ -1,0 +1,25 @@
+@startuml
+start
+partition "Analyse Plattform" {
+	:Trainieren von ML-Modellen;
+	:neue Version eines Modells;
+	:Der Container wird in die KOMSoS/(Analyse)-Registry verschoben;
+	:neues Modell wird in der DB-gespeichert;
+	:Bereitstellen zu einem Contract, dass ein neues Modell zu Verfügung steht;
+}
+partition "Edge/SCADA" {
+	:Abrufen der Updates von der Edge aus;
+	:Der Contract Engine wird Container Credentials übergeben;
+	:Contract Engine startet neuen Analyse Container;
+	if (Analyse Container startet erfolgreich) then (ja)
+		:der alte Container wird beendet;
+	else (nein)
+		:Notification über nicht erfolgreiches Starten des Containers;
+	endif
+	:Status wird an Analyse Platform gesendet;
+}
+partition "Analyse Plattform" {
+	:update der verwendeten Container Version in der DB;
+}
+stop
+@enduml
