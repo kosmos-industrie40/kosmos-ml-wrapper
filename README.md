@@ -85,19 +85,18 @@ If you have a group token already, skip this step and go to the next heading.
 - Click **Add Variable**
 - As key enter `GIT_TOKEN`
 - As value you enter the token you created / copied earlier
+Repeat this step for the Username `GIT_USER` with value `gitlab-ci-token`
 
 ### Set up your gitlab pipeline
 - Edit your .gitlab-ci.yml
 - In every job, that needs to install / clone from another internal repository, 
 enter the following two lines in the beginning.
 ```
-- git config --global credential.helper 'cache'
-- echo -e "protocol=https\nhost=gitlab.inovex.de\nusername=gitlab-ci-token\npassword=${GIT_TOKEN}" | git credential approve
+- git config --global url."https://$GIT_USER:$GIT_TOKEN@gitlab.inovex.de".insteadOf https://gitlab.inovex.de
 ```
 Then your pipeline before_script might look like this:
 ```
 - before_script:
-    - git config --global credential.helper 'cache'
-    - echo -e "protocol=https\nhost=gitlab.inovex.de\nusername=gitlab-ci-token\npassword=${GIT_TOKEN}" | git credential approve
+    - git config --global url."https://$GIT_USER:$GIT_TOKEN@gitlab.inovex.de".insteadOf https://gitlab.inovex.de
     - pip install -r requirements.txt
 ```
