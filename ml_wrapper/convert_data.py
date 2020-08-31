@@ -49,8 +49,10 @@ def retrieve_data(
     :return metadata: List of dictionaried containing metadata about the data and data acquisition
     :return timestamp: Timestamp of the incoming message
     """
-
-    payload_dict = json.loads(payload)
+    try:
+        payload_dict = json.loads(payload)
+    except ValueError as e:
+        raise ValueError("No valid json was provided: %s".format(e))
     payload_type = payload_dict.get("type")
     metadata = None
     if payload_type == "time_series":

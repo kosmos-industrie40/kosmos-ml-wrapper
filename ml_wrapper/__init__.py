@@ -169,7 +169,11 @@ class MLWrapper(abc.ABC):
     ) -> Union[str, pd.DataFrame]:
         """ This method is the entry point when a message is received. """
         self.logger.debug("Message received: %s", format(str(message.payload)))
-        retrieved_data = self.retrieve_payload_data(message.topic, message.payload)
+        try:
+            retrieved_data = self.retrieve_payload_data(message.topic, message.payload)
+        except ValueError as e:
+            self.logger.error(e)
+            return
         self.logger.debug("Start the threaded run of the ML Tool")
         self.async_result = self.thread_pool.apply_async(
             self._run,
