@@ -40,7 +40,8 @@ def retrieve_data(
     Convert the data contained in an MQTT message payload
     to a usable format for ML applications.
 
-    TODO: 'text' and 'multiple_time_series' datatypes not supported.
+    FIXME: 'text' and 'multiple_time_series' datatypes not supported.
+    https://gitlab.inovex.de/proj-kosmos/kosmos-mqtt-reaction/-/issues/5
 
     :param payload: MQTT message payload as a string
     :returns dataframe: Payload results converted to Dataframe
@@ -108,8 +109,6 @@ def resolve_data_frame(dataframe: pd.DataFrame) -> (list, list):
     Turns a data_frame into two list usable as a json payload.
     First list is the columns, second list is the data.
     """
-    # pylint: disable=fixme
-    # TODO: Take the mapping information out of the docs git module
     assert isinstance(
         dataframe, pd.DataFrame
     ), "Only dataframes are allowed in function resolve_data_frame"
@@ -140,12 +139,12 @@ def resolve_data(
     Formats the result from the analysis workflow so that it is
     usable as json payload.
 
-    TODO: Analysis output for 'text' resulttype still not entirely clear. Need
-    to discuss the data structure of such a function's returned data structure.
+    FIXME: Analysis output for 'text' resulttype still not entirely clear.
+    Need to discuss the data structure of such a function's returned data structure.
+    https://gitlab.inovex.de/proj-kosmos/kosmos-mqtt-reaction/-/issues/5
 
     :param resulttype: The type of the return value of the analysis function.
         Can either be "text", "time_series", or "multiple_time_series".
-        (TODO: Need to define correct structure of "text" type.)
     :return schema: Dictionary containing the analysis result in a structure
         that conforms to the defined json schema.
     """
