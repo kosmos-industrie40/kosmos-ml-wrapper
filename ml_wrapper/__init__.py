@@ -213,13 +213,13 @@ class MLWrapper(abc.ABC):
         Formats the result from the analysis workflow so that it is
         usable as json payload.
 
-        TODO: Analysis output for 'text' resulttype still not entirely clear. Need
-        to discuss the data structure of such a function's returned data structure.
+        FIXME: Analysis output for 'text' resulttype still not entirely clear.
+        Need to discuss the data structure of such a function's returned data structure.
+        https://gitlab.inovex.de/proj-kosmos/kosmos-mqtt-reaction/-/issues/5
 
         :param data: The data to be resolved
         :param resulttype: The type of the return value of the analysis function.
             Can either be "text", "time_series", or "multiple_time_series".
-            (TODO: Need to define correct structure of "text" type.)
         :return schema: Dictionary containing the analysis result in a structure
             that conforms to the defined json schema.
         """
