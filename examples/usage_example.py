@@ -11,13 +11,9 @@ if __name__ == "__main__" and __package__ is None:
     __package__ = "examples"
 
 # This is required for you to write in order to create your own ML Tool
-import logging
 from typing import Union, List
 import pandas as pd
 from ml_wrapper import MLWrapper
-
-# This level should be set according to your needs (development, production, ...)
-logging.basicConfig(level=logging.DEBUG)
 
 
 # Create child class of MLWrappers
@@ -27,7 +23,7 @@ class AnalysisTool(MLWrapper):
     # Implementation required
     def __init__(self):
         # Instantiation of super required
-        super().__init__(log_level=logging.DEBUG)
+        super().__init__()
 
     # Implementation required
     def run(
