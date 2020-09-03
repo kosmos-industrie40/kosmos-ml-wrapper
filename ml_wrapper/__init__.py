@@ -19,6 +19,7 @@ from paho.mqtt.client import MQTTMessage, Client
 from iniparser import Config
 
 from .convert_data import retrieve_data, resolve_data
+from .log_level import LOG_LEVEL
 
 FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -68,7 +69,7 @@ class MLWrapper(abc.ABC):
     def __init__(
         self,
         result_type: ResultType = ResultType.TIME_SERIES,
-        log_level=logging.INFO,
+        log_level=LOG_LEVEL,
         logger_name=None,
     ):
         """

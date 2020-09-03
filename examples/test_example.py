@@ -13,12 +13,9 @@ if __name__ == "__main__" and __package__ is None:
 
 # This is required for you to write in order to create your own ML Tool
 
-import logging
 import unittest
 from examples.usage_example import AnalysisTool
 from ml_wrapper.mock_mqtt_client import MockMqttClient
-
-logging.basicConfig(level=logging.INFO)
 
 
 # Just make a local Mock Class of your own ml tool and copy paste the rest of this class
