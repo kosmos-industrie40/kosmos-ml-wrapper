@@ -12,3 +12,11 @@ class ResultType(Enum):
     TEXT = "text"
     TIME_SERIES = "time_series"
     MULTIPLE_TIME_SERIES = "multiple_time_series"
+
+    @classmethod
+    def value2member_map(cls):
+        """
+        Release the value2member_map function
+        @return: dict
+        """
+        return cls._value2member_map_
