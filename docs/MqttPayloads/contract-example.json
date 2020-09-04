@@ -1,0 +1,195 @@
+{
+	"$schema": "contract-formal.json",
+	"contract": {
+		"valid": {
+			"start": "2020-08-25T11:32:22.1235",
+			"end": "2020-08-31T11:32:22.1235"
+		},
+		"creationTime": "2020-08-25T11:32:22.1235",
+		"partners": [
+			"sw",
+			"schwarzwald"
+		],
+		"permissions": {
+			"read": [
+				"sw",
+				"schwarzwald",
+				"inovex"
+			], 
+			"write" : [
+				"robot"
+			]
+		},
+		"id": "ddc51cd4-e909-11ea-ac4b-54e1ad207114"
+	},
+	"requiredTechnicalContainers": [
+		{
+			"system": "edge",
+			"containers": [
+				{
+					"url": "harbor.kosmos.idcp.inovex.io/abc/grafana",
+					"tag": "7.1.5",
+					"arguments": [],
+					"environment": []
+				},
+				{
+					"url": "harbor.kosmos.idcp.inovex.io/abc/vault",
+					"tag": "23refds",
+					"arguments": [],
+					"environment": []
+				}
+			]
+		}
+	],
+	"machine": "84bab968-e6b7-11ea-b10c-54e1ad207114",
+	"kosmosLocalSystems": [
+		"machineGateway",
+		"edge"
+	],
+	"sensors": [
+		{
+			"name": "temperature",
+			"storageDuration": [
+				{
+					"systemName": "machineGateway",
+					"duration": "5h"
+				},
+				{
+					"systemName": "edge",
+					"duration": "5h"
+				}
+			],
+			"meta": {}
+		},
+		{
+			"name":"alarms",
+			"storageDuration": [
+				{
+					"systemName": "machineGateway",
+					"duration": "5h"
+				},
+				{
+					"systemName": "edge",
+					"duration": "5h"
+				}
+			],
+			"meta": {}
+		},
+		{
+			"name": "crash",
+			"storageDuration": [
+				{
+					"systemName": "machineGateway",
+					"duration": "5h"
+				},
+				{
+					"systemName": "edge",
+					"duration": "5h"
+				}
+			],
+			"meta": {}
+		}
+	],
+	"checkSignatures": false,
+	"analyses": {
+		"enable": true,
+		"systems": [
+			{
+				"enable": true,
+				"system": "edge",
+				"pipelines": [
+					{
+						"ml-trigger": {
+							"type": "time",
+							"definition": {
+								"after": "5s"
+							}
+						},
+						"pipeline": [
+							{
+								"container": {
+									"url": "fft",
+									"tag": "0.0.0.0.1",
+									"arguments": [],
+									"environment": []
+								},
+								"persistOutput": false,
+								"from": null,
+								"to": null
+							}
+						],
+						"sensors": [
+							"alarms"
+						]
+					}
+				]
+			},
+			{
+				"enable": true,
+				"system": "cloud",
+				"connection": {
+					"url": "https://connector.kosmos.idcp.inovex.io",
+					"user-mgmt": "https://user.kosmos.idcp.inovex.io",
+					"interval": "5M",
+					"container": {
+						"url": "analyse-connector",
+						"tag": "0.0.10",
+						"arguments": [
+							"this will be transmitted to the docker container"
+						],
+						"environment": []
+					}
+				},
+				"pipelines": [
+					{
+						"ml-trigger": {
+							"type": "event",
+							"definition": null
+						},
+						"pipeline": [
+							{
+								"container": {
+									"url": "fft",
+									"tag": "0.0.0.0.1",
+									"arguments": [
+										"this will be transmitted to the docker container"
+									],
+									"environment": []
+								},
+								"persistOutput": true,
+								"from": null,
+								"to": {
+									"tag": "0.0.0.0",
+									"url": "test"
+								}
+							},
+							{
+								"container":{
+									"url": "abc",
+									"tag": "0.0.0.0.1",
+									"environment": [],
+									"arguments": []
+								},
+								"from": {
+									"tag": "0.0.0.0",
+									"url": "test"
+								},
+								"to": null,
+								"persistOutput": true
+							}
+						],
+						"sensors": [
+							"alarms"
+						]
+					}
+				]
+			}
+		]
+	},
+	"metadata":{
+	},
+	"machineConnection": {
+	},
+	"blockchain": {
+	}
+}
