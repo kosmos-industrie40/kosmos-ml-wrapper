@@ -266,6 +266,11 @@ class IncomingMessage:
         del self._topic
 
 
-if __name__ == "__main__":
-    inf = IncomingMessage()
-    print(inf.topic)
+class OutgoingMessage:
+    """
+    Outgoing Message object
+    TODO: Finish
+    """
+
+    def __init__(self):
+        self.data_frame = None

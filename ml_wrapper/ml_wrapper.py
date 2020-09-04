@@ -16,6 +16,9 @@ import pandas as pd
 import paho.mqtt.client as mqtt
 from paho.mqtt.client import MQTTMessage, Client
 from iniparser import Config
+
+from .exceptions import EmptyResult, InvalidType, NotYetRetrieved
+from .messaging import IncomingMessage, OutgoingMessage
 from .result_type import ResultType
 
 from .convert_data import retrieve_data, resolve_data
@@ -157,18 +160,19 @@ class MLWrapper(abc.ABC):
     # pylint: disable=unused-argument
     def _react_to_message(
         self, client: Client, user_data: Union[None, str], message: MQTTMessage
-    ) -> Union[str, pd.DataFrame]:
+    ) -> IncomingMessage:
         """ This method is the entry point when a message is received. """
         self.logger.debug("Message received: %s", format(str(message.payload)))
+        in_message = IncomingMessage()
         try:
-            retrieved_data = self.retrieve_payload_data(message.topic, message.payload)
-        except ValueError as error:
+            in_message.mqtt_message = message
+        except (EmptyResult, InvalidType) as error:
             self.logger.error(error)
             return
         self.logger.debug("Start the threaded run of the ML Tool")
         self.async_result = self.thread_pool.apply_async(
             self._run,
-            retrieved_data,
+            in_message,
             callback=self.prompt,
             error_callback=self.error_prompt,
         )
@@ -197,6 +201,7 @@ class MLWrapper(abc.ABC):
         return dataframe, columns, data, metadada, timestamp, topic
 
     # Can be reimplemented by user, and can then gain self-use
+    # TODO: Define OutgoingMessage to ease information sharing
     def resolve_result_data(
         self, data: Union[list, pd.DataFrame, dict], resulttype: ResultType
     ) -> dict:
@@ -219,13 +224,13 @@ class MLWrapper(abc.ABC):
         schema = resolve_data(data, resulttype.value)
         return schema
 
-    def _run(self, *args):
+    def _run(self, in_message: IncomingMessage):
         """
         Wrapper around the actual run method.
         Executes run() and passes its result to and MQTT message.
         """
         self.logger.debug("Start ML tool...")
-        result = self.run(*args)
+        result = self.run(in_message)
         self.logger.debug("End ML tool")
         payload = self._publish_result_message(result)
         return payload
@@ -240,15 +245,7 @@ class MLWrapper(abc.ABC):
         return payload
 
     @abc.abstractmethod
-    def run(
-        self,
-        dataframe: Union[str, pd.DataFrame, None] = None,
-        columns: List[dict] = None,
-        data: List[dict] = None,
-        metadada: Union[List[dict], None] = None,
-        timestamp: str = None,
-        topic: str = None,
-    ) -> Union[str, pd.DataFrame]:
+    def run(self, in_message: IncomingMessage) -> OutgoingMessage:
         """
         Interface for ML function.
 
@@ -262,15 +259,8 @@ class MLWrapper(abc.ABC):
         result = self.run(*retrieved_data)
         message_payload = self.resolve_payload_data(result).
 
-        :param dataframe: Payload data converted to Dataframe
-        :param columns: Specification about column types and names
-        :param data: Data from payload in list-representation
-        :param metadata: List of dictionaries containing metadata about
-            the data and data acquisition
-        :param timestamp: Timestamp of the trigger message
-        :param topic: Topic of the trigger message
-        :return data: Analysis result data
-        :return resulttype: Type of the analysis result. Enum ResultType is used
+        :param in_message: IncomingMessage
+        :return: OutgoingMessage
         """
         self.logger.warning("This method needs to be implemented!")
         return NotImplementedError
