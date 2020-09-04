@@ -9,6 +9,7 @@ from typing import Union
 from jsonschema import ValidationError
 
 from ml_wrapper.exceptions import NonSchemaConformJsonPayload
+from ml_wrapper.message_type import MessageType
 
 FILE_DIR = dirname(abspath(__file__))
 
@@ -31,24 +32,24 @@ def _validate_formal_single(json_object: Union[str, dict], against=ANALYSES_FORM
     jsonschema.validate(json_object, against)
 
 
-def validate_formal(json_object: Union[str, dict]) -> bool:
+def validate_formal(json_object: Union[str, dict]) -> Union[None, MessageType]:
     """
     Validates a json dictionary or a json string against the formal json schemas
     @param json_object: str or dict
     @raises NonSchemaConformJsonPayload
     """
-    validation_worked = False
+    validation_type_result = None
     validation_error = []
     try:
         _validate_formal_single(json_object, ANALYSES_FORMAL)
-        validation_worked = True
+        validation_type_result = MessageType.ANALYSES
     except ValidationError as error:
         validation_error.append(error.message)
     try:
         _validate_formal_single(json_object, DATA_FORMAL)
-        validation_worked = True
+        validation_type_result = MessageType.DATA
     except ValidationError as error:
         validation_error.append(error.message)
-    if not validation_worked:
+    if validation_type_result is None:
         raise NonSchemaConformJsonPayload("\n----\n".join(validation_error))
-    return validation_worked
+    return validation_type_result
