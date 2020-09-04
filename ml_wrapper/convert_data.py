@@ -56,11 +56,11 @@ def retrieve_data(
         raise ValueError("No valid json was provided: {}".format(error)) from error
     payload_type = payload_dict.get("type")
     metadata = None
+    timestamp = payload_dict.get("timestamp")
     if payload_type == "time_series":
         results = payload_dict.get("results")
         if results is not None:
             dataframe, columns, data = retrieve_dataframe(results)
-            timestamp = payload_dict.get("timestamp")
             # NB: timestamp should never be None
 
         else:
@@ -74,8 +74,6 @@ def retrieve_data(
             dataframe = pd.DataFrame(data=results_string, columns=column_name)
             data = results
 
-            timestamp = payload_dict.get("timestamp")
-
     elif payload_type == "multiple_time_series":
         results = payload_dict.get("results")
         if results is not None:
@@ -83,25 +81,35 @@ def retrieve_data(
 
     # assume new sensor data in this case instead of analyses results
     elif payload_type is None:
-        data = payload_dict.get("data")
-        data = list(map(list, zip(*data)))  # transpose data
-
-        columns = payload_dict.get("columns")
-        column_names = [col.get("name") for col in columns]
-        column_types = {
-            col.get("name"): JSON_TYPES.get(col.get("type")) for col in columns
-        }
-
-        dataframe = pd.DataFrame(data=data, columns=column_names)
-        dataframe = dataframe.astype(dtype=column_types)
-
-        metadata = payload_dict.get("meta")
-
-        timestamp = payload_dict.get("timestamp")
+        return retrieve_sensor_update_data(payload_dict), timestamp
     else:
         raise Exception(f"Error while reading payload type {payload_type}")
 
     return dataframe, columns, data, metadata, timestamp
+
+
+def retrieve_sensor_update_data(payload: dict):
+    """
+    This method retrieves the data of a data-formal.json payload
+    :param payload: dict
+    :return dataframe: Payload results converted to Dataframe
+    :return columns: Specification about column types and names
+    :return data: Data from payload in list-representation
+    :return metadata: List of dictionary containing metadata about the data and data acquisition
+    :return timestamp: Timestamp of the incoming message
+    """
+    data = payload.get("data")
+    data = list(map(list, zip(*data)))  # transpose data
+
+    columns = payload.get("columns")
+    column_names = [col.get("name") for col in columns]
+    column_types = {col.get("name"): JSON_TYPES.get(col.get("type")) for col in columns}
+
+    dataframe = pd.DataFrame(data=data, columns=column_names)
+    dataframe = dataframe.astype(dtype=column_types)
+
+    metadata = payload.get("meta")
+    return dataframe, columns, data, metadata
 
 
 def resolve_data_frame(dataframe: pd.DataFrame) -> (list, list):
