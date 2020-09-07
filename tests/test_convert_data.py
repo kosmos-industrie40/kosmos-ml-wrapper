@@ -212,7 +212,8 @@ class TestDataRetrieval(unittest.TestCase):
         with open(join(JSON_PATH, "data-example-2.json")) as file:
             sensor_payload = file.read()
 
-        data_frame, columns, data, metadata, timestamp = retrieve_data(sensor_payload)
+        data_frame, columns, data, metadata = retrieve_data(sensor_payload)
+        timestamp = sensor_payload.get("timestamp")
         self.assertIsInstance(data_frame, pd.DataFrame)
         self.assertIsInstance(columns, list)
         self.assertIsInstance(data, list)
