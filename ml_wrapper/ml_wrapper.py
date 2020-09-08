@@ -6,10 +6,10 @@ and configuration for MQTT messaging.
 
 import logging
 import abc
+import re
 import sys
 from multiprocessing.pool import ThreadPool
 import os
-import json
 from typing import Union, List
 import traceback
 import pandas as pd
@@ -17,11 +17,15 @@ import paho.mqtt.client as mqtt
 from paho.mqtt.client import MQTTMessage, Client
 from iniparser import Config
 
-from .exceptions import EmptyResult, InvalidType, NotYetRetrieved
+from .exceptions import (
+    EmptyResult,
+    InvalidType,
+    NotInitialized,
+    NonSchemaConformJsonPayload,
+)
 from .messaging import IncomingMessage, OutgoingMessage
 from .result_type import ResultType
 
-from .convert_data import retrieve_data, resolve_data
 from .log_level import LOG_LEVEL
 
 FILE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -75,22 +79,22 @@ class MLWrapper(abc.ABC):
             "Resulttype needs to be either of 'text', 'time_series', or"
             " 'multiple_time_series'."
         )
-        self.resulttype = result_type
-        self.config = Config(mode="all_allowed").scan(FILE_DIR, True).read()
+        self.result_type = result_type
+        self._config = Config(mode="all_allowed").scan(FILE_DIR, True).read()
         self.logger_ = logging.getLogger(logger_name or __name__)
         if not self.logger_.handlers:
             handler = logging.StreamHandler(sys.stdout)
             handler.setLevel(log_level)
             handler.setFormatter(
                 logging.Formatter(
-                    "%(asctime)s\t%(levelname)-10s"
-                    " %(processName)s\t%(name)s:\t%(message)s"
+                    "%(asctime)s\t%(filename)-20sline %(lineno)-4d %(levelname)s"
+                    ": \t%(message)s"
                 )
             )
             self.logger_.addHandler(handler)
         self.logger_.propagate = False
-        self.logger.debug("The config is: %s", str(self.config.config_rendered))
-        self.config = self.config.config_rendered
+        self.logger.debug("The config is: %s", str(self._config.config_rendered))
+        self.config = self._config.config_rendered
         self.client = None
         self.thread_pool = ThreadPool(
             int(self.config["config"]["threading"]["pool_num"])
@@ -157,22 +161,32 @@ class MLWrapper(abc.ABC):
         raise type(err)(err)
 
     # client and user_data are expected arguments by mqtt client
-    # pylint: disable=unused-argument
+    # pylint: disable=unused-argument,broad-except
     def _react_to_message(
         self, client: Client, user_data: Union[None, str], message: MQTTMessage
-    ) -> IncomingMessage:
+    ):
         """ This method is the entry point when a message is received. """
         self.logger.debug("Message received: %s", format(str(message.payload)))
-        in_message = IncomingMessage()
+        in_message = IncomingMessage(logger=self.logger)
+        self.logger.debug("Message is now referenced by %s", in_message.mid)
         try:
+            self.logger.info(in_message)
             in_message.mqtt_message = message
-        except (EmptyResult, InvalidType) as error:
-            self.logger.error(error)
+            self.logger.info(in_message)
+        except (EmptyResult, InvalidType, NonSchemaConformJsonPayload) as error:
+            self.logger.error("%s:\n%s", error.__class__.__name__, error)
+            return
+        except Exception as error:
+            self.logger.error(
+                "The exception %s has to be handled!\n%s",
+                error.__class__.__name__,
+                error,
+            )
             return
         self.logger.debug("Start the threaded run of the ML Tool")
         self.async_result = self.thread_pool.apply_async(
             self._run,
-            in_message,
+            [in_message],
             callback=self.prompt,
             error_callback=self.error_prompt,
         )
@@ -180,87 +194,133 @@ class MLWrapper(abc.ABC):
         self.logger.debug("closed and joined pool")
 
     # Can be reimplemented by user, and can then gain self-use
-    def retrieve_payload_data(
-        self, topic: str, payload: str
-    ) -> (Union[pd.DataFrame, None], list, list, Union[dict, list, None], str, str):
+    def retrieve_payload_data(self, in_message: IncomingMessage) -> IncomingMessage:
         """
-        Convert the data contained in an MQTT message payload
-        to a usable format for ML applications.
+        This method allows you to retrieve additional information or to temper with the
+        automatically parsed information in the IncomingMessage object.
 
-        :param topic: MQTT message topic as a string
-        :param payload: MQTT message payload as a string
-        :returns dataframe: Payload results converted to Dataframe
-        :return columns: Specification about column types and names
-        :return data: Data from payload in list-representation
-        :return metadata: List of dictionaries containing metadata about
-            the data and data acquisition
-        :return timestamp: Timestamp the trigger message
-        :return topic: MQTT message topic as a string
+        The recomended way of adding information is to use the in_message's field
+        in_message.custom_information_field to store your own information and pass it to the
+        other functions.
+
+        @param in_message: IncomingMessage
+        @return: IncomingMessage
         """
-        dataframe, columns, data, metadada, timestamp = retrieve_data(payload)
-        return dataframe, columns, data, metadada, timestamp, topic
+        self.logger.debug(in_message.id_ref)
+        self.logger.debug("Retrieve data")
+        return in_message
 
     # Can be reimplemented by user, and can then gain self-use
-    # TODO: Define OutgoingMessage to ease information sharing
     def resolve_result_data(
-        self, data: Union[list, pd.DataFrame, dict], resulttype: ResultType
-    ) -> dict:
+        self,
+        result: Union[pd.DataFrame, List[pd.DataFrame], dict],
+        out_message: OutgoingMessage,
+    ) -> OutgoingMessage:
         """
-        Formats the result from the analysis workflow so that it is
-        usable as json payload.
+        This method automatically resolves the data results into a valid payload. If your case
+        is not covered by the standard cases, we highly recommend to discuss to include this into
+        the ML Wrapper. If you need to update some fields manually, you can do this here.
 
-        FIXME: Analysis output for 'text' resulttype still not entirely clear.
-        Need to discuss the data structure of such a function's returned data structure.
-        https://gitlab.inovex.de/proj-kosmos/kosmos-mqtt-reaction/-/issues/5
+        This function has to return an OutgoingMessage object. After this method, only the
+        out_message.payload getter is called. So if you want to change or temper with the
+        payload, you can set the out_message's payload here. However, be aware that only
+        valid jsons will be accepted to write to the payload.
 
-        :param data: The data to be resolved
-        :param resulttype: The type of the return value of the analysis function.
-            Can either be "text", "time_series", or "multiple_time_series".
-        :return schema: Dictionary containing the analysis result in a structure
-            that conforms to the defined json schema.
+        If you want to overwrite this method we encourage you to use the following procedure as
+        example for the text result case:
+        .. highlight:: python
+        .. code-block:: python
+
+            out_message = super().resolve_result_data(result, out_message)
+            payload_dict = out_message.payload_as_json_dict
+            payload_dict["results"]["total"] = "tempered result"
+            out_message.payload = payload_dict
+
+        This way you will only change the dictionary where required and make sure you have a
+        valid json.
+
+        @param result: result of the run method
+        @param out_message: OutgoingMessage
+        @return: OutgoingMessage
         """
+        self.logger.debug(out_message.in_message.id_ref)
         self.logger.debug("Resolving data")
-        self.logger.debug(str(data))
-        schema = resolve_data(data, resulttype.value)
-        return schema
+        out_message.set_results(result, result_type=self.result_type)
+        return out_message
 
-    def _run(self, in_message: IncomingMessage):
+    def _run(self, in_message: IncomingMessage) -> OutgoingMessage:
         """
         Wrapper around the actual run method.
-        Executes run() and passes its result to and MQTT message.
+        Executes run() and passes its result to a MQTT message.
         """
+        self.logger.debug(in_message.id_ref)
         self.logger.debug("Start ML tool...")
-        result = self.run(in_message)
-        self.logger.debug("End ML tool")
-        payload = self._publish_result_message(result)
-        return payload
-
-    def _publish_result_message(self, payload):
-        """ This method is called when the run process is done and the result is to be published """
-        payload = self.resolve_result_data(payload, self.resulttype)
-        self.client.publish(
-            self.config["config"]["messaging"]["result_topic"],
-            payload=json.dumps(payload),
+        out_message = OutgoingMessage(
+            self.retrieve_payload_data(in_message),
+            base_topic=self._config.get(
+                "messaging", "base_result_topic", default="kosmos/analyses/"
+            ),
         )
-        return payload
+        result = self.run(out_message)
+        if not any([isinstance(result, dtype) for dtype in [pd.DataFrame, list, dict]]):
+            raise TypeError(
+                "The run method has to provide a DataFrame, a list of DataFrames or a dictionary"
+            )
+        self.logger.debug("End ML tool")
+        out_message = self.resolve_result_data(result, out_message)
+        try:
+            out_message.payload
+        except NotInitialized as error:
+            self.logger.error(error)
+            self.logger.error(
+                "You need to specify the payload. If you overwrite the "
+                "resolve_result_data method, please make sure to provide "
+                "the payload manually!"
+            )
+            return None
+        out_message = self._publish_result_message(out_message)
+        return out_message
+
+    def _publish_result_message(
+        self,
+        out_message: OutgoingMessage,
+    ) -> OutgoingMessage:
+        """This method is called when the run process is done and the result is to be published
+        @param out_message: OutgoingMessage
+        @return: OutgoingMessage
+        """
+        self.logger.debug(out_message.in_message.id_ref)
+        self.logger.debug("Publish the result to %s", out_message.topic)
+        payload = out_message.payload
+        if re.match(r"/?kosmos/analyses/[^/]+", out_message.topic) is None:
+            self.logger.warning(
+                "You are using an undefined topic %s. Please consider either correcting "
+                "your publishing topic or open an issue for the ML Wrapper to include "
+                "the new topic into the logic.",
+                out_message.topic,
+            )
+        self.client.publish(
+            topic=out_message.topic,
+            payload=payload,
+        )
+        return out_message
 
     @abc.abstractmethod
-    def run(self, in_message: IncomingMessage) -> OutgoingMessage:
+    def run(
+        self, out_message: OutgoingMessage
+    ) -> Union[pd.DataFrame, List[pd.DataFrame], dict]:
         """
-        Interface for ML function.
+        The run method executes your actual ML Logic.
 
-        Arguments need to conform to the outputs of
-        self.retrieve_payload_data().
-        Likewise, outputs need to conform to the arguments of
-        self.resolve_payload_data().
+        Here you can start your calculations/functions and collect the results.
+        The out_message object is the one that should be returned. You will be able to pass
+        some standard results using the OutgoingMessage Class directly, or if you need to specify
+        the outgoing payload more, you can overwrite the resolve_result_data method.
 
-        In simplified terms, this will be called like the following:
-        retrieved_data = self.retrieve_payload_data()
-        result = self.run(*retrieved_data)
-        message_payload = self.resolve_payload_data(result).
+        Please note, that you can access the incomingMessage object with out_message.in_message.
 
-        :param in_message: IncomingMessage
-        :return: OutgoingMessage
+        @param out_message: OutgoingMessage
+        @return: OutgoingMessage
         """
         self.logger.warning("This method needs to be implemented!")
         return NotImplementedError
