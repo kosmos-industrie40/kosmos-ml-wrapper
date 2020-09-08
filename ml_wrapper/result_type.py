@@ -19,4 +19,5 @@ class ResultType(Enum):
         Release the value2member_map function
         @return: dict
         """
+        # pylint: disable=no-member
         return cls._value2member_map_
