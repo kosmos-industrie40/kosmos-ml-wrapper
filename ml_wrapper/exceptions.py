@@ -33,12 +33,6 @@ class InvalidTopic(Exception):
     """
 
 
-class NotYetImplemented(Exception):
-    """
-    TODO: Delete...
-    """
-
-
 class NonSchemaConformJsonPayload(Exception):
     """
     This exception descirbes the error of a json object, that does not conform to the defined

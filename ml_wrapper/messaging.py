@@ -397,7 +397,6 @@ class IncomingMessage:
 class OutgoingMessage:
     """
     Outgoing Message object
-    TODO: Finish
     """
 
     def __init__(
