@@ -19,6 +19,7 @@ class MockMqttClient:
         ), "Please overwrite the clients on_message property with your custom function"
         msg = MQTTMessage
         msg.payload = message
+        msg.topic = "kosmos/analytics/mock_model/mock_tag"
         # pylint: disable=not-callable
         self.on_message(client, None, msg)
 

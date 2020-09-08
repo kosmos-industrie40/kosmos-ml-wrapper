@@ -1,12 +1,13 @@
 """
 This module implements a basic ML Wrapper Mock
 """
+import os
 import time
 from typing import Union, List
 import logging
 import pandas as pd
 
-from ml_wrapper import MLWrapper, ResultType
+from ml_wrapper import MLWrapper, ResultType, IncomingMessage, OutgoingMessage
 from ml_wrapper.mock_mqtt_client import MockMqttClient
 
 
@@ -15,7 +16,7 @@ class FFT(MLWrapper):
 
     def __init__(self):
         """Constructor"""
-        super().__init__(log_level=logging.INFO, logger_name="Mock FFT")
+        super().__init__(log_level=logging.DEBUG, logger_name="Mock FFT")
         self.logger.debug(type(self))
         self.logger.debug(self.config)
 
@@ -24,17 +25,36 @@ class FFT(MLWrapper):
         self.client = MockMqttClient(self.logger)
 
     def run(
-        self,
-        dataframe: Union[str, pd.DataFrame, None] = None,
-        columns: List[dict] = None,
-        data: List[dict] = None,
-        metadada: Union[List[dict], None] = None,
-        timestamp: str = None,
-        topic: str = None,
-    ) -> Union[str, pd.DataFrame]:
+        self, out_message: OutgoingMessage
+    ) -> Union[pd.DataFrame, List[pd.DataFrame], dict]:
         """Simple run step"""
         self.logger.debug("Starting run method")
         time.sleep(2)
+        dataframe = out_message.in_message.retrieved_data
+        dataframe["triple"] = dataframe["time"] * 3
+        dataframe["time as text"] = dataframe["time"].astype(str)
+        return dataframe
+
+
+class BadTopicTool(MLWrapper):
+    """Mocked FFT class"""
+
+    def __init__(self):
+        """Constructor"""
+        os.environ["CONFIG_MESSAGING_BASE_RESULT_TOPIC"] = "this/isnotcorrect"
+        super().__init__(log_level=logging.DEBUG, logger_name="Mock FFT")
+
+    def _init_mqtt(self):
+        """ Initialise a mock mqtt client """
+        self.client = MockMqttClient(self.logger)
+
+    def run(
+        self, out_message: OutgoingMessage
+    ) -> Union[pd.DataFrame, List[pd.DataFrame], dict]:
+        """Simple run step"""
+        self.logger.debug("Starting run method")
+        time.sleep(2)
+        dataframe = out_message.in_message.retrieved_data
         dataframe["triple"] = dataframe["time"] * 3
         dataframe["time as text"] = dataframe["time"].astype(str)
         return dataframe
@@ -52,15 +72,9 @@ class SlowMLTool(MLWrapper):
         self.client = MockMqttClient(self.logger)
 
     def run(
-        self,
-        dataframe: Union[str, pd.DataFrame, None] = None,
-        columns: List[dict] = None,
-        data: List[dict] = None,
-        metadada: Union[List[dict], None] = None,
-        timestamp: str = None,
-        topic: str = None,
-    ) -> Union[str, pd.DataFrame]:
-        """ Run method implementation """
+        self, out_message: OutgoingMessage
+    ) -> Union[pd.DataFrame, List[pd.DataFrame], dict]:
+        """Run method implementation"""
         time.sleep(5)
         return "Done"
 
@@ -72,7 +86,7 @@ class ResultTypeTool(MLWrapper):
         """ Constructor """
         super().__init__(
             result_type=ResultType.MULTIPLE_TIME_SERIES,
-            log_level=logging.INFO,
+            log_level=logging.DEBUG,
             logger_name="Result Type Logger",
         )
 
@@ -81,15 +95,9 @@ class ResultTypeTool(MLWrapper):
         self.client = MockMqttClient(self.logger)
 
     def run(
-        self,
-        dataframe: Union[str, pd.DataFrame, None] = None,
-        columns: List[dict] = None,
-        data: List[dict] = None,
-        metadada: Union[List[dict], None] = None,
-        timestamp: str = None,
-        topic: str = None,
-    ) -> Union[str, pd.DataFrame]:
-        """ Run method implementation """
+        self, out_message: OutgoingMessage
+    ) -> Union[pd.DataFrame, List[pd.DataFrame], dict]:
+        """Run method implementation"""
         return "Done"
 
 
@@ -98,21 +106,17 @@ class BadMLTool(MLWrapper):
 
     def __init__(self):
         """ Constructor """
-        super().__init__(log_level=logging.INFO)
+        super().__init__(log_level=logging.DEBUG)
 
     def _init_mqtt(self):
         """ Initialise a mock mqtt client """
         self.client = MockMqttClient(self.logger)
 
     def run(
-        self,
-        dataframe: Union[str, pd.DataFrame, None] = None,
-        columns: List[dict] = None,
-        data: List[dict] = None,
-        metadada: Union[List[dict], None] = None,
-        timestamp: str = None,
-        topic: str = None,
-    ) -> Union[str, pd.DataFrame]:
-        """ Run method implementation """
+        self, out_message: OutgoingMessage
+    ) -> Union[pd.DataFrame, List[pd.DataFrame], dict]:
+        """Run method implementation"""
+        dataframe = out_message.in_message.retrieved_data
+        columns = out_message.in_message.columns
         self.logger.debug(dataframe, columns)
         return "Done"

@@ -9,7 +9,12 @@ import pandas as pd
 import numpy as np
 import jsonschema
 
-from ml_wrapper.convert_data import resolve_data, resolve_data_frame, retrieve_data
+from ml_wrapper.convert_data import (
+    resolve_data_frame,
+    retrieve_dataframe,
+    retrieve_sensor_update_data,
+)
+from ml_wrapper.json_provider import *
 
 JSON_PATH = join(dirname(__file__), "..", "docs", "MqttPayloads")
 
@@ -27,80 +32,10 @@ def create_df():
     return pdf
 
 
-class TestDataResolve(unittest.TestCase):
-    """ Testcase for the Retrieval of data """
-
-    def provide_admin_data(self):
-        # NB: Need to handle signing and so on in ml wrapper class
-        # Use sample data as a stand-in for testing
-        now_iso = datetime.datetime.utcnow().isoformat(sep="T")
-        payload = {
-            "from": "something",
-            "timestamp": now_iso,
-            "calculated": {
-                "message": {"machine": "huckleberry", "sensor": "finn"},
-                "received": now_iso,
-            },
-            "model": {"url": "to/the/infinity", "tag": "and/beyond"},
-        }
-        return payload
-
-    def test_send_time_series(self):
-        data_frame = create_df()
-
-        payload = resolve_data(data_frame, "time_series")
-
-        with open(join(JSON_PATH, "analyses-formal.json")) as file:
-            schema = json.load(file)
-
-        payload.update(self.provide_admin_data())
-        jsonschema.validate(payload, schema)
-
-    def test_send_multiple_time_series(self):
-        df_list = []
-        for _ in range(4):
-            data_frame = create_df()
-            df_list.append(data_frame)
-
-        payload = resolve_data(df_list, "multiple_time_series")
-
-        with open(join(JSON_PATH, "analyses-formal.json")) as file:
-            schema = json.load(file)
-
-        payload.update(self.provide_admin_data())
-        jsonschema.validate(payload, schema)
-
-    def test_send_text(self):
-        with open(join(JSON_PATH, "analyses-formal.json")) as file:
-            schema = json.load(file)
-
-        data1 = {"foo": "bar"}
-        self.assertRaises(Exception, resolve_data, data1, "text")
-
-        data2 = {"total": "something"}
-        self.assertRaises(Exception, resolve_data, data2, "text")
-
-        data = {"total": "foo", "predict": 987, "anything": {"More": "Data"}}
-        payload = resolve_data(data, "text")
-
-        payload.update(self.provide_admin_data())
-        jsonschema.validate(payload, schema)
-
-    def test_send_something(self):
-        data1 = {"foo": "bar"}
-        self.assertRaises(Exception, resolve_data, data1, "something")
-
-    def test_send_string(self):
-        data_frame = create_df()
-        data_frame = data_frame.astype(str)
-
-        payload = resolve_data(data_frame, "time_series")
-
-        with open(join(JSON_PATH, "analyses-formal.json")) as file:
-            schema = json.load(file)
-
-        payload.update(self.provide_admin_data())
-        jsonschema.validate(payload, schema)
+class TestDataRetrievalAndResolve(unittest.TestCase):
+    """
+    Test Case for data retrieval
+    """
 
     def test_resolve_dataframe(self):
         data = pd.DataFrame(
@@ -140,36 +75,35 @@ class TestDataResolve(unittest.TestCase):
             )
         )
 
-
-class TestDataRetrieval(unittest.TestCase):
-    """
-    Test Case for data retrieval
-    """
-
     def test_analysis_time_series(self):
         # test analysis time series
-        with open(join(JSON_PATH, "analyses-example-time_series.json")) as file:
-            time_series_payload = file.read()
 
-        data_frame, columns, data, metadata, timestamp = retrieve_data(
-            time_series_payload
+        data_frame, columns, data = retrieve_dataframe(
+            JSON_ANALYSE_TIME_SERIES.get("results")
         )
+        timestamp = JSON_ANALYSE_TIME_SERIES.get("timestamp")
         self.assertIsInstance(data_frame, pd.DataFrame)
         self.assertIsInstance(columns, list)
         self.assertIsInstance(data, list)
-        self.assertTrue(metadata is None)
         self.assertIsInstance(timestamp, str)
+
+    def test_analysis_multiple_time_series(self):
+        # test analysis time series
+        print(JSON_ANALYSE_MULTIPLE_TIME_SERIES)
+        timestamp = JSON_ANALYSE_MULTIPLE_TIME_SERIES.get("timestamp")
+        self.assertIsInstance(timestamp, str)
+        for result in JSON_ANALYSE_MULTIPLE_TIME_SERIES.get("results"):
+            data_frame, columns, data = retrieve_dataframe(result)
+            self.assertIsInstance(data_frame, pd.DataFrame)
+            self.assertIsInstance(columns, list)
+            self.assertIsInstance(data, list)
 
     def test_analysis_text(self):
         # test analysis text
-        with open(join(JSON_PATH, "analyses-example-text.json")) as file:
-            text_payload = file.read()
-
-        data_frame, columns, data, metadata, timestamp = retrieve_data(text_payload)
-        self.assertIsInstance(data_frame, pd.DataFrame)
-        self.assertIsInstance(columns, list)
+        print(JSON_ANALYSE_TEXT)
+        data = JSON_ANALYSE_TEXT.get("results")
+        timestamp = JSON_ANALYSE_TEXT.get("timestamp")
         self.assertIsInstance(data, dict)
-        self.assertTrue(metadata is None)
         self.assertIsInstance(timestamp, str)
 
     # def test_analysis_mutliple_time_series(self):
@@ -184,22 +118,20 @@ class TestDataRetrieval(unittest.TestCase):
     #     self.assertTrue(metadata is None)
     #     self.assertIsInstance(timestamp, str)
 
-    def test_retrieval_of_dataframe(self):
-        with open(join(JSON_PATH, "data-example-3.json")) as file:
-            sensor_payload = file.read()
-        print(sensor_payload)
-        data_frame, _, _, _, _ = retrieve_data(sensor_payload)
+    def test_dataframe_types_retrieval(self):
+        print(JSON_DATA_EXAMPLE_3)
+        data_frame, _, _, _ = retrieve_sensor_update_data(JSON_DATA_EXAMPLE_3)
         self.assertEqual(
             data_frame.dtypes.tolist(), ["float64", "float64", "datetime64[ns]"]
         )
 
     def test_sensor_without_metadata(self):
         # test sensor data w/o metadata
-        with open(join(JSON_PATH, "data-example.json")) as file:
-            sensor_payload = file.read()
-
-        print(sensor_payload)
-        data_frame, columns, data, metadata, timestamp = retrieve_data(sensor_payload)
+        print(JSON_DATA_EXAMPLE)
+        data_frame, columns, data, metadata = retrieve_sensor_update_data(
+            JSON_DATA_EXAMPLE
+        )
+        timestamp = JSON_DATA_EXAMPLE.get("timestamp")
         self.assertIsInstance(data_frame, pd.DataFrame)
         self.assertIsInstance(columns, list)
         self.assertIsInstance(data, list)
@@ -209,11 +141,11 @@ class TestDataRetrieval(unittest.TestCase):
 
     def test_sensor_with_metadata(self):
         # test sensor data w/ metadata
-        with open(join(JSON_PATH, "data-example-2.json")) as file:
-            sensor_payload = file.read()
 
-        data_frame, columns, data, metadata = retrieve_data(sensor_payload)
-        timestamp = sensor_payload.get("timestamp")
+        data_frame, columns, data, metadata = retrieve_sensor_update_data(
+            JSON_DATA_EXAMPLE_2
+        )
+        timestamp = JSON_DATA_EXAMPLE_2.get("timestamp")
         self.assertIsInstance(data_frame, pd.DataFrame)
         self.assertIsInstance(columns, list)
         self.assertIsInstance(data, list)

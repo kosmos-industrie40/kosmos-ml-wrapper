@@ -2,11 +2,11 @@
 This file provides tests for the helper file
 """
 import json
+import unittest
 from os.path import dirname, abspath, join
 from unittest import TestCase
 
-from ml_wrapper import NonSchemaConformJsonPayload, validate_formal
-
+from ml_wrapper import NonSchemaConformJsonPayload, validate_formal, validate_trigger
 
 FILE_DIR = dirname(abspath(__file__))
 
@@ -17,6 +17,12 @@ with open(join(SCHEMA_DIR, "analyses-example-time_series.json")) as file:
 
 with open(join(SCHEMA_DIR, "data-example-3.json")) as file:
     DATA_EXAMPLE = json.load(file)
+
+with open(join(SCHEMA_DIR, "ml-analyses-example.json")) as file:
+    ML_ANALYSES = json.load(file)
+
+with open(join(SCHEMA_DIR, "ml-update-example.json")) as file:
+    ML_DATA = json.load(file)
 
 
 class Test(TestCase):
@@ -33,3 +39,17 @@ class Test(TestCase):
         self.assertRaises(NonSchemaConformJsonPayload, validate_formal, bad_analyses)
         del bad_analyses["timestamp"]
         self.assertRaises(NonSchemaConformJsonPayload, validate_formal, bad_analyses)
+
+    def test_validate_trigger(self):
+        analyses = dict(ML_ANALYSES)
+        data = dict(ML_DATA)
+        analyses["payload"] = ANALYSES_EXAMPLE_TIME_SERIES
+        data["payload"] = DATA_EXAMPLE
+        validate_trigger(analyses)
+        validate_trigger(data)
+        analyses["payload"] = "corrupt"
+        self.assertRaises(NonSchemaConformJsonPayload, validate_trigger, analyses)
+
+
+if __name__ == "__main__":
+    unittest.main()
