@@ -27,6 +27,12 @@ class EmptyResult(Exception):
     """
 
 
+class InvalidTopic(Exception):
+    """
+    Represents the error case that a topic is invalid
+    """
+
+
 class NotYetImplemented(Exception):
     """
     TODO: Delete...
