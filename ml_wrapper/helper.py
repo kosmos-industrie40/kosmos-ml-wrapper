@@ -107,7 +107,7 @@ def find_result_type(result) -> ResultType:
 
 def topic_splitter(topic_string: str, sep: str = ",") -> List[str]:
     """
-    Splits topic string into topics by separator sep
+    Splits topic string into topics by separator sep.
     @param sep: str
     @param topic_string: str
     @return: List[str]
