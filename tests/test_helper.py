@@ -6,7 +6,11 @@ import unittest
 from os.path import dirname, abspath, join
 from unittest import TestCase
 
-from ml_wrapper import NonSchemaConformJsonPayload, validate_formal, validate_trigger
+from ml_wrapper.helper import (
+    NonSchemaConformJsonPayload,
+    validate_formal,
+    validate_trigger,
+)
 
 FILE_DIR = dirname(abspath(__file__))
 

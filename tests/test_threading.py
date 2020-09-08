@@ -1,11 +1,10 @@
 """ This module tests the threading behaviour """
 import unittest
 import json
-from os.path import dirname, join
 
 from paho.mqtt.client import MQTTMessage
 
-from tests.mock_ml_function import SlowMLTool
+from tests.mock_ml_tools import SlowMLTool
 from ml_wrapper.json_provider import JSON_ML_ANALYSE_TIME_SERIES
 
 

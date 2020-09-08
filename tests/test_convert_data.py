@@ -2,19 +2,23 @@
 This module tests the conversion of the data
 """
 import unittest
-import json
-import datetime
 from os.path import dirname, join
 import pandas as pd
 import numpy as np
-import jsonschema
 
+from ml_wrapper.json_provider import (
+    JSON_ANALYSE_TIME_SERIES,
+    JSON_ANALYSE_MULTIPLE_TIME_SERIES,
+    JSON_ANALYSE_TEXT,
+    JSON_DATA_EXAMPLE_3,
+    JSON_DATA_EXAMPLE,
+    JSON_DATA_EXAMPLE_2,
+)
 from ml_wrapper.convert_data import (
     resolve_data_frame,
     retrieve_dataframe,
     retrieve_sensor_update_data,
 )
-from ml_wrapper.json_provider import *
 
 JSON_PATH = join(dirname(__file__), "..", "docs", "MqttPayloads")
 
@@ -105,18 +109,6 @@ class TestDataRetrievalAndResolve(unittest.TestCase):
         timestamp = JSON_ANALYSE_TEXT.get("timestamp")
         self.assertIsInstance(data, dict)
         self.assertIsInstance(timestamp, str)
-
-    # def test_analysis_mutliple_time_series(self):
-    #     # test analysis time series
-    #     with open(join(JSON_PATH, "analyses-example-multiple_time_series.json")) as f:
-    #         time_series_payload = f.read()
-
-    #     df, columns, data, metadata, timestamp = retrieve_data(time_series_payload)
-    #     self.assertIsInstance(df, list)
-    #     self.assertIsInstance(columns, list)
-    #     self.assertIsInstance(data, list)
-    #     self.assertTrue(metadata is None)
-    #     self.assertIsInstance(timestamp, str)
 
     def test_dataframe_types_retrieval(self):
         print(JSON_DATA_EXAMPLE_3)

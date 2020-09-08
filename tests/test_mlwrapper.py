@@ -1,33 +1,22 @@
 """
 This module is testing the general ML Wrapper behaviour
 """
-import logging
+# pylint: disable=wrong-import-position
 import os
 import unittest
 import json
-from os.path import dirname, join
 from time import sleep
 
 from paho.mqtt.client import MQTTMessage
-from pandas import DataFrame
 
 os.environ["CONFIG_LOGGING_LOG_LEVEL"] = "DEBUG"
 
-from ml_wrapper import (
-    MLWrapper,
-    ResultType,
-    NonSchemaConformJsonPayload,
-    IncomingMessage,
-)
-from tests.mock_ml_function import FFT, ResultTypeTool, BadMLTool, BadTopicTool
-
+from ml_wrapper.ml_wrapper import MLWrapper
+from ml_wrapper.result_type import ResultType
+from ml_wrapper.messaging import IncomingMessage
+from ml_wrapper.exceptions import NonSchemaConformJsonPayload
 from ml_wrapper.json_provider import JSON_ML_ANALYSE_TIME_SERIES
-
-JSON_PATH = join(dirname(__file__), "..", "docs", "MqttPayloads")
-
-
-os.environ["CONFIG_LOGGING_LOG_LEVEL"] = "DEBUG"
-logging.basicConfig(level=logging.DEBUG)
+from tests.mock_ml_tools import FFT, ResultTypeTool, BadMLTool, BadTopicTool
 
 
 class TestMLWrapper(unittest.TestCase):
@@ -35,9 +24,11 @@ class TestMLWrapper(unittest.TestCase):
     Testcase for the ML Wrapper tests
     """
 
+    # pylint: disable=attribute-defined-outside-init
     def get_mltool(self):
         self.mlw = FFT()
 
+    # pylint: disable=attribute-defined-outside-init
     def get_message(self):
         msg = MQTTMessage
         msg.topic = "kosmos/analytics/model/tag"

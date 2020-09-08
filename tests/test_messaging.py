@@ -4,21 +4,36 @@ Unittests for the Messaging/Information class
 import json
 import logging
 import unittest
-from os.path import dirname, join, abspath
 from unittest import TestCase
 import pandas as pd
 
-from iniparser import Config
 from paho.mqtt.client import MQTTMessage
 
-from ml_wrapper import ResultType
+from ml_wrapper import (
+    ResultType,
+    JSON_ML_ANALYSE_TIME_SERIES,
+    JSON_ML_ANALYSE_MULTIPLE_TIME_SERIES,
+    JSON_ML_ANALYSE_TEXT,
+    JSON_ML_DATA_EXAMPLE,
+    JSON_ANALYSE_TEXT,
+    JSON_ANALYSE_TIME_SERIES,
+    JSON_ANALYSE_MULTIPLE_TIME_SERIES,
+    JSON_ML_DATA_EXAMPLE_2,
+    JSON_ML_DATA_EXAMPLE_3,
+    JSON_DATA_EXAMPLE,
+    JSON_DATA_EXAMPLE_2,
+    JSON_DATA_EXAMPLE_3,
+)
 from ml_wrapper.exceptions import NotInitialized, NonSchemaConformJsonPayload
 from ml_wrapper.messaging import IncomingMessage, OutgoingMessage
 
-from ml_wrapper.json_provider import *
+# from ml_wrapper.json_provider import *
 
 
+# pylint: disable=super-init-not-called
 class MQTTMessageMock(MQTTMessage):
+    """ Mocking Message """
+
     def __init__(self, topic, payload):
         self.topic = topic
         self.payload = payload
@@ -31,6 +46,7 @@ class TestInformation(TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
+        """ Sets up test messages """
         cls.inf_uninitialized = IncomingMessage(logger=logging.getLogger(__file__))
         cls.inf_initialized_analyses_time_series = IncomingMessage(
             logger=logging.getLogger(__file__)
@@ -60,6 +76,7 @@ class TestInformation(TestCase):
         )
 
     def initialize(self):
+        """ Initializes messages when required """
         self.inf_initialized_data.mqtt_message = self.message_data
         self.inf_initialized_analyses_time_series.mqtt_message = (
             self.message_analyses_time_series

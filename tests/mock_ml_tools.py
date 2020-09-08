@@ -7,7 +7,7 @@ from typing import Union, List
 import logging
 import pandas as pd
 
-from ml_wrapper import MLWrapper, ResultType, IncomingMessage, OutgoingMessage
+from ml_wrapper import MLWrapper, ResultType, OutgoingMessage
 from ml_wrapper.mock_mqtt_client import MockMqttClient
 
 
