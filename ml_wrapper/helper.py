@@ -2,8 +2,9 @@
 This class provides helper functions
 """
 import json
+import re
 
-from typing import Union
+from typing import Union, List
 
 import jsonschema
 from jsonschema import ValidationError
@@ -102,3 +103,19 @@ def find_result_type(result) -> ResultType:
         return ResultType.TEXT
     else:
         return None
+
+
+def topic_splitter(topic_string: str, sep: str = ",") -> List[str]:
+    """
+    Splits topic string into topics by separator sep
+    @param sep: str
+    @param topic_string: str
+    @return: List[str]
+    """
+    assert isinstance(topic_string, str), "I can only handle strings"
+    topic_list = topic_string.split(sep)
+    for ind, topic in enumerate(topic_list):
+        if re.match(r"/?([^/]+/|)*[^/]+/?", topic) is None:
+            raise TypeError("Topic '{}' is not a valid topic.".format(topic))
+        topic_list[ind] = topic.strip()
+    return topic_list

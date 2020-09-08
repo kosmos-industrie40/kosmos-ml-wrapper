@@ -23,6 +23,7 @@ from .exceptions import (
     NotInitialized,
     NonSchemaConformJsonPayload,
 )
+from .helper import topic_splitter
 from .messaging import IncomingMessage, OutgoingMessage
 from .result_type import ResultType
 
@@ -122,14 +123,16 @@ class MLWrapper(abc.ABC):
 
     def _subscribe(self):
         """ Subscribe the client to the config/env topic """
-        self.client.subscribe(
-            self.config["config"]["messaging"]["request_topic"],
-            qos=int(self.config["config"]["messaging"]["qos"]),
-        )
-        self.logger.info(
-            "Subscribed to topic\t %s",
-            self.config["config"]["messaging"]["request_topic"],
-        )
+        topics = topic_splitter(self.config["config"]["messaging"]["request_topic"])
+        for topic in topics:
+            self.client.subscribe(
+                topic=topic,
+                qos=int(self.config["config"]["messaging"]["qos"]),
+            )
+            self.logger.info(
+                "Subscribed to topic\t %s",
+                topic,
+            )
 
     def start(self):
         """
@@ -175,14 +178,14 @@ class MLWrapper(abc.ABC):
             self.logger.info(in_message)
         except (EmptyResult, InvalidType, NonSchemaConformJsonPayload) as error:
             self.logger.error("%s:\n%s", error.__class__.__name__, error)
-            return
+            raise error from error
         except Exception as error:
             self.logger.error(
                 "The exception %s has to be handled!\n%s",
                 error.__class__.__name__,
                 error,
             )
-            return
+            raise error from error
         self.logger.debug("Start the threaded run of the ML Tool")
         self.async_result = self.thread_pool.apply_async(
             self._run,

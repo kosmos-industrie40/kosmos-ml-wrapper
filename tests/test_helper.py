@@ -10,6 +10,7 @@ from ml_wrapper.helper import (
     NonSchemaConformJsonPayload,
     validate_formal,
     validate_trigger,
+    topic_splitter,
 )
 
 FILE_DIR = dirname(abspath(__file__))
@@ -53,6 +54,15 @@ class Test(TestCase):
         validate_trigger(data)
         analyses["payload"] = "corrupt"
         self.assertRaises(NonSchemaConformJsonPayload, validate_trigger, analyses)
+
+    def test_topic_splitter(self):
+        self.assertRaises(AssertionError, topic_splitter, dict(test=True))
+        topics = ["a/b/c", "a/bc", "abc/t"]
+        self.assertEqual(topics, topic_splitter(",".join(topics)))
+        self.assertEqual(topics, topic_splitter(", ".join(topics)))
+        self.assertEqual(["a", "b"], topic_splitter("a,b"))
+        self.assertEqual(["a", "b"], topic_splitter("a|b", sep="|"))
+        self.assertEqual(["a/b/c"], topic_splitter("a/b/c", sep="|"))
 
 
 if __name__ == "__main__":
