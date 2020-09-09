@@ -27,8 +27,6 @@ from ml_wrapper import (
 from ml_wrapper.exceptions import NotInitialized, NonSchemaConformJsonPayload
 from ml_wrapper.messaging import IncomingMessage, OutgoingMessage
 
-# from ml_wrapper.json_provider import *
-
 
 # pylint: disable=super-init-not-called
 class MQTTMessageMock(MQTTMessage):
@@ -144,7 +142,12 @@ class TestInformation(TestCase):
 
     def test_set_payload(self):
         self.initialize()
-        out = OutgoingMessage(self.inf_initialized_analyses_time_series)
+        out = OutgoingMessage(
+            self.inf_initialized_analyses_time_series,
+            from_="none",
+            model_url="none",
+            model_tag="none",
+        )
         out.payload = JSON_ANALYSE_TEXT
         out.payload = JSON_ANALYSE_TIME_SERIES
         out.payload = JSON_ANALYSE_MULTIPLE_TIME_SERIES
@@ -162,7 +165,11 @@ class TestInformation(TestCase):
     def test_set_results(self):
         self.initialize()
         out = OutgoingMessage(
-            self.inf_initialized_analyses_time_series, base_topic="kosmos/analytics"
+            self.inf_initialized_analyses_time_series,
+            from_="none",
+            model_tag="none",
+            model_url="none",
+            base_topic="kosmos/analytics",
         )
         out.set_results(pd.DataFrame(dict(test=[1, 2, 3])), ResultType.TIME_SERIES)
         with self.assertRaises(NonSchemaConformJsonPayload):

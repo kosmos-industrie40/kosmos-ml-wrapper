@@ -5,6 +5,7 @@ This module presents an example of a possible ML Tool Unittest using the ML Wrap
 # pylint: disable=redefined-builtin,wrong-import-position
 # pylint: disable=duplicate-code,useless-super-delegation
 import json
+import os
 
 if __name__ == "__main__" and __package__ is None:
     from sys import path as pth
@@ -12,6 +13,10 @@ if __name__ == "__main__" and __package__ is None:
 
     pth.append(dirname(pth[0]))
     __package__ = "examples"
+
+os.environ["CONFIG_MODEL_URL"] = "test"
+os.environ["CONFIG_MODEL_TAG"] = "test"
+os.environ["CONFIG_MODEL_FROM"] = "test"
 
 # This is required for you to write in order to create your own ML Tool
 

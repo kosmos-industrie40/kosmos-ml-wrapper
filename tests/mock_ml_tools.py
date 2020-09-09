@@ -1,11 +1,16 @@
 """
 This module implements a basic ML Wrapper Mock
 """
+# pylint: disable=wrong-import-position
 import os
 import time
 from typing import Union, List
 import logging
 import pandas as pd
+
+os.environ["CONFIG_MODEL_URL"] = "test"
+os.environ["CONFIG_MODEL_TAG"] = "test"
+os.environ["CONFIG_MODEL_FROM"] = "test"
 
 from ml_wrapper import MLWrapper, ResultType, OutgoingMessage
 from ml_wrapper.mock_mqtt_client import MockMqttClient

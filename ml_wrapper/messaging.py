@@ -400,7 +400,12 @@ class OutgoingMessage:
     """
 
     def __init__(
-        self, in_message: IncomingMessage, base_topic: str = "kosmos/analyses/"
+        self,
+        in_message: IncomingMessage,
+        from_: str = None,
+        model_url: str = None,
+        model_tag: str = None,
+        base_topic: str = "kosmos/analyses/",
     ):
         self._payload = None
         self.in_message = in_message
@@ -408,6 +413,12 @@ class OutgoingMessage:
         self.logger = self.in_message.logger
         self._result = None
         self._result_type = None
+        assert from_ is not None, "The variable from_ has to be set"
+        assert model_url is not None, "The variable model_url has to be set"
+        assert model_tag is not None, "The variable model_tag has to be set"
+        self.from_ = from_
+        self.model_url = model_url
+        self.model_tag = model_tag
 
     @property
     def topic(self) -> str:
@@ -498,13 +509,11 @@ class OutgoingMessage:
         resolved = dict()
         resolved["type"] = result_type.value
 
-        # pylint: disable=fixme
-        # TODO,FIXME: @junterbrink These fields are randomly set currently,
-        #  because it is not clear how to retrieve these information it yet
-        resolved["from"] = "A nonsense id, that has to be fixed"
+        # Derive ml tool specific values
+        resolved["from"] = self.from_
         resolved["model"] = dict(
-            url="This url has to be retrieved somehow",
-            tag="This tag has to be retrieved as well",
+            url=self.model_url,
+            tag=self.model_tag,
         )
         resolved["calculated"] = dict(
             message=dict(

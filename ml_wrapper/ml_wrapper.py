@@ -22,6 +22,7 @@ from .exceptions import (
     InvalidType,
     NotInitialized,
     NonSchemaConformJsonPayload,
+    ConfigNotValid,
 )
 from .helper import topic_splitter
 from .messaging import IncomingMessage, OutgoingMessage
@@ -96,6 +97,7 @@ class MLWrapper(abc.ABC):
         self.logger_.propagate = False
         self.logger.debug("The config is: %s", str(self._config.config_rendered))
         self.config = self._config.config_rendered
+        self._check_config_sanity()
         self.client = None
         self.thread_pool = ThreadPool(
             int(self.config["config"]["threading"]["pool_num"])
@@ -105,6 +107,27 @@ class MLWrapper(abc.ABC):
         self._init_mqtt()
         self.client.on_message = self._react_to_message
         self._subscribe()
+
+    def _check_config_sanity(self):
+        """ Checks the sanity of the config file at creation time """
+        assert (
+            "url" in self.config["config"]["model"]
+        ), "url needs to be set in the configuration file"
+        assert (
+            "tag" in self.config["config"]["model"]
+        ), "tag needs to be set in the configuration file"
+        assert (
+            "from" in self.config["config"]["model"]
+        ), "from needs to be set in the configuration file"
+        for field in ["url", "tag", "from"]:
+            current = self.config["config"]["model"][field]
+            if len(current) <= 0:
+                raise ConfigNotValid(
+                    "The field {} has to be set either in the configuration "
+                    "file of the MLWrapper, or with the help of the according "
+                    "environment variable. You can find all the environment variables in the "
+                    "env_ml_wrapper.md file.".format(field)
+                )
 
     @property
     def logger(self):
@@ -260,6 +283,9 @@ class MLWrapper(abc.ABC):
         self.logger.debug("Start ML tool...")
         out_message = OutgoingMessage(
             self.retrieve_payload_data(in_message),
+            from_=self._config.get("model", "from"),
+            model_tag=self._config.get("model", "tag"),
+            model_url=self._config.get("model", "url"),
             base_topic=self._config.get(
                 "messaging", "base_result_topic", default="kosmos/analyses/"
             ),

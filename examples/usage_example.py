@@ -10,12 +10,18 @@ if __name__ == "__main__" and __package__ is None:
     path.append(dir(path[0]))
     __package__ = "examples"
 
-# This is required for you to write in order to create your own ML Tool
 import os
+
+os.environ["CONFIG_MODEL_URL"] = "test"
+os.environ["CONFIG_MODEL_TAG"] = "test"
+os.environ["CONFIG_MODEL_FROM"] = "test"
+os.environ["CONFIG_LOGGING_LOG_LEVEL"] = "DEBUG"
+
+# This is required for you to write in order to create your own ML Tool
 from typing import Union, List
 import pandas as pd
 
-os.environ["CONFIG_LOGGING_LOG_LEVEL"] = "DEBUG"
+
 from ml_wrapper import MLWrapper, IncomingMessage, OutgoingMessage
 
 
