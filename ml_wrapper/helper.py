@@ -6,13 +6,11 @@ from typing import List
 
 import pandas as pd
 
-from ml_wrapper import ResultType
+from .result_type import ResultType
+from .exceptions import InvalidTopic
 
 
 # pylint: disable=no-else-return
-from ml_wrapper.exceptions import InvalidTopic
-
-
 def find_result_type(result) -> ResultType:
     """
     This method checks a few conditions to find the ResultType of a message. If none is matching,

@@ -86,13 +86,13 @@ class TestMLWrapper(unittest.TestCase):
         btt._react_to_message(None, None, self.msg)
         # btt.client.mock_a_message(btt.client, self.msg.payload)
         print(btt.async_result.ready())
-        with self.assertLogs("MOCK", level="WARNING") as cm:
+        with self.assertLogs("MOCK", level="WARNING") as log:
             while btt._async_ready():
                 print("Waiting for the tool to finish")
                 sleep(1)
         print("done")
         self.assertTrue(
-            any(["undefined topic" in msg and "consider" in msg for msg in cm.output])
+            any(["undefined topic" in msg and "consider" in msg for msg in log.output])
         )
 
 

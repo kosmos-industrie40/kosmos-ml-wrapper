@@ -1,9 +1,7 @@
 """
 This file provides tests for the helper file
 """
-import json
 import unittest
-from os.path import dirname, abspath, join
 from unittest import TestCase
 
 from ml_wrapper.helper import topic_splitter

@@ -89,7 +89,8 @@ class MLWrapper(abc.ABC):
             handler.setLevel(log_level)
             handler.setFormatter(
                 logging.Formatter(
-                    "%(asctime)s\t%(name)s\t%(filename)-20s %(funcName)-20s %(lineno)-4d %(levelname)s"
+                    "%(asctime)s\t%(name)s\t%(filename)-20s "
+                    "%(funcName)-20s %(lineno)-4d %(levelname)s"
                     ": \t%(message)s"
                 )
             )
