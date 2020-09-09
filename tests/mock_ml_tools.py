@@ -21,7 +21,7 @@ class FFT(MLWrapper):
 
     def __init__(self):
         """Constructor"""
-        super().__init__(log_level=logging.DEBUG, logger_name="Mock FFT")
+        super().__init__(log_level=logging.DEBUG, logger_name="MOCK")
         self.logger.debug(type(self))
         self.logger.debug(self.config)
 
@@ -47,7 +47,7 @@ class BadTopicTool(MLWrapper):
     def __init__(self):
         """Constructor"""
         os.environ["CONFIG_MESSAGING_BASE_RESULT_TOPIC"] = "this/isnotcorrect"
-        super().__init__(log_level=logging.DEBUG, logger_name="Mock FFT")
+        super().__init__(log_level=logging.DEBUG, logger_name="MOCK")
 
     def _init_mqtt(self):
         """ Initialise a mock mqtt client """
@@ -58,6 +58,7 @@ class BadTopicTool(MLWrapper):
     ) -> Union[pd.DataFrame, List[pd.DataFrame], dict]:
         """Simple run step"""
         self.logger.debug("Starting run method")
+        self.logger.warning("I will now calculate my stuff")
         time.sleep(2)
         dataframe = out_message.in_message.retrieved_data
         dataframe["triple"] = dataframe["time"] * 3
@@ -111,7 +112,7 @@ class BadMLTool(MLWrapper):
 
     def __init__(self):
         """ Constructor """
-        super().__init__(log_level=logging.DEBUG)
+        super().__init__(logger_name="MOCK", log_level=logging.DEBUG)
 
     def _init_mqtt(self):
         """ Initialise a mock mqtt client """

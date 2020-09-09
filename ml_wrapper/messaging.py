@@ -18,11 +18,11 @@ from paho.mqtt.client import MQTTMessage
 
 from .message_type import MessageType
 from .result_type import ResultType
-from .helper import (
+from .json_validator import (
     validate_trigger,
     validate_formal_single,
-    find_result_type,
 )
+from .helper import find_result_type
 from .convert_data import (
     retrieve_sensor_update_data,
     retrieve_dataframe,
@@ -70,7 +70,7 @@ class IncomingMessage:
 
     @property
     def mid(self):
-        """The machines unique id"""
+        """The messages unique id"""
         return self._id
 
     @property
@@ -272,7 +272,7 @@ class IncomingMessage:
         Sets the protected property for mqtt_message
         :param new_value: MQTTMessage
         """
-        self.logger.debug("1 Setter of mqtt_message")
+        self.logger.debug("Enter setter of mqtt_message")
         assert (
             inspect.isclass(new_value) and issubclass(new_value, MQTTMessage)
         ) or isinstance(
@@ -280,13 +280,10 @@ class IncomingMessage:
         ), "The value to be set has to be of type MQTTMessage, but received {}".format(
             type(new_value)
         )
-        self.logger.debug("2 Setter of mqtt_message")
         self._mqtt_message = new_value
-        self.logger.debug("3 Setter of mqtt_message")
         self._initialize_with_message()
-        self.logger.debug("4 Setter of mqtt_message")
         self._retrieve()
-        self.logger.debug("5 Setter of mqtt_message")
+        self.logger.debug("Exit setter of mqtt_message")
 
     @mqtt_message.deleter
     def mqtt_message(self):
@@ -294,15 +291,13 @@ class IncomingMessage:
         del self._mqtt_message
 
     def _initialize_with_message(self):
-        self.logger.debug("1 Initialize with set message")
+        self.logger.debug("Enter initialize with message")
         assert (
             self._mqtt_message is not None
         ), "MQTT Message needs to be set prior to this method"
-        self.logger.debug("2 Initialize with set message")
         self.payload = self.mqtt_message.payload
-        self.logger.debug("3 Initialize with set message")
         self.topic = self.mqtt_message.topic
-        self.logger.debug("4 Initialize with set message")
+        self.logger.debug("Exit initialize with message")
 
     @property
     def payload(self):
@@ -315,18 +310,16 @@ class IncomingMessage:
         Sets the protected property for payload
         :param new_value: json string
         """
-        self.logger.debug("1 Setting payload with new value")
+        self.logger.debug("Enter setter of payload")
         try:
             payload = json.loads(new_value)
         except JSONDecodeError as error:
             raise error from error
-        self.logger.debug("2 Setting payload with new value")
         type_ = None
         try:
             type_ = payload["type"]
         except KeyError as error:
             raise KeyError("The type keyword is required in the payload") from error
-        self.logger.debug("3 Setting payload with new value")
         try:
             message_type = MessageType.value2member_map()[type_]
         except KeyError as error:
@@ -337,23 +330,17 @@ class IncomingMessage:
                     "I only accept ml-formal.json conform messages".format(type_),
                 )
             ) from error
-        self.logger.debug("4 Setting payload with new value")
         try:
             validate_trigger(payload)
             # validate_formal(payload["payload"])
         except NonSchemaConformJsonPayload as error:
             raise error from error
-        self.logger.debug("5 Setting payload with new value")
         self._machine = payload.get("machine")
-        self.logger.debug("6 Setting payload with new value")
         self._sensor = payload.get("sensor")
-        self.logger.debug("7 Setting payload with new value")
         self._contract = payload.get("contract")
-        self.logger.debug("8 Setting payload with new value")
         self._message_type = message_type
-        self.logger.debug("9 Setting payload with new value")
         self._payload = payload.get("payload")
-        self.logger.debug("10 Setting payload with new value")
+        self.logger.debug("Exit setter of payload")
 
     @payload.deleter
     def payload(self):
@@ -371,14 +358,15 @@ class IncomingMessage:
         Sets the protected property for topic
         :param new_value:
         """
-        print(new_value)
+        self.logger.debug("Setting topic with %s", new_value)
         new_value = (
             str(new_value, "utf-8") if isinstance(new_value, bytes) else new_value
         )
-        assert re.match("/?kosmos/analytics/[^/]+/[^/]+", new_value) is not None, (
-            "Topic doesn't conform to the trigger "
-            "topic kosmos/analystics/<model url>/<model tag>:\n{}".format(new_value)
-        )
+        if re.match("/?kosmos/analytics/[^/]+/[^/]+", new_value) is None:
+            raise InvalidTopic(
+                "Topic doesn't conform to the trigger "
+                "topic kosmos/analystics/<model url>/<model tag>:\n{}".format(new_value)
+            )
         regex_search = re.search(
             "/?kosmos/analytics/([^/]+)/([^/]+)/?", new_value, re.IGNORECASE
         )
@@ -444,7 +432,7 @@ class OutgoingMessage:
     @property
     def payload(self) -> str:
         """ Returns the protected property for payload """
-        if not self._is_payload_set():
+        if self._payload is None:
             raise NotInitialized(
                 "The payload of the outgoing message has to be set. "
                 "You can either use the set_results method or set the "
@@ -460,7 +448,7 @@ class OutgoingMessage:
         """
         assert isinstance(
             new_value, (str, dict)
-        ), "The value to be set has to be of type str, but received {}".format(
+        ), "The value to be set has to be of type str or dict, but received {}".format(
             type(new_value)
         )
         if isinstance(new_value, dict):
@@ -553,6 +541,3 @@ class OutgoingMessage:
             datetime.datetime.utcnow().astimezone(timezone.utc).isoformat(sep="T")
         )
         self.payload = resolved
-
-    def _is_payload_set(self):
-        return self._payload is not None

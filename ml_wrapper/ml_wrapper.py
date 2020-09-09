@@ -89,7 +89,7 @@ class MLWrapper(abc.ABC):
             handler.setLevel(log_level)
             handler.setFormatter(
                 logging.Formatter(
-                    "%(asctime)s\t%(filename)-20sline %(lineno)-4d %(levelname)s"
+                    "%(asctime)s\t%(name)s\t%(filename)-20s %(funcName)-20s %(lineno)-4d %(levelname)s"
                     ": \t%(message)s"
                 )
             )
@@ -135,6 +135,13 @@ class MLWrapper(abc.ABC):
         Returns the logger instance
         """
         return self.logger_
+
+    def _async_ready(self):
+        """
+        This method is quite experimental and just intended to be used in testing
+        @return: bool
+        """
+        return self.async_result is not None and not self.async_result.ready()
 
     def _init_mqtt(self):
         """ Initialise the mqtt client """
@@ -196,9 +203,8 @@ class MLWrapper(abc.ABC):
         in_message = IncomingMessage(logger=self.logger)
         self.logger.debug("Message is now referenced by %s", in_message.mid)
         try:
-            self.logger.info(in_message)
+            self.logger.debug(in_message)
             in_message.mqtt_message = message
-            self.logger.info(in_message)
         except (EmptyResult, InvalidType, NonSchemaConformJsonPayload) as error:
             self.logger.error("%s:\n%s", error.__class__.__name__, error)
             raise error from error
@@ -320,7 +326,6 @@ class MLWrapper(abc.ABC):
         """
         self.logger.debug(out_message.in_message.id_ref)
         self.logger.debug("Publish the result to %s", out_message.topic)
-        payload = out_message.payload
         if re.match(r"/?kosmos/analyses/[^/]+", out_message.topic) is None:
             self.logger.warning(
                 "You are using an undefined topic %s. Please consider either correcting "
@@ -330,7 +335,7 @@ class MLWrapper(abc.ABC):
             )
         self.client.publish(
             topic=out_message.topic,
-            payload=payload,
+            payload=out_message.payload,
         )
         return out_message
 

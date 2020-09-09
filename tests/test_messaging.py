@@ -24,7 +24,11 @@ from ml_wrapper import (
     JSON_DATA_EXAMPLE_2,
     JSON_DATA_EXAMPLE_3,
 )
-from ml_wrapper.exceptions import NotInitialized, NonSchemaConformJsonPayload
+from ml_wrapper.exceptions import (
+    NotInitialized,
+    NonSchemaConformJsonPayload,
+    InvalidTopic,
+)
 from ml_wrapper.messaging import IncomingMessage, OutgoingMessage
 
 
@@ -133,7 +137,7 @@ class TestInformation(TestCase):
         print(self.inf_initialized_data.retrieved_data)
 
     def test_set_topic(self):
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(InvalidTopic):
             self.inf_uninitialized.topic = "/kosmos/analytics/abce.def-ghi.jkl.omn"
             self.inf_uninitialized.topic = "/kosmos/analytics/abce.def-ghi.jkl.omn/a/v0"
             self.inf_uninitialized.topic = "/kosmos/nalytics/abce.def-ghi.jkl.omn/a/v0"

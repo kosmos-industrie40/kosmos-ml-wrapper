@@ -75,13 +75,25 @@ class TestMLWrapper(unittest.TestCase):
                 fft.client, str(json.dumps({"type": "text", "test": "hi"}))
             )
         fft.client.mock_a_message(fft.client, json.dumps(JSON_ML_ANALYSE_TIME_SERIES))
+        while fft._async_ready():
+            print("Waiting for the tool to finish")
+            sleep(1)
 
     def test_wrong_topic(self):
         btt = BadTopicTool()
+        self.assertEqual("this/isnotcorrect", btt._config.get("base_result_topic"))
         self.get_message()
         btt._react_to_message(None, None, self.msg)
-        while btt.async_result is None:
-            sleep(1)
+        # btt.client.mock_a_message(btt.client, self.msg.payload)
+        print(btt.async_result.ready())
+        with self.assertLogs("MOCK", level="WARNING") as cm:
+            while btt._async_ready():
+                print("Waiting for the tool to finish")
+                sleep(1)
+        print("done")
+        self.assertTrue(
+            any(["undefined topic" in msg and "consider" in msg for msg in cm.output])
+        )
 
 
 if __name__ == "__main__":

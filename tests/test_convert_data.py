@@ -81,7 +81,7 @@ class TestDataRetrievalAndResolve(unittest.TestCase):
 
     def test_analysis_time_series(self):
         # test analysis time series
-
+        print("Testing with analyses-example-time_series.json")
         data_frame, columns, data = retrieve_dataframe(
             JSON_ANALYSE_TIME_SERIES.get("results")
         )
@@ -93,7 +93,7 @@ class TestDataRetrievalAndResolve(unittest.TestCase):
 
     def test_analysis_multiple_time_series(self):
         # test analysis time series
-        print(JSON_ANALYSE_MULTIPLE_TIME_SERIES)
+        print("Test with analyses-example-multiple_time_series.json")
         timestamp = JSON_ANALYSE_MULTIPLE_TIME_SERIES.get("timestamp")
         self.assertIsInstance(timestamp, str)
         for result in JSON_ANALYSE_MULTIPLE_TIME_SERIES.get("results"):
@@ -104,14 +104,14 @@ class TestDataRetrievalAndResolve(unittest.TestCase):
 
     def test_analysis_text(self):
         # test analysis text
-        print(JSON_ANALYSE_TEXT)
+        print("Testing with analyses-example-text.json")
         data = JSON_ANALYSE_TEXT.get("results")
         timestamp = JSON_ANALYSE_TEXT.get("timestamp")
         self.assertIsInstance(data, dict)
         self.assertIsInstance(timestamp, str)
 
     def test_dataframe_types_retrieval(self):
-        print(JSON_DATA_EXAMPLE_3)
+        print("Testing with data-example-3.json")
         data_frame, _, _, _ = retrieve_sensor_update_data(JSON_DATA_EXAMPLE_3)
         self.assertEqual(
             data_frame.dtypes.tolist(), ["float64", "float64", "datetime64[ns]"]
@@ -119,7 +119,7 @@ class TestDataRetrievalAndResolve(unittest.TestCase):
 
     def test_sensor_without_metadata(self):
         # test sensor data w/o metadata
-        print(JSON_DATA_EXAMPLE)
+        print("Testing with data-example.json")
         data_frame, columns, data, metadata = retrieve_sensor_update_data(
             JSON_DATA_EXAMPLE
         )
@@ -133,7 +133,7 @@ class TestDataRetrievalAndResolve(unittest.TestCase):
 
     def test_sensor_with_metadata(self):
         # test sensor data w/ metadata
-
+        print("Testing with data-example-2.json")
         data_frame, columns, data, metadata = retrieve_sensor_update_data(
             JSON_DATA_EXAMPLE_2
         )

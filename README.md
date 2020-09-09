@@ -52,6 +52,17 @@ To test your application with the ML Wrapper, a testing framework to build on is
 As the run() method is an abstract method, it needs to be implemented to cover the needed ML analysis functionality.
 Further customizations can be made for the methods retrieve_payload_data and resolve_payload_data to fit the need of the analysis tool.
 
+The standard information retrieved from the message (a DataFrame, a list of DataFrames or a dictionary) will be
+available by the field `out_message.in_message.retrieved_data`. More fields available are
+```
+out_message.in_message.columns
+out_message.in_message.data
+out_message.in_message.metadata
+out_message.in_message.timestamp
+```
+These hold the original json message fields. The `retrieved_data` holds the information of the other fields in one of the
+three datatypes DataFrame, list of DataFrames or dictionary, depending on the message type that was received.
+
 You can pass additional information from the retrieve_payload_data function to the run method through the `in_message`'s field
 `custom_information_field`. This will be available to the run method via `out_message.in_message.custom_information_field`.
 
@@ -60,14 +71,16 @@ The argument of the run() method is the prepared OutgoingMessage. This OutgoingM
 formal text analysis case of the jsonschema) and return said calculation. The result will then be transformed
 to the proper outputs in the retrieve_payload_data() method. In case you need to change those values, you can
 overwrite the retrieve_payload_data() method by setting the `out_message`'s field `payload` directly. 
-However, keep in mind that you will have to stick to the jsonschema and provide a valid payload. 
+However, keep in mind that you will have to stick to the [jsonschema](docs/MqttPayloads/analyses-formal.json) and provide a valid payload. 
 
 In simplified terms, the main analysis workflow looks like the following:
 
-    in_message = self.retrieve_payload_data(in_message)
-    out_message = Created by magic, but holds the in_message
-    result = self.run(out_message)
-    out_message = self.resolve_payload_data(result, out_message).
+```
+in_message = self.retrieve_payload_data(in_message)
+out_message = Created by magic, but holds the in_message
+result = self.run(out_message)
+out_message = self.resolve_payload_data(result, out_message).
+```
 
 In the main program, self.start() shall be used to start an
 infinite loop and react to incoming MQTT messages.
@@ -126,3 +139,12 @@ CONFIG_MODEL_TAG
 CONFIG_MODEL_FROM
 ```
 in your dockerfile via args and have them point to the same vars the kaniko push will get the tag and the url from.
+The Dockerfile you are writing will have to set the ENV variable `CONFIG_MODEL_URL` by the ARG variable `CONFIG_MODEL_URL`.
+The same goes for the other 2 ENV Vars. Then you can pass them by setting
+```
+--build-arg CONFIG_MODEL_URL=<yourURL> --build-arg CONFIG_MODEL_TAG=<yourTAG> --build-arg CONFIG_MODEL_FROM=<yourFROMID>
+```
+With docker this would then look something like
+```
+docker build --build-arg CONFIG_MODEL_URL=<yourURL> --build-arg CONFIG_MODEL_TAG=<yourTAG> --build-arg CONFIG_MODEL_FROM=<yourFROMID> .
+```
