@@ -10,10 +10,19 @@ if __name__ == "__main__" and __package__ is None:
     path.append(dir(path[0]))
     __package__ = "examples"
 
+import os
+
+os.environ["CONFIG_MODEL_URL"] = "test"
+os.environ["CONFIG_MODEL_TAG"] = "test"
+os.environ["CONFIG_MODEL_FROM"] = "test"
+os.environ["CONFIG_LOGGING_LOG_LEVEL"] = "DEBUG"
+
 # This is required for you to write in order to create your own ML Tool
 from typing import Union, List
 import pandas as pd
-from ml_wrapper import MLWrapper
+
+
+from ml_wrapper import MLWrapper, IncomingMessage, OutgoingMessage
 
 
 # Create child class of MLWrappers
@@ -27,15 +36,14 @@ class AnalysisTool(MLWrapper):
 
     # Implementation required
     def run(
-        self,
-        dataframe: Union[str, pd.DataFrame, None] = None,
-        columns: List[dict] = None,
-        data: List[dict] = None,
-        metadada: Union[List[dict], None] = None,
-        timestamp: str = None,
-        topic: str = None,
-    ) -> Union[str, pd.DataFrame]:
+        self, out_message: OutgoingMessage
+    ) -> Union[pd.DataFrame, List[pd.DataFrame], dict]:
         # perform your ML magic here
+        self.logger.info(
+            "Here you can find the seperately retrieved information. Just call "
+            "out_message.in_message.custom_information_field"
+        )
+        self.logger.info("\n%s", out_message.in_message.custom_information_field)
         data = pd.DataFrame({"ind": [list(range(10))]})
         return data
 
@@ -44,14 +52,13 @@ class AnalysisTool(MLWrapper):
     # the mqtt payload. Must conform to the args required by the run() method.
     # Default implementation returns
     # dataframe, columns, data, metadada, timestamp
-    def retrieve_payload_data(
-        self, topic: str, payload: str
-    ) -> (Union[pd.DataFrame, None], list, list, Union[dict, list, None], int):
+    def retrieve_payload_data(self, in_message: IncomingMessage) -> IncomingMessage:
         # retrieve data from payload
         # or request historical data from database
         # based on the present information in the payload
         data = pd.DataFrame({"ind": [list(range(10))]})
-        return data
+        in_message.custom_information_field = data
+        return in_message
 
 
 # Usage of AnalysisTool class

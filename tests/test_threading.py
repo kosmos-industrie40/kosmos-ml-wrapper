@@ -1,16 +1,11 @@
 """ This module tests the threading behaviour """
 import unittest
 import json
-from os.path import dirname, join
 
 from paho.mqtt.client import MQTTMessage
 
-from tests.mock_ml_function import SlowMLTool
-
-JSON_PATH = join(dirname(__file__), "..", "docs", "MqttPayloads")
-
-with open(join(JSON_PATH, "analyses-example-time_series.json")) as f:
-    schema = json.load(f)
+from tests.mock_ml_tools import SlowMLTool
+from ml_wrapper.json_provider import JSON_ML_ANALYSE_TIME_SERIES
 
 
 class TestThreading(unittest.TestCase):
@@ -19,7 +14,7 @@ class TestThreading(unittest.TestCase):
     def test_thread_run(self):
         slowml = SlowMLTool()
         msg = MQTTMessage
-        msg.payload = json.dumps(schema)
+        msg.payload = json.dumps(JSON_ML_ANALYSE_TIME_SERIES)
         self.assertRaises(TypeError, slowml._react_to_message, (None, None, msg))
 
 

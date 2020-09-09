@@ -1,3 +1,4 @@
 paho-mqtt
 pandas
 git+https://gitlab.com/jockel/config-env-parser.git
+jsonschema

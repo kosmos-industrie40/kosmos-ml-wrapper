@@ -21,7 +21,7 @@ Afterwards, the results of the analysis tool are itself parsed to conform to the
 You can install the ML Wrapper package from this repository directly:
 
 ```
-pip install git+https://gitlab.inovex.de/proj-kosmos/kosmos-mqtt-reaction.git
+pip install git+https://gitlab.inovex.de/proj-kosmos/libraries/python/kosmos-mqtt-reaction.git
 ```
 After the installation - assuming you are using a virtualenv `env` - you can execute 
 ```
@@ -29,11 +29,22 @@ env/bin/python env/lib/python3.7/site-packages/ml_wrapper/create_config_md.py
 ```
 in your directory, to create the env_ml_wrapper.md file in your repository, if required.
     
+# Runtime Requirements
+All the required variables that have to be set can be found in [env_ml_wrapper.md](env_ml_wrapper.md).
+Especially the three variables 
+```
+CONFIG_MODEL_URL
+CONFIG_MODEL_TAG
+CONFIG_MODEL_FROM
+```
+are to be set per container/image because you will need to make sure those are referring to your actual
+ml tool.
 
 # How to use
-After installing this package, you can use this package as described in examples/usage_example.py.
+After installing this package, you can use this package as described in [usage_example.py](examples/usage_example.py).
 
-To test your application with the ML Wrapper, a testing framework to build on is provided in examples/test_example.py.
+To test your application with the ML Wrapper, a testing framework to build on is provided in [test_example.py](examples/test_example.py).
+
 
 ## Usage summary
 *A slightly more conceptual description of the class*
@@ -41,18 +52,35 @@ To test your application with the ML Wrapper, a testing framework to build on is
 As the run() method is an abstract method, it needs to be implemented to cover the needed ML analysis functionality.
 Further customizations can be made for the methods retrieve_payload_data and resolve_payload_data to fit the need of the analysis tool.
 
-The arguments of the run() method need to conform
-to the outputs of retrieve_payload_data() and to the inputs
-of the resolve_payload_data() method.
-The latter two can also be customized as needed.
-(The current implementation takes the sensor or analysis data from an
-incoming message, converts them to a pandas dataframe and passes this along with some more data from the payload to the run() method.)
+The standard information retrieved from the message (a DataFrame, a list of DataFrames or a dictionary) will be
+available by the field `out_message.in_message.retrieved_data`. More fields available are
+```
+out_message.in_message.columns
+out_message.in_message.data
+out_message.in_message.metadata
+out_message.in_message.timestamp
+```
+These hold the original json message fields. The `retrieved_data` holds the information of the other fields in one of the
+three datatypes DataFrame, list of DataFrames or dictionary, depending on the message type that was received.
+
+You can pass additional information from the retrieve_payload_data function to the run method through the `in_message`'s field
+`custom_information_field`. This will be available to the run method via `out_message.in_message.custom_information_field`.
+
+The argument of the run() method is the prepared OutgoingMessage. This OutgoingMessage holds the IncomingMessage in the field
+`in_message`. The run() method should calculate a DataFrame, a List of DataFrames or a dictionary (representing the 
+formal text analysis case of the jsonschema) and return said calculation. The result will then be transformed
+to the proper outputs in the retrieve_payload_data() method. In case you need to change those values, you can
+overwrite the retrieve_payload_data() method by setting the `out_message`'s field `payload` directly. 
+However, keep in mind that you will have to stick to the [jsonschema](docs/MqttPayloads/analyses-formal.json) and provide a valid payload. 
 
 In simplified terms, the main analysis workflow looks like the following:
 
-    retrieved_data = self.retrieve_payload_data()
-    result = self.run(*retrieved_data)
-    message_payload = self.resolve_payload_data(result).
+```
+in_message = self.retrieve_payload_data(in_message)
+out_message = Created by magic, but holds the in_message
+result = self.run(out_message)
+out_message = self.resolve_payload_data(result, out_message).
+```
 
 In the main program, self.start() shall be used to start an
 infinite loop and react to incoming MQTT messages.
@@ -67,7 +95,8 @@ In order to set up your Pipeline properly, you will need to have a group deploy 
 #### Gopass
 If you are not an owner of the proj-kosmos group in gitlab, you will need to use the
 token that is saved in gopass. Simply use `gopass gitlab.inovex.de/deploytoken/gitlab-ci-token`
-to retrieve the deploy token for this project.
+to retrieve the deploy token for this project. If that doesn't work, you will have to find the token
+in your correct gopass group.
 
 #### Create a Gitlab Group Deploy Token
 For this step you require ownership rights on the gitlab proj-kosmos group.
@@ -99,4 +128,23 @@ Then your pipeline before_script might look like this:
 - before_script:
     - git config --global url."https://$GIT_USER:$GIT_TOKEN@gitlab.inovex.de".insteadOf https://gitlab.inovex.de
     - pip install -r requirements.txt
+```
+
+### Dockerfile
+If you are providing a docker build and push step, e.g. using kaniko, then it's recommended to provide the 
+environment variables
+```
+CONFIG_MODEL_URL
+CONFIG_MODEL_TAG
+CONFIG_MODEL_FROM
+```
+in your dockerfile via args and have them point to the same vars the kaniko push will get the tag and the url from.
+The Dockerfile you are writing will have to set the ENV variable `CONFIG_MODEL_URL` by the ARG variable `CONFIG_MODEL_URL`.
+The same goes for the other 2 ENV Vars. Then you can pass them by setting
+```
+--build-arg CONFIG_MODEL_URL=<yourURL> --build-arg CONFIG_MODEL_TAG=<yourTAG> --build-arg CONFIG_MODEL_FROM=<yourFROMID>
+```
+With docker this would then look something like
+```
+docker build --build-arg CONFIG_MODEL_URL=<yourURL> --build-arg CONFIG_MODEL_TAG=<yourTAG> --build-arg CONFIG_MODEL_FROM=<yourFROMID> .
 ```
