@@ -8,11 +8,14 @@ from typing import Union, List
 import logging
 import pandas as pd
 
+
 os.environ["CONFIG_MODEL_URL"] = "test"
 os.environ["CONFIG_MODEL_TAG"] = "test"
 os.environ["CONFIG_MODEL_FROM"] = "test"
 
-from ml_wrapper import MLWrapper, ResultType, OutgoingMessage
+from ml_wrapper import MLWrapper
+from ml_wrapper.messaging import OutgoingMessage
+from ml_wrapper.result_type import ResultType
 from ml_wrapper.mock_mqtt_client import MockMqttClient
 
 

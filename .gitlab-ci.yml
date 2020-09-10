@@ -8,15 +8,13 @@ pylint:
   image: "python:3.8"
   before_script:
     - python --version
-    - pip install -r requirements.txt
-    - pip install -r tests/testrequirements.txt
+    - python setup.py develop
     - pip install pylint
   tags:
     - shared
   script:
-    - pylint ml_wrapper
+    - pylint src
     - pylint --rcfile tests/.pylintrc tests
-    - pylint examples
 
 black:
   stage: Static Analysis
@@ -27,20 +25,23 @@ black:
   tags:
     - shared
   script:
-    - black --check .
+    - black --check src
+    - black --check tests
 
 test:
   stage: Unit Test
   image: "python:3.8"
   needs: []
   before_script:
-    - python --version
-    - pip install -r requirements.txt
-    - pip install -r tests/testrequirements.txt
+    - python setup.py develop
   tags:
     - shared
+  artifacts:
+    reports:
+      junit: junit.xml
+      cobertura: coverage.xml
   script:
-    - python -m unittest discover
+    - python setup.py test
 
 build:
   stage: Build
@@ -50,7 +51,6 @@ build:
     - black
     - pylint
   before_script:
-    - pip install -r requirements.txt
     - pip install wheel
   tags:
     - shared
