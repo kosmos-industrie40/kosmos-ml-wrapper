@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "Payload: kosmos/analysis/<contractId>",
+  "description": "definition of the payload for the topic kosmos/analysis/<contractId>",
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "description": "timestamp where the metric is created in RFC 3339 format"
+    },
+    "columns": {
+      "type": "array",
+      "description": "definition of the column data",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/MetaInformation"
+      }
+    },
+    "data": {
+      "type": "array",
+      "description": "are the transmitted data",
+      "minItems": 1,
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "meta": {
+      "type": "array",
+      "description": "are extended meta information about this transmitted data",
+      "minItems": 1,
+      "items": {
+        "definitions": {
+          "name": {
+            "type": "string",
+            "description": "is the name of the metadata"
+          },
+          "description": {
+            "type": "string",
+            "description": "is the description of the metadata"
+          },
+          "type": {
+            "type": "string",
+            "description": "is the meta data type definition"
+          },
+          "value": {
+            "type": "string",
+            "description": "is the value of this meta data"
+          }
+        },
+        "required": ["name", "type", "value"]
+      }
+    },
+    "signature": {
+      "type": "string",
+      "description": "base64 encoded cryptographic signature about all other fields in the message"
+    }
+  },
+  "required": ["timestamp", "columns", "data"],
+  "definitions": {
+    "MetaInformation":{
+      "type": "object",
+      "definitions": {
+        "name": {
+          "type": "string",
+          "description": "name of the meta data"
+        },
+        "description": {
+          "type": "string",
+          "description": "describe the metadata"
+        },
+        "type": {
+          "type": "string",
+          "description": "is the type of the metadata",
+          "enum": ["number", "string", "rfctime"]
+        },
+        "value": {
+          "type": "string",
+          "description": "is the type of the metadata"
+        }
+      },
+      "required": ["name", "type"]
+    }
+  }
+}

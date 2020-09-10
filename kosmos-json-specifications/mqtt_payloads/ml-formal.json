@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "Payload: kosmos/analysis/<name>/<version>",
+  "description": "definition of the payload for the topic kosmos/analysis/<name>/<version>",
+  "properties": {
+    "contract": {
+      "type": "string",
+      "description": "defines the contract on which the result will be made"
+    },
+    "type": {
+      "type": "string",
+      "description": "defines the type of the payload",
+      "enum": [
+        "sensor_update",
+        "analyse_result"
+      ]
+    },
+    "payload": {
+      "type": "object",
+      "description": "is the transmitted data",
+      "oneOf": [
+        {"$ref": "analysis-formal.json"},
+        {"$ref": "data-formal.json"}
+      ]
+    },
+    "machine": {
+	    "type": "string",
+	    "description": "representing the submitted machine"
+    },
+    "sensor": {
+	    "type": "string",
+	    "description": "representing the submitted machine"
+    }
+  },
+  "required": [ "contract" , "type", "payload", "machine", "sensor"],
+  "if": {
+    "properties": {
+      "type": {
+        "enum": ["sensor_update"]
+      }
+    }
+  },
+  "then": {
+    "properties": {
+      "payload": {
+        "$ref": "data-formal.json"
+      }
+    }
+  },
+  "else": {
+    "properties": {
+      "payload": {
+        "$ref": "analysis-formal.json"
+      }
+    }
+  }
+}

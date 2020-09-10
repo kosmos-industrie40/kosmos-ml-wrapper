@@ -1,0 +1,236 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "Topic: kosmos/analysis/<contractId>",
+  "description": "definition of the payload for the topic kosmos/analysis/<contractId>",
+  "required": ["from", "timestamp", "type", "calculated", "results", "model"],
+  "properties": {
+    "from": {
+      "type": "string",
+      "description": "contains the id of the creator"
+    },
+    "model": {
+      "type": "object",
+      "description": "described the used model of this package",
+      "properties": {
+        "url": {
+	      "type": "string",
+          "description": "url of the used model"
+        },
+        "tag": {
+          "type": "string",
+          "description": "tag of the model"
+        }
+      },
+      "required": ["url", "tag"]
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "is the timestamp in RFC 3339 format"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "time_series",
+        "multiple_time_series",
+        "text"
+      ],
+      "description": "defines the type of this message; the result of a ml computing unit can be a time series, multiple time series or an string (text)"
+    },
+    "signature": {
+      "type": "string",
+      "description": "Base64 Encoded signature about all other fields in the message"
+    },
+    "calculated": {
+      "type": "object",
+      "description": "reference on the message on which the calculation will be executed",
+      "properties": {
+        "message": {
+          "type": "object",
+          "properties": {
+            "machine": {
+              "type": "string",
+              "description": "defines the machine from which the update message came"
+            },
+            "sensor": {
+              "type": "string",
+              "description": "defines the sensor from which the update message came"
+            }
+          },
+	  "required": ["machine", "sensor"]
+        },
+        "received": {
+          "type": "string",
+          "description": "timestamp on which the message is received in rfc 3339 format"
+        }
+      },
+      "required": [
+        "message",
+        "received"
+      ]
+    },
+    "results": {
+      "description": "defines the results which are made by the computing unit",
+      "oneOf": [
+        {"$ref": "#/definitions/multiple_time_series-result"},
+        {"$ref": "#/definitions/time_series-result"},
+        {"$ref": "#/definitions/text-result"}
+      ]
+    }
+  },
+  "definitions": {
+    "multiple_time_series-result": {
+      "type": "array",
+      "description": "defines multiple time series as result! each element in this array is a self organised time series",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/time_series-result"
+      }
+    },
+    "time_series-result": {
+      "type": "object",
+      "description": "definition of time series data",
+      "properties": {
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "name of this column"
+              },
+              "type": {
+                "type": "string",
+                "description": "defines the type which is used in this column; allowed are the number and the string type",
+                "enum": ["number", "string", "rfctime"]
+              },
+              "allowed_values": {
+                "type": "array",
+                "description": "defines the values which are allowed in the data to this column definition"
+              }
+            },
+            "required": ["name", "type"]
+          },
+          "minItems": 1
+        },
+        "data": {
+          "type": "array",
+          "description": "the transmitted data, where element 0 in every array which are stored in this array defines the line of time series",
+          "minItems": 1,
+          "items": {
+            "type": "array",
+            "minItems": 0,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": ["columns", "data"]
+    },
+    "text-result": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "string",
+          "description": "the end result of the computing unit"
+        },
+        "predict": {
+          "type": "number",
+          "description": "the percentage on which the result are made"
+        },
+        "parts": {
+          "type": "array",
+          "description": "the parts on which the results are made",
+          "items": {
+            "properties": {
+              "machine": {
+                "type": "string",
+                "description": "the id of the machine on which this calculation are made"
+              },
+              "result": {
+                "type": "string",
+                "description": "the result of this specific machine"
+              },
+              "predict": {
+                "type": "number",
+                "description": "the percentage on which the result are made"
+              },
+              "sensors": {
+                "type": "array",
+                "description": "result made by the sensors",
+                "items": {
+                  "definitions": {
+                    "sensor": {
+                      "type": "string",
+                      "description": "the id of the sensor"
+                    },
+                    "result": {
+                      "type": "string",
+                      "description": "the result of the computing unit"
+                    },
+                    "predict": {
+                      "type": "number",
+                      "description": "the percentage on which the result are made"
+                    }
+                  },
+                  "required": [
+                    "sensor",
+                    "result",
+                    "predict"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "machine",
+              "result",
+              "predict"
+            ]
+          }
+        }
+      },
+      "required": [
+        "total",
+        "predict"
+      ]
+    }
+  },
+  "if": {
+    "properties": {
+      "type": {
+        "enum": ["text"]
+      }
+    }
+  },
+  "then": {
+    "properties": {
+      "results": {
+        "$ref": "#/definitions/text-result"
+      }
+    }
+  },
+  "else": {
+    "if": {
+      "properties": {
+        "type": {
+          "enum": ["time_series"]
+        }
+      }
+    },
+    "then": {
+      "properties": {
+        "results": {
+          "$ref": "#/definitions/time_series-result"
+        }
+      }
+    },
+    "else": {
+      "properties": {
+        "results": {
+          "$ref": "#/definitions/multiple_time_series-result"
+        }
+      }
+    }
+  }
+}
