@@ -1,4 +1,4 @@
-# kosmos-mqtt-reaction
+# ml_wrapper
 
 This Project is intended to provide a mqtt subscription trigger method for python projects.
 
@@ -21,7 +21,7 @@ Afterwards, the results of the analysis tool are itself parsed to conform to the
 You can install the ML Wrapper package from this repository directly:
 
 ```
-pip install git+https://gitlab.inovex.de/proj-kosmos/libraries/python/kosmos-mqtt-reaction.git
+pip install git+https://gitlab.inovex.de/proj-kosmos/libraries/python/ml_wrapper.git
 ```
 After the installation - assuming you are using a virtualenv `env` - you can execute 
 ```
