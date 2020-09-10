@@ -7,7 +7,7 @@ import json
 
 FILE_DIR = dirname(abspath(__file__))
 SCHEMA_DIR = abspath(
-    join(FILE_DIR, "..", "kosmos-json-specifications", "mqtt_payloads")
+    join(FILE_DIR, "kosmos-json-specifications", "mqtt_payloads")
 )
 
 FORMAL_REPLACES = {
