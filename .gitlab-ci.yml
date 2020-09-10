@@ -14,9 +14,8 @@ pylint:
   tags:
     - shared
   script:
-    - pylint ml_wrapper
+    - pylint src
     - pylint --rcfile tests/.pylintrc tests
-    - pylint examples
 
 black:
   stage: Static Analysis
@@ -27,7 +26,8 @@ black:
   tags:
     - shared
   script:
-    - black --check .
+    - black --check src
+    - black --check tests
 
 test:
   stage: Unit Test
