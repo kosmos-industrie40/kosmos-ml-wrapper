@@ -1,4 +1,0 @@
-include ml_wrapper/config.ini
-include env_ml_wrapper.md
-include docs/MqttPayloads/analyses-formal.json
-include docs/MqttPayloads/data-formal.json
