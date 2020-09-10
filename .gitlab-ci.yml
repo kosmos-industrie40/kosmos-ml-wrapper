@@ -8,8 +8,7 @@ pylint:
   image: "python:3.8"
   before_script:
     - python --version
-    - pip install -r requirements.txt
-    - pip install -r tests/testrequirements.txt
+    - python setup.py develop
     - pip install pylint
   tags:
     - shared
