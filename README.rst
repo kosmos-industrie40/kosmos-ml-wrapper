@@ -16,7 +16,7 @@ MQTT topic e.g. to write results to a database or to trigger a
 successive workflow.
 
 The ML Wrapper class listens to the trigger topic and publishes results
-to the correspnding result topic when deployed. This frees any ML
+to the corresponding result topic when deployed. This frees any ML
 engineer from having to deal with all overhead that comes with setting
 up the handling of MQTT messaging within the project.
 
@@ -217,7 +217,7 @@ With docker this would then look something like
 
    docker build --build-arg CONFIG_MODEL_URL=<yourURL> --build-arg CONFIG_MODEL_TAG=<yourTAG> --build-arg CONFIG_MODEL_FROM=<yourFROMID> .
 
-.. _jsonschema: src/kosmos-json-specifications/mqtt_payloads/analyses-formal.json
+.. _jsonschema: src/ml_wrapper/kosmos_json_specifications/mqtt_payloads/analyses-formal.json
 .. _KOSMoS MQTT standards: https://confluence.inovex.de/display/KOSMOS/MQTT-Specification
 .. _env_ml_wrapper.md: src/env_ml_wrapper.md
 .. _usage_example.py: src/examples/usage_example.py
