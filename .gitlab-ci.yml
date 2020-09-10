@@ -39,8 +39,12 @@ test:
     - pip install -r tests/testrequirements.txt
   tags:
     - shared
+  artifacts:
+    reports:
+      junit: junit.xml
+      cobertura: coverage.xml
   script:
-    - python -m unittest discover
+    - python setup.py test
 
 build:
   stage: Build
