@@ -33,6 +33,7 @@ class MockAnalysisTool(AnalysisTool):
         """ Constructor """
         super().__init__()
 
+    # pylint: disable=attribute-defined-outside-init
     def _init_mqtt(self):
         """ Mock the mqtt client on init """
         self.client = MockMqttClient(self.logger)
