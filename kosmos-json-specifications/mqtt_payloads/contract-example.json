@@ -20,7 +20,8 @@
 				"robot"
 			]
 		},
-		"id": "ddc51cd4-e909-11ea-ac4b-54e1ad207114"
+		"id": "ddc51cd4-e909-11ea-ac4b-54e1ad207114",
+		"version": "v2"
 	},
 	"requiredTechnicalContainers": [
 		{
@@ -91,7 +92,7 @@
 		}
 	],
 	"checkSignatures": false,
-	"analyses": {
+	"analysis": {
 		"enable": true,
 		"systems": [
 			{
@@ -191,5 +192,12 @@
 	"machineConnection": {
 	},
 	"blockchain": {
+		"url": "blockchain",
+		"container": {
+			"url": "bc-connector",
+			"tag": "-1",
+			"environment": [],
+			"arguments": []
+		}
 	}
 }

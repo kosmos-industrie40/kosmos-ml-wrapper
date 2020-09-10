@@ -54,7 +54,7 @@
     },
     "Pipelines": {
       "type": "array",
-      "description": "defines the analyses pipeline",
+      "description": "defines the analysis pipeline",
       "items": {
         "type": "object",
         "properties": {
@@ -190,7 +190,11 @@
         "id": {
           "type": "string",
           "description": "is the id of the contract"
-        }
+        },
+	"version": {
+		"type": "string",
+		"description": "sets the version of the contract"
+	}
       }
     },
     "requiredTechnicalContainers": {
@@ -263,12 +267,12 @@
       "type": "boolean",
       "description": "defines if all programs should check the message signature or not (end to end validation)"
     },
-    "analyses": {
+    "analysis": {
       "type": "object",
       "properties": {
         "enable": {
           "type": "boolean",
-          "description": "defines if analyses is enabled or not"
+          "description": "defines if analysis is enabled or not"
         },
         "systems": {
           "type": "array",
@@ -281,23 +285,23 @@
               },
               "enable": {
                 "type": "boolean",
-                "description": "defines if this analyses part is enabled or not"
+                "description": "defines if this analysis part is enabled or not"
               },
               "pipelines": {
                 "$ref": "#/definitions/Pipelines",
                 "description": "defines the pipeline for this specific system"
               },
               "connection": {
-                "description": "defines the connection to the analyses cloud",
+                "description": "defines the connection to the analysis cloud",
                 "type": "object",
                 "properties": {
                   "url": {
-                    "description": "is the url to the analyses-cloud-connector",
+                    "description": "is the url to the analysis-cloud-connector",
                     "type": "string",
                     "format": "url"
                   },
                   "user-mgmt": {
-                    "description": "is the usrl to the user-mgmt on the analyses-cloud",
+                    "description": "is the usrl to the user-mgmt on the analysis-cloud",
                     "type": "string",
                     "format": "url"
                   },
@@ -330,5 +334,6 @@
       "type": "object",
       "description": "placeholder to add meta data of this message"
     }
-  }
+  },
+  "required": ["machine", "sensors"]
 }

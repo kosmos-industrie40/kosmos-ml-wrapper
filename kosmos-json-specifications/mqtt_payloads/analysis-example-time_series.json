@@ -1,5 +1,5 @@
 {
-  "$schema": "analyses-formal.json",
+  "$schema": "analysis-formal.json",
   "calculated": {
     "received": "2020-08-15T15:47:55.789Z",
     "message": {

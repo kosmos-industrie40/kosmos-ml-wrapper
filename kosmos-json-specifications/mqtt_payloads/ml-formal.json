@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "title": "Payload: kosmos/analyses/<name>/<version>",
-  "description": "definition of the payload for the topic kosmos/analyses/<name>/<version>",
+  "title": "Payload: kosmos/analysis/<name>/<version>",
+  "description": "definition of the payload for the topic kosmos/analysis/<name>/<version>",
   "properties": {
     "contract": {
       "type": "string",
@@ -19,8 +19,8 @@
       "type": "object",
       "description": "is the transmitted data",
       "oneOf": [
-        {"$ref": "analyses-formal.json"},
-        {"$ref":  "data-formal.json"}
+        {"$ref": "analysis-formal.json"},
+        {"$ref": "data-formal.json"}
       ]
     },
     "machine": {
@@ -50,7 +50,7 @@
   "else": {
     "properties": {
       "payload": {
-        "$ref": "analyses-formal.json"
+        "$ref": "analysis-formal.json"
       }
     }
   }

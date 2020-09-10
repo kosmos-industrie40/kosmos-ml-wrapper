@@ -1,5 +1,5 @@
 {
-	"$schema":"blockchain-formal.json",
+	"$schema": "blockchain-formal.json",
 	"from": "blockchain-client",
 	"date": 1585758170,
 	"calculation": {

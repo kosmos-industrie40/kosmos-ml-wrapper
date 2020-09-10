@@ -1,5 +1,5 @@
 {
-  "$schema": "analyses-formal.json",
+  "$schema": "analysis-formal.json",
   "from": "creator of this message",
   "timestamp": "2020-08-12T15:46:10.821Z",
   "model": {
