@@ -33,9 +33,7 @@ test:
   image: "python:3.8"
   needs: []
   before_script:
-    - python --version
-    - pip install -r requirements.txt
-    - pip install -r tests/testrequirements.txt
+    - python setup.py develop
   tags:
     - shared
   artifacts:
@@ -43,7 +41,6 @@ test:
       junit: junit.xml
       cobertura: coverage.xml
   script:
-    - python setup.py develop
     - python setup.py test
 
 build:
@@ -54,7 +51,6 @@ build:
     - black
     - pylint
   before_script:
-    - pip install -r requirements.txt
     - pip install wheel
   tags:
     - shared
