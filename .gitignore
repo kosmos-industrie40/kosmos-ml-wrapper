@@ -5,3 +5,4 @@ htmlcov/
 build/
 dist/
 mlwrapper.egg-info/
+kosmos-json-specifications/.gitlab-ci.yml
