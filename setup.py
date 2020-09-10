@@ -1,53 +1,23 @@
+# -*- coding: utf-8 -*-
 """
-This module sets up the package when it is installed
+    Setup file for ml_wrapper.
+    Use setup.cfg to configure your project.
+
+    This file was generated with PyScaffold 3.2.3.
+    PyScaffold helps you to put up the scaffold of your new Python project.
+    Learn more under: https://pyscaffold.org/
 """
-import configparser
-import setuptools
+import sys
 
-# Read the Readme as long description
-with open("README.md", "r") as fh:
-    LONG_DESCRIPTION = fh.read()
+from pkg_resources import VersionConflict, require
+from setuptools import setup
 
-REQS = []
-with open("requirements.txt", "r") as requirements:
-    REQS = requirements.read().split("\n")
-
-for req_, req in enumerate(REQS):
-    if "git+" in req:
-        REQS[req_] = req.split("/")[-1]
-        if req.endswith(".git"):
-            REQS[req_] = REQS[req_].strip(".git")
-        REQS[req_] += " @ " + req
-
-REQUIREMENTS = [package.strip() for package in REQS]
+try:
+    require('setuptools>=38.3')
+except VersionConflict:
+    print("Error: version of setuptools is too old (<38.3)!")
+    sys.exit(1)
 
 
-print(REQUIREMENTS)
-
-# Read the package config from the package_config.ini
-CONFIG = configparser.ConfigParser()
-CONFIG.read("package_config.ini")
-
-# Author and Package
-AUTHOR = CONFIG["author"]
-PACKAGE = CONFIG["package"]
-
-setuptools.setup(
-    name=PACKAGE["name"],
-    version=PACKAGE["version"],
-    author=AUTHOR["name"],
-    author_email=AUTHOR["email"],
-    description=PACKAGE["description"],
-    long_description=LONG_DESCRIPTION,
-    long_description_content_type="text/markdown",
-    url=PACKAGE["repository_url"],
-    packages=setuptools.find_packages(),
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-    ],
-    include_package_data=True,
-    install_requires=REQUIREMENTS,
-    python_requires=PACKAGE["python_requires"],
-)
+if __name__ == "__main__":
+    setup(use_pyscaffold=True)

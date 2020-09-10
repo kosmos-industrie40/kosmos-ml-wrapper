@@ -21,7 +21,7 @@ os.environ["CONFIG_MODEL_FROM"] = "test"
 # This is required for you to write in order to create your own ML Tool
 
 import unittest
-from examples.usage_example import AnalysisTool
+from src.examples.usage_example import AnalysisTool
 from ml_wrapper.mock_mqtt_client import MockMqttClient
 from ml_wrapper.json_provider import JSON_ML_ANALYSE_TIME_SERIES
 

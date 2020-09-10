@@ -30,7 +30,7 @@ env/bin/python env/lib/python3.7/site-packages/ml_wrapper/create_config_md.py
 in your directory, to create the env_ml_wrapper.md file in your repository, if required.
     
 # Runtime Requirements
-All the required variables that have to be set can be found in [env_ml_wrapper.md](env_ml_wrapper.md).
+All the required variables that have to be set can be found in [env_ml_wrapper.md](src/env_ml_wrapper.md).
 Especially the three variables 
 ```
 CONFIG_MODEL_URL
@@ -41,9 +41,9 @@ are to be set per container/image because you will need to make sure those are r
 ml tool.
 
 # How to use
-After installing this package, you can use this package as described in [usage_example.py](examples/usage_example.py).
+After installing this package, you can use this package as described in [usage_example.py](src/examples/usage_example.py).
 
-To test your application with the ML Wrapper, a testing framework to build on is provided in [test_example.py](examples/test_example.py).
+To test your application with the ML Wrapper, a testing framework to build on is provided in [test_example.py](src/examples/test_example.py).
 
 
 ## Usage summary
