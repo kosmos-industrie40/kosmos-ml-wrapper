@@ -1,6 +1,4 @@
 """ This module provides a mock for testing of this package """
-from paho.mqtt.client import MQTTMessage
-
 from .helper import generate_mqtt_message_mock
 
 
