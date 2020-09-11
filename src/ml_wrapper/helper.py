@@ -5,6 +5,7 @@ import re
 from typing import List
 
 import pandas as pd
+from paho.mqtt.client import MQTTMessage
 
 from .result_type import ResultType
 from .exceptions import InvalidTopic
@@ -50,3 +51,18 @@ def topic_splitter(topic_string: str, sep: str = ",") -> List[str]:
             raise InvalidTopic("Topic '{}' is not a valid topic.".format(topic))
         topic_list[ind] = topic.strip()
     return topic_list
+
+
+def generate_mqtt_message_mock(
+    topic="kosmos/analytics/mock_model/mock_tag", message=""
+):
+    """
+    Generates an MQTTMessage class object.
+    @param topic: str
+    @param message: str
+    @return: MQTTMessage
+    """
+    msg = MQTTMessage
+    msg.topic = topic
+    msg.payload = message
+    return msg

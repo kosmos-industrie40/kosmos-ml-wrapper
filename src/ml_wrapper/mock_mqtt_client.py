@@ -1,6 +1,8 @@
 """ This module provides a mock for testing of this package """
 from paho.mqtt.client import MQTTMessage
 
+from .helper import generate_mqtt_message_mock
+
 
 class MockMqttClient:
     """ Mock of a mqtt client """
@@ -17,9 +19,9 @@ class MockMqttClient:
         assert (
             self.on_message is not None
         ), "Please overwrite the clients on_message property with your custom function"
-        msg = MQTTMessage
-        msg.payload = message
-        msg.topic = "kosmos/analytics/mock_model/mock_tag"
+        msg = generate_mqtt_message_mock(
+            "kosmos/analytics/mock_model/mock_tag", message
+        )
         # pylint: disable=not-callable
         self.on_message(client, None, msg)
 
