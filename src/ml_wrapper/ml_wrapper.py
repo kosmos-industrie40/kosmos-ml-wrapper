@@ -127,7 +127,9 @@ class MLWrapper(abc.ABC):
                     "The field {} has to be set either in the configuration "
                     "file of the MLWrapper, or with the help of the according "
                     "environment variable. You can find all the environment variables in the "
-                    "env_ml_wrapper.md file.\nAvailable environment variables are:\n{}".format(field, self._config.environment_variables)
+                    "env_ml_wrapper.md file.\nAvailable environment variables are:\n{}".format(
+                        field, self._config.environment_variables
+                    )
                 )
 
     @property
