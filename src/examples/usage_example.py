@@ -22,7 +22,7 @@ from typing import Union, List
 import pandas as pd
 
 
-from ml_wrapper import MLWrapper, IncomingMessage, OutgoingMessage
+from ml_wrapper import MLWrapper, IncomingMessage, OutgoingMessage, ResultType
 
 
 # Create child class of MLWrappers
@@ -31,8 +31,8 @@ class AnalysisTool(MLWrapper):
 
     # Implementation required
     def __init__(self):
-        # Instantiation of super required
-        super().__init__()
+        # Instantiation of super encouraged to explicitly set the result_type
+        super().__init__(result_type=ResultType.TIME_SERIES)
 
     # Implementation required
     def run(
