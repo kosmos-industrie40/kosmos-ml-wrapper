@@ -4,13 +4,13 @@ This file provides tests for the helper file
 import unittest
 from unittest import TestCase
 
-from ml_wrapper.json_provider import (
+from src.ml_wrapper.json_provider import (
     JSON_DATA_EXAMPLE_3,
     JSON_ANALYSE_TIME_SERIES,
     JSON_ML_ANALYSE_TEXT,
     JSON_ML_DATA_EXAMPLE,
 )
-from ml_wrapper.json_validator import (
+from src.ml_wrapper.json_validator import (
     NonSchemaConformJsonPayload,
     validate_formal,
     validate_trigger,
