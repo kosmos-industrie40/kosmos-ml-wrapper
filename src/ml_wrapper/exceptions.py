@@ -3,6 +3,12 @@ This file holds the exceptions used
 """
 
 
+class WrongMessageType(Exception):
+    """
+    Represents the exception of a wrong message type
+    """
+
+
 class NotInitialized(Exception):
     """
     Represents the error of an uninitialized object

@@ -129,3 +129,26 @@ class BadMLTool(MLWrapper):
         columns = out_message.in_message.columns
         self.logger.debug(dataframe, columns)
         return "Done"
+
+
+class RequireCertainInput(MLWrapper):
+    """
+    Mock for message requirements
+    """
+
+    def __init__(self):
+        """ Constructor """
+        super().__init__(
+            logger_name="MOCK", log_level=logging.DEBUG, result_type=ResultType.TEXT
+        )
+
+    def _init_mqtt(self):
+        """Initialize a mock mqtt client"""
+        self.client = MockMqttClient(self.logger)
+
+    def run(
+        self, out_message: OutgoingMessage
+    ) -> Union[pd.DataFrame, List[pd.DataFrame], dict]:
+        """Run method implementation"""
+        self.logger.debug("Do Nothing")
+        return {"total": "Done", "predict": 100}

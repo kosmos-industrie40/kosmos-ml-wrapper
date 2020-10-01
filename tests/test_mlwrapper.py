@@ -9,14 +9,26 @@ from time import sleep
 
 from paho.mqtt.client import MQTTMessage
 
+
 os.environ["CONFIG_LOGGING_LOG_LEVEL"] = "DEBUG"
 
 from ml_wrapper.ml_wrapper import MLWrapper
 from ml_wrapper.result_type import ResultType
+from ml_wrapper.message_type import MessageType
 from ml_wrapper.messaging import IncomingMessage
-from ml_wrapper.exceptions import NonSchemaConformJsonPayload
-from ml_wrapper.json_provider import JSON_ML_ANALYSE_TIME_SERIES
-from tests.mock_ml_tools import FFT, ResultTypeTool, BadMLTool, BadTopicTool
+from ml_wrapper.exceptions import NonSchemaConformJsonPayload, WrongMessageType
+from ml_wrapper.json_provider import (
+    JSON_ML_ANALYSE_TIME_SERIES,
+    JSON_ML_DATA_EXAMPLE,
+    JSON_ML_ANALYSE_TEXT,
+)
+from tests.mock_ml_tools import (
+    FFT,
+    ResultTypeTool,
+    BadMLTool,
+    BadTopicTool,
+    RequireCertainInput,
+)
 
 
 class TestMLWrapper(unittest.TestCase):
@@ -94,6 +106,26 @@ class TestMLWrapper(unittest.TestCase):
         self.assertTrue(
             any(["undefined topic" in msg and "consider" in msg for msg in log.output])
         )
+
+    def test_require_message_type(self):
+        ml_tool = RequireCertainInput()
+        ml_tool._only_react_to_message_type = MessageType.SENSOR_UPDATE
+        ml_tool.client.mock_a_message(ml_tool.client, json.dumps(JSON_ML_DATA_EXAMPLE))
+        ml_tool._only_react_to_message_type = MessageType.ANALYSES_Result
+        with self.assertRaises(WrongMessageType):
+            ml_tool.client.mock_a_message(
+                ml_tool.client, json.dumps(JSON_ML_DATA_EXAMPLE)
+            )
+        t_series = json.dumps(JSON_ML_ANALYSE_TIME_SERIES)
+        text = json.dumps(JSON_ML_ANALYSE_TEXT)
+        ml_tool.client.mock_a_message(ml_tool.client, t_series)
+        ml_tool._only_react_to_previous_result_types = [
+            ResultType.TIME_SERIES,
+            ResultType.MULTIPLE_TIME_SERIES,
+        ]
+        ml_tool.client.mock_a_message(ml_tool.client, t_series)
+        with self.assertRaises(WrongMessageType):
+            ml_tool.client.mock_a_message(ml_tool.client, text)
 
 
 if __name__ == "__main__":
