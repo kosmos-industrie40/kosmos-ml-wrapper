@@ -3,6 +3,13 @@ Conftest is like the setup for your pytests.
 This provides pytest fixtures for all tests
 """
 
+# pylint: disable=redefined-builtin,wrong-import-position,duplicate-code
+import os
+
+os.environ["CONFIG_MODEL_URL"] = "test_url"
+os.environ["CONFIG_MODEL_TAG"] = "test_tag"
+os.environ["CONFIG_MODEL_FROM"] = "test_from"
+
 import pytest
 import json
 
