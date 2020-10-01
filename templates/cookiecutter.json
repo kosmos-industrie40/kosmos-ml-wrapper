@@ -1,0 +1,11 @@
+{
+  "src_folder_name": ["src"],
+  "test_folder_name": ["tests"],
+  "project_name_in_src": "simple_ml_tool",
+  "short_project_description": "",
+  "ml_tool_name": "simple_ml_tool",
+  "ml_class_name": "SimpleMlTool",
+  "result_type_of_the_tool": ["time_series", "multiple_time_series", "text"],
+  "only_react_to_message_type": ["I react to all messages", "sensor", "analyse"],
+  "do_you_want_to_retrieve_data": ["no", "yes"]
+}
