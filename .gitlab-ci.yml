@@ -100,10 +100,11 @@ test_template:
     - build
   before_script:
     - pip install cookiecutter
+    - pip install pyscaffold
     - pip install ./dist/*.whl
     - pip install pytest
     - pip install pandas
   script:
     - cookiecutter templates --no-input --config-file tests/cookiecutter-template-test.yaml
     - cd simple_ml_tool
-    - python setup.py test
+    - pytest
