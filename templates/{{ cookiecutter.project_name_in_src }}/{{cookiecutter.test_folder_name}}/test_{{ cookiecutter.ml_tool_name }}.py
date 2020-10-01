@@ -21,7 +21,7 @@ def test_run(mock_tool, payloads_prerendered):
     assert mock_tool.last_result is not None
 
 # Parameterize your tests
-@pytest.mark.parameterize("json_key", [
+@pytest.mark.parametrize("json_key", [
 {%- if cookiecutter.only_react_to_message_type == "sensor" %}
 "JSON_ML_DATA_EXAMPLE",
 "JSON_ML_DATA_EXAMPLE_3",
