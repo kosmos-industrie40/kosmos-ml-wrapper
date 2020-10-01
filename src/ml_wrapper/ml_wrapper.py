@@ -172,9 +172,19 @@ class MLWrapper(abc.ABC):
             port=int(self.config["config"]["mqtt"]["port"]),
         )
 
+    def _get_topics(self):
+        topics = topic_splitter(self.config["config"]["messaging"]["request_topic"])
+        base = self._config.get(
+            "messaging", "analytic_base_url", default="kosmos/analytics/"
+        )
+        model_url = self._config.get("model", "url")
+        model_tag = self._config.get("model", "tag")
+        topics.append(f"{base}/{model_url}/{model_tag}".replace("//", "/"))
+        return topics
+
     def _subscribe(self):
         """ Subscribe the client to the config/env topic """
-        topics = topic_splitter(self.config["config"]["messaging"]["request_topic"])
+        topics = self._get_topics()
         for topic in topics:
             self.client.subscribe(
                 topic=topic,

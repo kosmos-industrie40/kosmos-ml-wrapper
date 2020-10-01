@@ -9,9 +9,9 @@ import logging
 import pandas as pd
 
 
-os.environ["CONFIG_MODEL_URL"] = "test"
-os.environ["CONFIG_MODEL_TAG"] = "test"
-os.environ["CONFIG_MODEL_FROM"] = "test"
+os.environ["CONFIG_MODEL_URL"] = "test_url"
+os.environ["CONFIG_MODEL_TAG"] = "test_tag"
+os.environ["CONFIG_MODEL_FROM"] = "test_from"
 
 from ml_wrapper import MLWrapper
 from ml_wrapper.messaging import OutgoingMessage

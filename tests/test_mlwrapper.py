@@ -127,6 +127,11 @@ class TestMLWrapper(unittest.TestCase):
         with self.assertRaises(WrongMessageType):
             ml_tool.client.mock_a_message(ml_tool.client, text)
 
+    def test_subscription(self):
+        ml_tool = FFT()
+        subscriptions = list(map(lambda x: x["topic"], ml_tool.client.subscriptions))
+        self.assertIn("kosmos/analytics/test_url/test_tag", subscriptions)
+
 
 if __name__ == "__main__":
     unittest.main()
