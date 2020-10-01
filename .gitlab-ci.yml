@@ -102,4 +102,4 @@ test_template:
     - pip install cookiecutter
   script:
     - ls -la
-    - pip install *.whl
+    - pip install ./dist/*.whl
