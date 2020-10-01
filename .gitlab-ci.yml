@@ -100,6 +100,9 @@ test_template:
     - build
   before_script:
     - pip install cookiecutter
-  script:
-    - ls -la
     - pip install ./dist/*.whl
+  script:
+    - cookiecutter templates --no-input --config-file tests/cookiecutter-template-test.yaml
+    - cd simple_ml_tool
+    - pip install -r requirements.txt
+    - python setup.py test
