@@ -2,6 +2,7 @@ stages:
   - Static Analysis
   - Unit Test
   - Build
+  - Templating
 
 pylint:
   stage: Static Analysis
@@ -67,7 +68,7 @@ build:
       - .gitlab-ci.yml
       - src/**/*
       - tests/*
-      - requirements.txct
+      - requirements.txt
       - setup.*
   needs:
     - test
@@ -82,3 +83,23 @@ build:
       - dist/*.whl
   script:
     - python setup.py sdist bdist_wheel
+
+test_template:
+  stage: Templating
+  image: "python:3.8"
+  only:
+    changes:
+      - .gitlab-ci.yml
+      - src/**/*
+      - tests/*
+      - requirements.txt
+      - setup.*
+  tags:
+    - shared
+  dependencies:
+    - build
+  before_script:
+    - pip install cookiecutter
+  script:
+    - ls -la
+    - pip install *.whl
