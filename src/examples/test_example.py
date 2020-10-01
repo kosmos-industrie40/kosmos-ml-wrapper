@@ -3,6 +3,7 @@ This module presents an example of a possible ML Tool Unittest using the ML Wrap
 """
 # This is only required for testing inside the ML Wrapper package
 # pylint: disable=redefined-builtin,wrong-import-position
+# pylint: disable=no-name-in-module,import-error,wrong-import-order
 # pylint: disable=duplicate-code,useless-super-delegation
 import json
 import os

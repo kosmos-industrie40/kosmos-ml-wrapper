@@ -35,6 +35,7 @@ from .log_level import LOG_LEVEL
 FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
+# pylint: disable=too-many-instance-attributes
 class MLWrapper(abc.ABC):
     """
     The MLWrapper class handles all administrative overhead regarding
@@ -172,6 +173,7 @@ class MLWrapper(abc.ABC):
             port=int(self.config["config"]["mqtt"]["port"]),
         )
 
+    # pylint: disable=no-member
     def _get_topics(self):
         topics = topic_splitter(self.config["config"]["messaging"]["request_topic"])
         base = self._config.get(
@@ -229,7 +231,8 @@ class MLWrapper(abc.ABC):
             return
         if message.message_type != self._only_react_to_message_type:
             raise WrongMessageType(
-                "The message I received is of type {} but the Tool is only reacting to type {}".format(
+                "The message I received is of type {} but the "
+                "Tool is only reacting to type {}".format(
                     message.message_type.value, self._only_react_to_message_type.value
                 )
             )

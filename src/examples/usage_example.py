@@ -2,6 +2,8 @@
 This module presents an example of a possible ML Tool using the ML Wrapper
 """
 # This is only required for testing inside the ML Wrapper package
+# pylint: disable=arguments-differ
+
 # pylint: disable=redefined-builtin,wrong-import-position,duplicate-code
 if __name__ == "__main__" and __package__ is None:
     from sys import path
@@ -22,6 +24,7 @@ from typing import Union, List
 import pandas as pd
 
 
+# pylint: disable=no-name-in-module
 from ml_wrapper import MLWrapper, IncomingMessage, OutgoingMessage, ResultType
 
 
