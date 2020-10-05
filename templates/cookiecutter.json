@@ -7,5 +7,9 @@
   "ml_class_name": "SimpleMlTool",
   "result_type_of_the_tool": ["time_series", "multiple_time_series", "text"],
   "only_react_to_message_type": ["I react to all messages", "sensor", "analyse"],
-  "do_you_want_to_retrieve_data": ["no", "yes"]
+  "do_you_want_to_retrieve_data": ["no", "yes"],
+  "python_version": ["3.8", "3.7", "3.6", "3.5"],
+  "build_python_package": ["yes", "no"],
+  "build_docker_image": ["yes", "no"],
+  "publish_docker_image": ["yes", "no"]
 }

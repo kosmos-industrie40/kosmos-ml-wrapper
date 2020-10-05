@@ -103,6 +103,7 @@ test_template:
     - pip install pyscaffold
     - pip install ./dist/*.whl
     - pip install pytest
+    - pip install yamllint
     - pip install pandas
     - git config --global user.email "testing@mail.com"
     - git config --global user.name "Tester"
@@ -112,3 +113,4 @@ test_template:
     - cd simple_ml_tool
     - ls -la
     - python setup.py test
+    - yamllint simple_ml_tool/.gitignore

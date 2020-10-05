@@ -9,3 +9,7 @@ default_context:
   result_type_of_the_tool": "time_series"
   only_react_to_message_type": "I react to all messages"
   do_you_want_to_retrieve_data": "yes"
+  python_version: "3.8"
+  build_python_package: "yes"
+  build_docker_image: "yes"
+  publish_docker_image: "yes"
