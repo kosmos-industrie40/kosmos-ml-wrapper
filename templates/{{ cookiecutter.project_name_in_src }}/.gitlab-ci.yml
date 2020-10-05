@@ -9,7 +9,7 @@ image: "python:{{ cookiecutter.python_version }}"
 
 before_script:
   - python -v
-  - git config --global user.email "test@mail.com"
+  - git config --global user.email "test@example.com"
   - git config --global user.name "Tester"
   - git config --global url."https://$GIT_USER:$GIT_TOKEN@gitlab.inovex.de".insteadOf https://gitlab.inovex.de
   - pip install -r requirements.txt
@@ -101,7 +101,7 @@ build_docker:
         --context $CI_PROJECT_DIR \
         --dockerfile $CI_PROJECT_DIR/Dockerfile \
         --build-arg GIT_USER=$GIT_USER \
-        --build-arg GIT_TOKEN=$GIT_TOKEN \
+        --build-arg GIT_TOKEN=$GIT_TOKEN
 
 {%- endif %}
 
@@ -122,8 +122,6 @@ publish_docker:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [ "" ]
-  tags:
-    - shared
   cache: { }
   before_script:
     - echo $CI_DOCKER_CONFIG > /kaniko/.docker/config.json

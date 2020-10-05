@@ -19,5 +19,7 @@ class ResultType(Enum):
         Release the value2member_map function
         @return: dict
         """
+        # pylint falsly doesn't detect the private method
+        # _value2member_map_
         # pylint: disable=no-member
         return cls._value2member_map_

@@ -24,6 +24,7 @@ class MockMqttClient:
         msg = generate_mqtt_message_mock(
             "kosmos/analytics/mock_model/mock_tag", message
         )
+        # pylint falsly thinks on_message is not callable
         # pylint: disable=not-callable
         self.on_message(client, None, msg)
 

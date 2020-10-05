@@ -173,6 +173,8 @@ class MLWrapper(abc.ABC):
             port=int(self.config["config"]["mqtt"]["port"]),
         )
 
+    # Pylint misclassifies .get of config object as no member.
+    # This is wrong and therefore disabled
     # pylint: disable=no-member
     def _get_topics(self):
         topics = topic_splitter(self.config["config"]["messaging"]["request_topic"])
@@ -185,7 +187,6 @@ class MLWrapper(abc.ABC):
         return topics
 
     def _subscribe(self):
-        """ Subscribe the client to the config/env topic """
         topics = self._get_topics()
         for topic in topics:
             self.client.subscribe(
@@ -232,7 +233,7 @@ class MLWrapper(abc.ABC):
         if message.message_type != self._only_react_to_message_type:
             raise WrongMessageType(
                 "The message I received is of type {} but the "
-                "Tool is only reacting to type {}".format(
+                "tool is only reacting to type {}".format(
                     message.message_type.value, self._only_react_to_message_type.value
                 )
             )
@@ -260,6 +261,7 @@ class MLWrapper(abc.ABC):
         return
 
     # client and user_data are expected arguments by mqtt client
+    # Furthermore no exception should completely kill the tool
     # pylint: disable=unused-argument,broad-except
     def _react_to_message(
         self, client: Client, user_data: Union[None, str], message: MQTTMessage
