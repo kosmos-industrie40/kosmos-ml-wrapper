@@ -104,6 +104,8 @@ test_template:
     - pip install ./dist/*.whl
     - pip install pytest
     - pip install pandas
+    - git config --global user.email "testing@mail.com"
+    - git config --global user.name "Tester"
   script:
     - putup simple_ml_tool
     - cookiecutter templates --no-input --config-file tests/cookiecutter-template-test.yaml
