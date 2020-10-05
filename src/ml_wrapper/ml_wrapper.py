@@ -82,16 +82,22 @@ class MLWrapper(abc.ABC):
         :param log_level: optional from logging enum (e.g. logging.INFO)
         :param logger_name: optional name of the logger
         """
+        # Handle result_type
         assert result_type.value in ["text", "time_series", "multiple_time_series",], (
             "Resulttype needs to be either of 'text', 'time_series', or"
             " 'multiple_time_series'."
         )
         self.result_type = result_type
+
         self._config = Config(mode="all_allowed").scan(FILE_DIR, True).read()
+
+        # Handle message type that is accepted
         assert only_react_to_message_type is None or isinstance(
             only_react_to_message_type, MessageType
         ), "only_react_to_message_type can only be None or a MessageType"
         self._only_react_to_message_type = only_react_to_message_type
+
+        # Handle result types to react to
         assert only_react_to_previous_result_types is None or (
             isinstance(only_react_to_previous_result_types, list)
             and all(
@@ -102,6 +108,8 @@ class MLWrapper(abc.ABC):
             )
         ), "only_react_to_previous_result_types can only be None or a list of ResultType"
         self._only_react_to_previous_result_types = only_react_to_previous_result_types
+
+        # Initialize logger
         self.logger_ = logging.getLogger(logger_name or __name__)
         if not self.logger_.handlers:
             handler = logging.StreamHandler(sys.stdout)
@@ -116,8 +124,12 @@ class MLWrapper(abc.ABC):
             self.logger_.addHandler(handler)
         self.logger_.propagate = False
         self.logger.debug("The config is: %s", str(self._config.config_rendered))
+
+        # Render and set config at beginning
         self.config = self._config.config_rendered
         self._check_config_sanity()
+
+        # Init the mqtt and thread specifics
         self.client = None
         self.thread_pool = ThreadPool(
             int(self.config["config"]["threading"]["pool_num"])
