@@ -105,6 +105,7 @@ test_template:
     - pip install pytest
     - pip install pandas
   script:
+    - putup simple_ml_tool
     - cookiecutter templates --no-input --config-file tests/cookiecutter-template-test.yaml
     - cd simple_ml_tool
     - pytest
