@@ -105,7 +105,7 @@ test_template:
     - pip install pytest
     - pip install yamllint
     - pip install pandas
-    - git config --global user.email "testing@mail.com"
+    - git config --global user.email "testing@example.com"
     - git config --global user.name "Tester"
   script:
     - putup simple_ml_tool --no-skeleton
