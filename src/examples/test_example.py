@@ -22,8 +22,8 @@ os.environ["CONFIG_MODEL_FROM"] = "test"
 
 import unittest
 from src.examples.usage_example import AnalysisTool
-from ml_wrapper.mock_mqtt_client import MockMqttClient
-from ml_wrapper.json_provider import JSON_ML_ANALYSE_TIME_SERIES
+from src.ml_wrapper.mock_mqtt_client import MockMqttClient
+from src.ml_wrapper.json_provider import JSON_ML_ANALYSE_TIME_SERIES
 
 # Just make a local Mock Class of your own ml tool and copy paste the rest of this class
 class MockAnalysisTool(AnalysisTool):

@@ -17,12 +17,14 @@ import paho.mqtt.client as mqtt
 from paho.mqtt.client import MQTTMessage, Client
 from iniparser import Config
 
+from .message_type import MessageType
 from .exceptions import (
     EmptyResult,
     InvalidType,
     NotInitialized,
     NonSchemaConformJsonPayload,
     ConfigNotValid,
+    WrongMessageType,
 )
 from .helper import topic_splitter
 from .messaging import IncomingMessage, OutgoingMessage
@@ -33,6 +35,7 @@ from .log_level import LOG_LEVEL
 FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
+# pylint: disable=too-many-instance-attributes
 class MLWrapper(abc.ABC):
     """
     The MLWrapper class handles all administrative overhead regarding
@@ -70,6 +73,8 @@ class MLWrapper(abc.ABC):
         result_type: ResultType = ResultType.TIME_SERIES,
         log_level=LOG_LEVEL,
         logger_name=None,
+        only_react_to_message_type: MessageType = None,
+        only_react_to_previous_result_types: [None, List[ResultType]] = None,
     ):
         """
         Constructor of ML Wrapper.
@@ -77,12 +82,34 @@ class MLWrapper(abc.ABC):
         :param log_level: optional from logging enum (e.g. logging.INFO)
         :param logger_name: optional name of the logger
         """
+        # Handle result_type
         assert result_type.value in ["text", "time_series", "multiple_time_series",], (
             "Resulttype needs to be either of 'text', 'time_series', or"
             " 'multiple_time_series'."
         )
         self.result_type = result_type
+
         self._config = Config(mode="all_allowed").scan(FILE_DIR, True).read()
+
+        # Handle message type that is accepted
+        assert only_react_to_message_type is None or isinstance(
+            only_react_to_message_type, MessageType
+        ), "only_react_to_message_type can only be None or a MessageType"
+        self._only_react_to_message_type = only_react_to_message_type
+
+        # Handle result types to react to
+        assert only_react_to_previous_result_types is None or (
+            isinstance(only_react_to_previous_result_types, list)
+            and all(
+                [
+                    isinstance(constraint, ResultType)
+                    for constraint in only_react_to_previous_result_types
+                ]
+            )
+        ), "only_react_to_previous_result_types can only be None or a list of ResultType"
+        self._only_react_to_previous_result_types = only_react_to_previous_result_types
+
+        # Initialize logger
         self.logger_ = logging.getLogger(logger_name or __name__)
         if not self.logger_.handlers:
             handler = logging.StreamHandler(sys.stdout)
@@ -97,8 +124,12 @@ class MLWrapper(abc.ABC):
             self.logger_.addHandler(handler)
         self.logger_.propagate = False
         self.logger.debug("The config is: %s", str(self._config.config_rendered))
+
+        # Render and set config at beginning
         self.config = self._config.config_rendered
         self._check_config_sanity()
+
+        # Init the mqtt and thread specifics
         self.client = None
         self.thread_pool = ThreadPool(
             int(self.config["config"]["threading"]["pool_num"])
@@ -154,9 +185,21 @@ class MLWrapper(abc.ABC):
             port=int(self.config["config"]["mqtt"]["port"]),
         )
 
-    def _subscribe(self):
-        """ Subscribe the client to the config/env topic """
+    # Pylint misclassifies .get of config object as no member.
+    # This is wrong and therefore disabled
+    # pylint: disable=no-member
+    def _get_topics(self):
         topics = topic_splitter(self.config["config"]["messaging"]["request_topic"])
+        base = self._config.get(
+            "messaging", "analytic_base_url", default="kosmos/analytics/"
+        )
+        model_url = self._config.get("model", "url")
+        model_tag = self._config.get("model", "tag")
+        topics.append(f"{base}/{model_url}/{model_tag}".replace("//", "/"))
+        return topics
+
+    def _subscribe(self):
+        topics = self._get_topics()
         for topic in topics:
             self.client.subscribe(
                 topic=topic,
@@ -196,7 +239,41 @@ class MLWrapper(abc.ABC):
         traceback.print_exception(type(err), err, err.__traceback__)
         raise type(err)(err)
 
+    def _check_message_requirements(self, message: IncomingMessage):
+        if self._only_react_to_message_type is None:
+            return
+        if message.message_type != self._only_react_to_message_type:
+            raise WrongMessageType(
+                "The message I received is of type {} but the "
+                "tool is only reacting to type {}".format(
+                    message.message_type.value, self._only_react_to_message_type.value
+                )
+            )
+        if (
+            message.message_type == MessageType.ANALYSES_Result
+            and self._only_react_to_previous_result_types is not None
+        ):
+            if (
+                message.analyses_message_type
+                not in self._only_react_to_previous_result_types
+            ):
+                raise WrongMessageType(
+                    "The message I received is a previously calculated analyse result. "
+                    "However I require a message of type {}".format(
+                        " or ".join(
+                            list(
+                                map(
+                                    lambda x: x.value,
+                                    self._only_react_to_previous_result_types,
+                                )
+                            )
+                        )
+                    )
+                )
+        return
+
     # client and user_data are expected arguments by mqtt client
+    # Furthermore no exception should completely kill the tool
     # pylint: disable=unused-argument,broad-except
     def _react_to_message(
         self, client: Client, user_data: Union[None, str], message: MQTTMessage
@@ -208,8 +285,12 @@ class MLWrapper(abc.ABC):
         try:
             self.logger.debug(in_message)
             in_message.mqtt_message = message
+            self._check_message_requirements(in_message)
         except (EmptyResult, InvalidType, NonSchemaConformJsonPayload) as error:
             self.logger.error("%s:\n%s", error.__class__.__name__, error)
+            raise error from error
+        except WrongMessageType as error:
+            self.logger.error("%s: \n%s", WrongMessageType.__name__, error)
             raise error from error
         except Exception as error:
             self.logger.error(

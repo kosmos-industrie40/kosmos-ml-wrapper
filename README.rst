@@ -76,6 +76,57 @@ After installing this package, you can use this package as described in
 To test your application with the ML Wrapper, a testing framework to
 build on is provided in `test_example.py`_.
 
+Using the template
+------------------
+
+The easiest way of getting started with this is by using the provided cookiecutter-template.
+We assume that you have set up your project using pyscaffold's putup command. If you are only
+starting, consider executing
+
+::
+
+    putup YOURPROJECTNAME --no-skeleton
+
+If you are on the parent directory of YOURPROJECTNAME, simply execute the template by:
+
+::
+    cookiecutter https://gitlab.inovex.de/proj-kosmos/libraries/python/ml_wrapper/ -f --directory templates
+
+Make sure to enter the same value in the project_name_in_src field as in putup with YOURPROJECTNAME.
+
++------------------------------+----------------------------+-----------------------+
+| Variale to fill              | Default value              | Description/hint      |
++==============================+============================+=======================+
+| src_folder_name              | src                        | Do not change         |
++------------------------------+----------------------------+-----------------------+
+| test_folder_name             | tests                      | Do not change         |
++------------------------------+----------------------------+-----------------------+
+| project_name_in_src          | simple_ml_tool             | Fill with the same    |
+|                              |                            | as in putup:          |
+|                              |                            | YOURPROJECTNAME       |
++------------------------------+----------------------------+-----------------------+
+| short_project_description    | <None given>               |                       |
++------------------------------+----------------------------+-----------------------+
+| ml_tool_name                 | simple_ml_tool             |                       |
++------------------------------+----------------------------+-----------------------+
+| ml_class_name                | SimpleMlTool               |                       |
++------------------------------+----------------------------+-----------------------+
+| result_type_of_the_tool      | time_series                |                       |
++------------------------------+----------------------------+-----------------------+
+| only_react_to_message_type   | I react to all messages    |                       |
++------------------------------+----------------------------+-----------------------+
+| do_you_want_to_retrieve_data | no                         |                       |
++------------------------------+----------------------------+-----------------------+
+| python_version               | 3.8                        |                       |
++------------------------------+----------------------------+-----------------------+
+| build_python_package         | yes                        |                       |
++------------------------------+----------------------------+-----------------------+
+| publish_docker_image         | yes                        |                       |
++------------------------------+----------------------------+-----------------------+
+| build_docker_image           | yes                        |                       |
++------------------------------+----------------------------+-----------------------+
+
+
 Usage summary
 -------------
 

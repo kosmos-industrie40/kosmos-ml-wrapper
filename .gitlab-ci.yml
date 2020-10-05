@@ -2,6 +2,7 @@ stages:
   - Static Analysis
   - Unit Test
   - Build
+  - Templating
 
 pylint:
   stage: Static Analysis
@@ -67,7 +68,7 @@ build:
       - .gitlab-ci.yml
       - src/**/*
       - tests/*
-      - requirements.txct
+      - requirements.txt
       - setup.*
   needs:
     - test
@@ -82,3 +83,33 @@ build:
       - dist/*.whl
   script:
     - python setup.py sdist bdist_wheel
+
+test_template:
+  stage: Templating
+  image: "python:3.8"
+  only:
+    changes:
+      - .gitlab-ci.yml
+      - src/**/*
+      - tests/*
+      - requirements.txt
+      - setup.*
+  tags:
+    - shared
+  dependencies:
+    - build
+  before_script:
+    - pip install cookiecutter
+    - pip install pyscaffold
+    - pip install ./dist/*.whl
+    - pip install pytest
+    - pip install yamllint
+    - pip install pandas
+    - git config --global user.email "testing@example.com"
+    - git config --global user.name "Tester"
+  script:
+    - putup simple_ml_tool --no-skeleton
+    - cookiecutter templates -f --no-input --config-file tests/cookiecutter-template-test.yaml
+    - cd simple_ml_tool
+    - ls -la
+    - python setup.py test

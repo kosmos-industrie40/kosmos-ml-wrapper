@@ -9,14 +9,12 @@ import logging
 import pandas as pd
 
 
-os.environ["CONFIG_MODEL_URL"] = "test"
-os.environ["CONFIG_MODEL_TAG"] = "test"
-os.environ["CONFIG_MODEL_FROM"] = "test"
+os.environ["CONFIG_MODEL_URL"] = "test_url"
+os.environ["CONFIG_MODEL_TAG"] = "test_tag"
+os.environ["CONFIG_MODEL_FROM"] = "test_from"
 
-from ml_wrapper import MLWrapper
-from ml_wrapper.messaging import OutgoingMessage
-from ml_wrapper.result_type import ResultType
-from ml_wrapper.mock_mqtt_client import MockMqttClient
+from src.ml_wrapper import MLWrapper, OutgoingMessage, ResultType
+from src.ml_wrapper.mock_mqtt_client import MockMqttClient
 
 
 class FFT(MLWrapper):
@@ -129,3 +127,26 @@ class BadMLTool(MLWrapper):
         columns = out_message.in_message.columns
         self.logger.debug(dataframe, columns)
         return "Done"
+
+
+class RequireCertainInput(MLWrapper):
+    """
+    Mock for message requirements
+    """
+
+    def __init__(self):
+        """ Constructor """
+        super().__init__(
+            logger_name="MOCK", log_level=logging.DEBUG, result_type=ResultType.TEXT
+        )
+
+    def _init_mqtt(self):
+        """Initialize a mock mqtt client"""
+        self.client = MockMqttClient(self.logger)
+
+    def run(
+        self, out_message: OutgoingMessage
+    ) -> Union[pd.DataFrame, List[pd.DataFrame], dict]:
+        """Run method implementation"""
+        self.logger.debug("Do Nothing")
+        return {"total": "Done", "predict": 100}

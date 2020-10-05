@@ -4,7 +4,7 @@ This file provides tests for the helper file
 import unittest
 from unittest import TestCase
 
-from ml_wrapper.helper import topic_splitter
+from src.ml_wrapper.helper import topic_splitter
 
 
 class Test(TestCase):

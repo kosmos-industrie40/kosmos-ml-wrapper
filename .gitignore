@@ -51,3 +51,5 @@ env/
 
 # Project specific
 kosmos-json-specifications/.gitlab-ci.yml
+xunit2
+simple_ml_tool/

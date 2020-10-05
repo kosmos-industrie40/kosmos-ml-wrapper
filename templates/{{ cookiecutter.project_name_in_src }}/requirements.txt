@@ -1,0 +1,2 @@
+git+https://gitlab.inovex.de/proj-kosmos/libraries/python/ml_wrapper.git
+pandas

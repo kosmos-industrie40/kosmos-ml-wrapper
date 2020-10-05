@@ -1,0 +1,154 @@
+---
+stages:
+  - static
+  - test
+  - build
+  - deploy
+
+image: "python:{{ cookiecutter.python_version }}"
+
+before_script:
+  - python -v
+  - git config --global user.email "test@example.com"
+  - git config --global user.name "Tester"
+  - git config --global url."https://$GIT_USER:$GIT_TOKEN@gitlab.inovex.de".insteadOf https://gitlab.inovex.de
+  - pip install -r requirements.txt
+  - |
+    if [ -f "./test-requirements.txt" ]; then
+      pip install -r test-requirements.txt
+    fi
+
+pylint:
+  stage: static
+  tags:
+    - shared
+  script:
+    - pip install pylint
+    - pylint src
+    - |
+      if [ -f "./tests/.pylintrc" ]; then
+        pylint --rcfile tests/.pylintrc tests
+      else
+        pylint tests
+      fi
+
+black:
+  stage: static
+  tags:
+    - shared
+  script:
+    - pip install black
+    - black --check src
+    - black --check tests
+
+unittests:
+  stage: test
+  tags:
+    - shared
+  artifacts:
+    reports:
+      junit: junit.xml
+      cobertura: coverage.xml
+  script:
+    - python setup.py test
+
+{% if cookiecutter.build_python_package == "yes" -%}
+build:
+  stage: build
+  tags:
+    - shared
+  script:
+    - pip install wheel
+    - python setup.py sdist bdist_wheel
+  artifacts:
+    paths:
+      - dist/*.whl
+{%- endif %}
+
+{% if cookiecutter.build_docker_image == "yes" -%}
+build_docker:
+  stage: build
+  tags:
+    - shared
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  except:
+    refs:
+      - master
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [ "" ]
+  cache: { }
+  before_script:
+    - echo $CI_DOCKER_CONFIG > /kaniko/.docker/config.json
+  script:
+    - |
+      if [ -z $CI_REGISTRY ] || [ -z $CI_REGISTRY_IMAGE ]; then
+        echo "missing parameters please add the entries for"
+        echo "CI_REGISTRY, CI_REGISTRY_IMAGE"
+        echo "This will fail on master or tag"
+      fi
+    - |
+      if [ -z $CI_COMMIT_TAG ]; then
+        version=$CI_COMMIT_SHA
+      else
+        version=$CI_COMMIT_TAG
+      fi
+    - echo $version
+    - |
+      /kaniko/executor \
+        --no-push \
+        --context $CI_PROJECT_DIR \
+        --dockerfile $CI_PROJECT_DIR/Dockerfile \
+        --build-arg GIT_USER=$GIT_USER \
+        --build-arg GIT_TOKEN=$GIT_TOKEN
+
+{%- endif %}
+
+{% if cookiecutter.publish_docker_image == "yes" -%}
+
+publish_docker:
+  stage: deploy
+  tags:
+    - shared
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  only:
+    refs:
+      - tags
+      - master
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /[.\n]*\[publish\s?image\][.\n]*/
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [ "" ]
+  cache: { }
+  before_script:
+    - echo $CI_DOCKER_CONFIG > /kaniko/.docker/config.json
+  script:
+    - |
+      if [ -z $CI_REGISTRY ] || [ -z $CI_REGISTRY_IMAGE ]; then
+        echo "missing parameters please add the entries for"
+        echo "CI_REGISTRY, CI_REGISTRY_IMAGE"
+        exit 1
+      fi
+    - |
+      if [ -z $CI_COMMIT_TAG ]; then
+        version=$CI_COMMIT_SHA
+      else
+        version=$CI_COMMIT_TAG
+      fi
+    - echo "Pushing version $version to registry"
+    - |
+      /kaniko/executor \
+      --context $CI_PROJECT_DIR \
+      --dockerfile $CI_PROJECT_DIR/Dockerfile \
+      --destination $CI_REGISTRY/$CI_REGISTRY_IMAGE:$version \
+      --destination $CI_REGISTRY/$CI_REGISTRY_IMAGE:latest \
+      --build-arg GIT_USER=$GIT_USER \
+      --build-arg GIT_TOKEN=$GIT_TOKEN \
+      --cache=true # Remove to disable caching
+
+
+  {%- endif %}
+

@@ -6,7 +6,7 @@ from os.path import dirname, join
 import pandas as pd
 import numpy as np
 
-from ml_wrapper.json_provider import (
+from src.ml_wrapper.json_provider import (
     JSON_ANALYSE_TIME_SERIES,
     JSON_ANALYSE_MULTIPLE_TIME_SERIES,
     JSON_ANALYSE_TEXT,
@@ -14,7 +14,7 @@ from ml_wrapper.json_provider import (
     JSON_DATA_EXAMPLE,
     JSON_DATA_EXAMPLE_2,
 )
-from ml_wrapper.convert_data import (
+from src.ml_wrapper.convert_data import (
     resolve_data_frame,
     retrieve_dataframe,
     retrieve_sensor_update_data,

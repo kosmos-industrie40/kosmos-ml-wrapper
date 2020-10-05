@@ -22,7 +22,7 @@ from typing import Union, List
 import pandas as pd
 
 
-from ml_wrapper import MLWrapper, IncomingMessage, OutgoingMessage, ResultType
+from src.ml_wrapper import MLWrapper, IncomingMessage, OutgoingMessage, ResultType
 
 
 # Create child class of MLWrappers

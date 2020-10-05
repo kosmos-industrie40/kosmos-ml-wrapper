@@ -9,8 +9,12 @@ class MockMqttClient:
         self.logger = logger
         self.on_message = None
         self.connect = lambda *args, **kwargs: None
-        self.subscribe = lambda *args, **kwargs: None
+        self.subscriptions = list()
         self.last_published = None
+
+    def subscribe(self, topic, qos):
+        """ Cache subscriptions """
+        self.subscriptions.append({"topic": topic, "qos": qos})
 
     def mock_a_message(self, client, message: str):
         """ This function can be used to inject a mocked message """
@@ -20,6 +24,7 @@ class MockMqttClient:
         msg = generate_mqtt_message_mock(
             "kosmos/analytics/mock_model/mock_tag", message
         )
+        # pylint falsly thinks on_message is not callable
         # pylint: disable=not-callable
         self.on_message(client, None, msg)
 

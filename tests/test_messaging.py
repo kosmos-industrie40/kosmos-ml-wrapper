@@ -9,7 +9,7 @@ import pandas as pd
 
 from paho.mqtt.client import MQTTMessage
 
-from ml_wrapper import (
+from src.ml_wrapper import (
     ResultType,
     JSON_ML_ANALYSE_TIME_SERIES,
     JSON_ML_ANALYSE_MULTIPLE_TIME_SERIES,
@@ -24,12 +24,12 @@ from ml_wrapper import (
     JSON_DATA_EXAMPLE_2,
     JSON_DATA_EXAMPLE_3,
 )
-from ml_wrapper.exceptions import (
+from src.ml_wrapper.exceptions import (
     NotInitialized,
     NonSchemaConformJsonPayload,
     InvalidTopic,
 )
-from ml_wrapper.messaging import IncomingMessage, OutgoingMessage
+from src.ml_wrapper.messaging import IncomingMessage, OutgoingMessage
 
 
 # pylint: disable=super-init-not-called
