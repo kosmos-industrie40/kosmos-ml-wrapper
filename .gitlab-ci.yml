@@ -108,6 +108,6 @@ test_template:
     - git config --global user.name "Tester"
   script:
     - putup simple_ml_tool
-    - cookiecutter templates --no-input --config-file tests/cookiecutter-template-test.yaml
+    - cookiecutter templates -f --no-input --config-file tests/cookiecutter-template-test.yaml
     - cd simple_ml_tool
     - pytest
