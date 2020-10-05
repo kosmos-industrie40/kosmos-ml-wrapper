@@ -105,7 +105,7 @@ Make sure to enter the same value in the project_name_in_src field as in putup w
 |                              |                            | as in putup:          |
 |                              |                            | YOURPROJECTNAME       |
 +------------------------------+----------------------------+-----------------------+
-| short_project_description    | -                          |                       |
+| short_project_description    | <None given>               |                       |
 +------------------------------+----------------------------+-----------------------+
 | ml_tool_name                 | simple_ml_tool             |                       |
 +------------------------------+----------------------------+-----------------------+
