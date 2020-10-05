@@ -113,4 +113,3 @@ test_template:
     - cd simple_ml_tool
     - ls -la
     - python setup.py test
-    - yamllint .gitlab-ci.yml
