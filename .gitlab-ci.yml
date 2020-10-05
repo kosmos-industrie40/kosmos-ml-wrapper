@@ -110,4 +110,5 @@ test_template:
     - putup simple_ml_tool
     - cookiecutter templates -f --no-input --config-file tests/cookiecutter-template-test.yaml
     - cd simple_ml_tool
-    - pytest
+    - ls -la
+    - python setup.py test
