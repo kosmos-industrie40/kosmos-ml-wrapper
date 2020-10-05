@@ -107,7 +107,7 @@ test_template:
     - git config --global user.email "testing@mail.com"
     - git config --global user.name "Tester"
   script:
-    - putup simple_ml_tool
+    - putup simple_ml_tool --no-skeleton
     - cookiecutter templates -f --no-input --config-file tests/cookiecutter-template-test.yaml
     - cd simple_ml_tool
     - ls -la
