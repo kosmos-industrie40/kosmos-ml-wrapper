@@ -97,7 +97,7 @@ If you are on the parent directory of YOURPROJECTNAME, simply execute the templa
 Make sure to enter the same value in the project_name_in_src field as in putup with YOURPROJECTNAME.
 
 +------------------------------+----------------------------+-----------------------+
-| Variale to fill              | Default value              | Description/hint      |
+| Variable to fill             | Default value              | Description/hint      |
 +==============================+============================+=======================+
 | src_folder_name              | src                        | Do not change         |
 +------------------------------+----------------------------+-----------------------+
