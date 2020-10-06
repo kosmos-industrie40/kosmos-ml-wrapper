@@ -40,7 +40,7 @@ class FFT(MLWrapper):
         result: Union[pd.DataFrame, List[pd.DataFrame], dict],
         out_message: OutgoingMessage,
     ) -> OutgoingMessage:
-        out_message = super(FFT, self).resolve_result_data(
+        out_message = super().resolve_result_data(
             result=result, out_message=out_message
         )
         self.last_out_message = out_message
@@ -80,7 +80,7 @@ class BadTopicTool(MLWrapper):
         result: Union[pd.DataFrame, List[pd.DataFrame], dict],
         out_message: OutgoingMessage,
     ) -> OutgoingMessage:
-        out_message = super(BadTopicTool, self).resolve_result_data(
+        out_message = super().resolve_result_data(
             result=result, out_message=out_message
         )
         self.last_out_message = out_message
@@ -118,7 +118,7 @@ class SlowMLTool(MLWrapper):
         result: Union[pd.DataFrame, List[pd.DataFrame], dict],
         out_message: OutgoingMessage,
     ) -> OutgoingMessage:
-        out_message = super(SlowMLTool, self).resolve_result_data(
+        out_message = super().resolve_result_data(
             result=result, out_message=out_message
         )
         self.last_out_message = out_message
@@ -154,7 +154,7 @@ class ResultTypeTool(MLWrapper):
         result: Union[pd.DataFrame, List[pd.DataFrame], dict],
         out_message: OutgoingMessage,
     ) -> OutgoingMessage:
-        out_message = super(ResultTypeTool, self).resolve_result_data(
+        out_message = super().resolve_result_data(
             result=result, out_message=out_message
         )
         self.last_out_message = out_message
@@ -188,7 +188,7 @@ class BadMLTool(MLWrapper):
         result: Union[pd.DataFrame, List[pd.DataFrame], dict],
         out_message: OutgoingMessage,
     ) -> OutgoingMessage:
-        out_message = super(BadMLTool, self).resolve_result_data(
+        out_message = super().resolve_result_data(
             result=result, out_message=out_message
         )
         self.last_out_message = out_message
@@ -228,7 +228,7 @@ class RequireCertainInput(MLWrapper):
         result: Union[pd.DataFrame, List[pd.DataFrame], dict],
         out_message: OutgoingMessage,
     ) -> OutgoingMessage:
-        out_message = super(RequireCertainInput, self).resolve_result_data(
+        out_message = super().resolve_result_data(
             result=result, out_message=out_message
         )
         self.last_out_message = out_message
