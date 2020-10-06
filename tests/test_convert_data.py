@@ -83,9 +83,9 @@ class TestDataRetrievalAndResolve(unittest.TestCase):
         # test analysis time series
         print("Testing with analyses-example-time_series.json")
         data_frame, columns, data = retrieve_dataframe(
-            JSON_ANALYSE_TIME_SERIES.get("results")
+            JSON_ANALYSE_TIME_SERIES["body"].get("results")
         )
-        timestamp = JSON_ANALYSE_TIME_SERIES.get("timestamp")
+        timestamp = JSON_ANALYSE_TIME_SERIES["body"].get("timestamp")
         self.assertIsInstance(data_frame, pd.DataFrame)
         self.assertIsInstance(columns, list)
         self.assertIsInstance(data, list)
@@ -94,9 +94,9 @@ class TestDataRetrievalAndResolve(unittest.TestCase):
     def test_analysis_multiple_time_series(self):
         # test analysis time series
         print("Test with analyses-example-multiple_time_series.json")
-        timestamp = JSON_ANALYSE_MULTIPLE_TIME_SERIES.get("timestamp")
+        timestamp = JSON_ANALYSE_MULTIPLE_TIME_SERIES["body"].get("timestamp")
         self.assertIsInstance(timestamp, str)
-        for result in JSON_ANALYSE_MULTIPLE_TIME_SERIES.get("results"):
+        for result in JSON_ANALYSE_MULTIPLE_TIME_SERIES["body"].get("results"):
             data_frame, columns, data = retrieve_dataframe(result)
             self.assertIsInstance(data_frame, pd.DataFrame)
             self.assertIsInstance(columns, list)
@@ -105,14 +105,14 @@ class TestDataRetrievalAndResolve(unittest.TestCase):
     def test_analysis_text(self):
         # test analysis text
         print("Testing with analyses-example-text.json")
-        data = JSON_ANALYSE_TEXT.get("results")
-        timestamp = JSON_ANALYSE_TEXT.get("timestamp")
+        data = JSON_ANALYSE_TEXT["body"].get("results")
+        timestamp = JSON_ANALYSE_TEXT["body"].get("timestamp")
         self.assertIsInstance(data, dict)
         self.assertIsInstance(timestamp, str)
 
     def test_dataframe_types_retrieval(self):
         print("Testing with data-example-3.json")
-        data_frame, _, _, _ = retrieve_sensor_update_data(JSON_DATA_EXAMPLE_3)
+        data_frame, _, _, _ = retrieve_sensor_update_data(JSON_DATA_EXAMPLE_3["body"])
         self.assertEqual(
             data_frame.dtypes.tolist(), ["float64", "float64", "datetime64[ns]"]
         )
@@ -121,9 +121,9 @@ class TestDataRetrievalAndResolve(unittest.TestCase):
         # test sensor data w/o metadata
         print("Testing with data-example.json")
         data_frame, columns, data, metadata = retrieve_sensor_update_data(
-            JSON_DATA_EXAMPLE
+            JSON_DATA_EXAMPLE["body"]
         )
-        timestamp = JSON_DATA_EXAMPLE.get("timestamp")
+        timestamp = JSON_DATA_EXAMPLE["body"].get("timestamp")
         self.assertIsInstance(data_frame, pd.DataFrame)
         self.assertIsInstance(columns, list)
         self.assertIsInstance(data, list)
@@ -135,9 +135,9 @@ class TestDataRetrievalAndResolve(unittest.TestCase):
         # test sensor data w/ metadata
         print("Testing with data-example-2.json")
         data_frame, columns, data, metadata = retrieve_sensor_update_data(
-            JSON_DATA_EXAMPLE_2
+            JSON_DATA_EXAMPLE_2["body"]
         )
-        timestamp = JSON_DATA_EXAMPLE_2.get("timestamp")
+        timestamp = JSON_DATA_EXAMPLE_2["body"].get("timestamp")
         self.assertIsInstance(data_frame, pd.DataFrame)
         self.assertIsInstance(columns, list)
         self.assertIsInstance(data, list)

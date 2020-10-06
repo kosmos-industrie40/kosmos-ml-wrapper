@@ -16,7 +16,7 @@ from src.ml_wrapper.ml_wrapper import MLWrapper
 from src.ml_wrapper.result_type import ResultType
 from src.ml_wrapper.message_type import MessageType
 from src.ml_wrapper.messaging import IncomingMessage
-from src.ml_wrapper.exceptions import NonSchemaConformJsonPayload, WrongMessageType
+from src.ml_wrapper.exceptions import NonSchemaConformJsonPayload
 from src.ml_wrapper.json_provider import (
     JSON_ML_ANALYSE_TIME_SERIES,
     JSON_ML_DATA_EXAMPLE,
@@ -63,9 +63,9 @@ class TestMLWrapper(unittest.TestCase):
         in_message.mqtt_message = self.msg
         in_message_new = self.mlw.retrieve_payload_data(in_message)
         self.assertEqual(in_message_new, in_message)
-        payload = self.mlw._run(in_message).payload_as_json_dict
-        self.assertIsNotNone(payload["results"])
-        self.assertIsNotNone(payload["timestamp"])
+        body = self.mlw._run(in_message).body_as_json_dict
+        self.assertIsNotNone(body["results"])
+        self.assertIsNotNone(body["timestamp"])
 
     def test_erroneous_run(self):
         bad_ml = BadMLTool()
@@ -84,7 +84,7 @@ class TestMLWrapper(unittest.TestCase):
             fft.client.mock_a_message(fft.client, str(json.dumps({"test": "hi"})))
         with self.assertRaises(NonSchemaConformJsonPayload):
             fft.client.mock_a_message(
-                fft.client, str(json.dumps({"type": "text", "test": "hi"}))
+                fft.client, str(json.dumps({"body": {"type": "text", "test": "hi"}}))
             )
         fft.client.mock_a_message(fft.client, json.dumps(JSON_ML_ANALYSE_TIME_SERIES))
         while fft._async_ready():
@@ -107,25 +107,43 @@ class TestMLWrapper(unittest.TestCase):
             any(["undefined topic" in msg and "consider" in msg for msg in log.output])
         )
 
+    def test_multiple_messages_with_failing_inbetween(self):
+        ml_tool = RequireCertainInput()
+        ml_tool._only_react_to_message_type = MessageType.SENSOR_UPDATE
+        ml_tool.client.mock_a_message(ml_tool.client, json.dumps(JSON_ML_DATA_EXAMPLE))
+        ml_tool._only_react_to_message_type = MessageType.ANALYSES_Result
+        ml_tool._only_react_to_previous_result_types = [
+            ResultType.TIME_SERIES,
+        ]
+        t_series = json.dumps(JSON_ML_ANALYSE_TIME_SERIES)
+        text = json.dumps(JSON_ML_ANALYSE_TEXT)
+        ml_tool.client.mock_a_message(ml_tool.client, t_series)
+        ml_tool.client.mock_a_message(ml_tool.client, text)
+        ml_tool.client.mock_a_message(ml_tool.client, t_series)
+
     def test_require_message_type(self):
         ml_tool = RequireCertainInput()
         ml_tool._only_react_to_message_type = MessageType.SENSOR_UPDATE
         ml_tool.client.mock_a_message(ml_tool.client, json.dumps(JSON_ML_DATA_EXAMPLE))
         ml_tool._only_react_to_message_type = MessageType.ANALYSES_Result
-        with self.assertRaises(WrongMessageType):
+        with self.assertLogs("MOCK", level="ERROR") as log:
             ml_tool.client.mock_a_message(
                 ml_tool.client, json.dumps(JSON_ML_DATA_EXAMPLE)
             )
+        self.assertIn("WrongMessageType", "\n".join(log.output))
         t_series = json.dumps(JSON_ML_ANALYSE_TIME_SERIES)
         text = json.dumps(JSON_ML_ANALYSE_TEXT)
         ml_tool.client.mock_a_message(ml_tool.client, t_series)
+        while ml_tool.async_result is not None and not ml_tool.async_result.ready():
+            sleep(1)
         ml_tool._only_react_to_previous_result_types = [
             ResultType.TIME_SERIES,
             ResultType.MULTIPLE_TIME_SERIES,
         ]
         ml_tool.client.mock_a_message(ml_tool.client, t_series)
-        with self.assertRaises(WrongMessageType):
+        with self.assertLogs("MOCK", level="ERROR") as log2:
             ml_tool.client.mock_a_message(ml_tool.client, text)
+        self.assertIn("WrongMessageType", "\n".join(log2.output))
 
     def test_subscription(self):
         ml_tool = FFT()
