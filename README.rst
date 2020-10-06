@@ -89,7 +89,9 @@ starting, consider executing
 
 If you are on the parent directory of YOURPROJECTNAME, simply execute the template by:
 
+
 ::
+
     cookiecutter https://gitlab.inovex.de/proj-kosmos/libraries/python/ml_wrapper/ -f --directory templates
 
 Make sure to enter the same value in the project_name_in_src field as in putup with YOURPROJECTNAME.
@@ -166,8 +168,8 @@ jsonschema) and return said calculation. The result will then be
 transformed to the proper outputs in the retrieve_payload_data() method.
 In case you need to change those values, you can overwrite the
 retrieve_payload_data() method by setting the ``out_message``\ ’s field
-``payload`` directly. However, keep in mind that you will have to stick
-to the `jsonschema`_ and provide a valid payload.
+``body`` directly. However, keep in mind that you will have to stick
+to the `jsonschema`_ and provide a valid payload body.
 
 In simplified terms, the main analysis workflow looks like the
 following:
