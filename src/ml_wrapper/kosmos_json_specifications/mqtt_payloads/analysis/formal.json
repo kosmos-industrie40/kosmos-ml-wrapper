@@ -2,81 +2,146 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "title": "Topic: kosmos/analysis/<contractId>",
   "description": "definition of the payload for the topic kosmos/analysis/<contractId>",
-  "required": ["from", "timestamp", "type", "calculated", "results", "model"],
   "properties": {
-    "from": {
-      "type": "string",
-      "description": "contains the id of the creator"
-    },
-    "model": {
-      "type": "object",
-      "description": "described the used model of this package",
+    "body": {
+      "required": [
+        "from",
+        "timestamp",
+        "type",
+        "calculated",
+        "results",
+        "model"
+      ],
       "properties": {
-        "url": {
-	      "type": "string",
-          "description": "url of the used model"
-        },
-        "tag": {
+        "from": {
           "type": "string",
-          "description": "tag of the model"
+          "description": "contains the id of the creator"
+        },
+        "model": {
+          "type": "object",
+          "description": "described the used model of this package",
+          "properties": {
+            "url": {
+              "type": "string",
+              "description": "url of the used model"
+            },
+            "tag": {
+              "type": "string",
+              "description": "tag of the model"
+            }
+          },
+          "required": [
+            "url",
+            "tag"
+          ]
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "is the timestamp in RFC 3339 format"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "time_series",
+            "multiple_time_series",
+            "text"
+          ],
+          "description": "defines the type of this message; the result of a ml computing unit can be a time series, multiple time series or an string (text)"
+        },
+        "calculated": {
+          "type": "object",
+          "description": "reference on the message on which the calculation will be executed",
+          "properties": {
+            "message": {
+              "type": "object",
+              "properties": {
+                "machine": {
+                  "type": "string",
+                  "description": "defines the machine from which the update message came"
+                },
+                "sensor": {
+                  "type": "string",
+                  "description": "defines the sensor from which the update message came"
+                }
+              },
+              "required": [
+                "machine",
+                "sensor"
+              ]
+            },
+            "received": {
+              "type": "string",
+              "description": "timestamp on which the message is received in rfc 3339 format"
+            }
+          },
+          "required": [
+            "message",
+            "received"
+          ]
+        },
+        "results": {
+          "description": "defines the results which are made by the computing unit",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/multiple_time_series-result"
+            },
+            {
+              "$ref": "#/definitions/time_series-result"
+            },
+            {
+              "$ref": "#/definitions/text-result"
+            }
+          ]
         }
       },
-      "required": ["url", "tag"]
-    },
-    "timestamp": {
-      "type": "string",
-      "description": "is the timestamp in RFC 3339 format"
-    },
-    "type": {
-      "type": "string",
-      "enum": [
-        "time_series",
-        "multiple_time_series",
-        "text"
-      ],
-      "description": "defines the type of this message; the result of a ml computing unit can be a time series, multiple time series or an string (text)"
+      "if": {
+        "properties": {
+          "type": {
+            "enum": [
+              "text"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "results": {
+            "$ref": "#/definitions/text-result"
+          }
+        }
+      },
+      "else": {
+        "if": {
+          "properties": {
+            "type": {
+              "enum": [
+                "time_series"
+              ]
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "results": {
+              "$ref": "#/definitions/time_series-result"
+            }
+          }
+        },
+        "else": {
+          "properties": {
+            "results": {
+              "$ref": "#/definitions/multiple_time_series-result"
+            }
+          }
+        }
+      }
     },
     "signature": {
       "type": "string",
       "description": "Base64 Encoded signature about all other fields in the message"
-    },
-    "calculated": {
-      "type": "object",
-      "description": "reference on the message on which the calculation will be executed",
-      "properties": {
-        "message": {
-          "type": "object",
-          "properties": {
-            "machine": {
-              "type": "string",
-              "description": "defines the machine from which the update message came"
-            },
-            "sensor": {
-              "type": "string",
-              "description": "defines the sensor from which the update message came"
-            }
-          },
-	  "required": ["machine", "sensor"]
-        },
-        "received": {
-          "type": "string",
-          "description": "timestamp on which the message is received in rfc 3339 format"
-        }
-      },
-      "required": [
-        "message",
-        "received"
-      ]
-    },
-    "results": {
-      "description": "defines the results which are made by the computing unit",
-      "oneOf": [
-        {"$ref": "#/definitions/multiple_time_series-result"},
-        {"$ref": "#/definitions/time_series-result"},
-        {"$ref": "#/definitions/text-result"}
-      ]
     }
   },
+  "required": ["body"],
   "definitions": {
     "multiple_time_series-result": {
       "type": "array",
@@ -102,14 +167,21 @@
               "type": {
                 "type": "string",
                 "description": "defines the type which is used in this column; allowed are the number and the string type",
-                "enum": ["number", "string", "rfctime"]
+                "enum": [
+                  "number",
+                  "string",
+                  "rfctime"
+                ]
               },
               "allowed_values": {
                 "type": "array",
                 "description": "defines the values which are allowed in the data to this column definition"
               }
             },
-            "required": ["name", "type"]
+            "required": [
+              "name",
+              "type"
+            ]
           },
           "minItems": 1
         },
@@ -126,7 +198,10 @@
           }
         }
       },
-      "required": ["columns", "data"]
+      "required": [
+        "columns",
+        "data"
+      ]
     },
     "text-result": {
       "type": "object",
@@ -194,43 +269,6 @@
         "total",
         "predict"
       ]
-    }
-  },
-  "if": {
-    "properties": {
-      "type": {
-        "enum": ["text"]
-      }
-    }
-  },
-  "then": {
-    "properties": {
-      "results": {
-        "$ref": "#/definitions/text-result"
-      }
-    }
-  },
-  "else": {
-    "if": {
-      "properties": {
-        "type": {
-          "enum": ["time_series"]
-        }
-      }
-    },
-    "then": {
-      "properties": {
-        "results": {
-          "$ref": "#/definitions/time_series-result"
-        }
-      }
-    },
-    "else": {
-      "properties": {
-        "results": {
-          "$ref": "#/definitions/multiple_time_series-result"
-        }
-      }
     }
   }
 }

@@ -1,0 +1,44 @@
+{
+  "$schema": "file:data-formal.json",
+  "body": {
+    "timestamp": "2020-08-15T15:33:44.897Z",
+    "columns": [
+      {
+        "name": "value",
+        "description": "metric",
+        "type": "number",
+        "meta": {
+          "unit": ""
+        }
+      },
+      {
+        "name": "quality",
+        "description": "quality of the metric",
+        "type": "number",
+        "meta": {
+          "unit": ""
+        }
+      },
+      {
+        "name": "time",
+        "description": "time of the data point",
+        "type": "rfctime",
+        "meta": {
+          "unit": ""
+        }
+      }
+    ],
+    "data": [
+      [
+        "15"
+      ],
+      [
+        "3"
+      ],
+      [
+        "2018-11-13T20:20:39+00:00"
+      ]
+    ]
+  },
+  "signature": ""
+}

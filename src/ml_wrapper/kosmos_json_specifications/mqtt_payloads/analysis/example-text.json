@@ -1,0 +1,37 @@
+{
+  "$schema": "file:formal.json",
+  "body": {
+    "from": "creator of this message",
+    "timestamp": "2020-08-12T15:46:10.821Z",
+    "model": {
+      "url": "abc",
+      "tag": "ab"
+    },
+    "type": "text",
+    "calculated": {
+      "message": {
+        "machine": "abc",
+        "sensor": "134wdsf"
+      },
+      "received": "2020-08-12T15:47:10.821Z"
+    },
+    "results": {
+      "total": "stop",
+      "predict": 80,
+      "parts": [
+        {
+          "machine": "machine1",
+          "result": "stop",
+          "predict": 90,
+          "sensors": [
+            {
+              "sensor": "sensor1",
+              "result": "stop",
+              "predict": 100
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
