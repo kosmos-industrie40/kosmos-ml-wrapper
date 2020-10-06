@@ -82,6 +82,10 @@ class MLWrapper(abc.ABC):
         :param result_type: optional
         :param log_level: optional from logging enum (e.g. logging.INFO)
         :param logger_name: optional name of the logger
+        :param only_react_to_message_type: optional to set the reaction type
+        :param only_react_to_previous_result_types: optional to set previous result_type required
+        :param outgoing_message_is_temporary: Required to define whether your result should be
+        stored (False) or just used for following steps (True)
         """
         # Handle result_type
         assert result_type.value in ["text", "time_series", "multiple_time_series",], (
