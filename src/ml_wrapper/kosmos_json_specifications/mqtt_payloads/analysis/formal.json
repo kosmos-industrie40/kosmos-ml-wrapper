@@ -4,6 +4,7 @@
   "description": "definition of the payload for the topic kosmos/analysis/<contractId>",
   "properties": {
     "body": {
+      "type": "object",
       "required": [
         "from",
         "timestamp",

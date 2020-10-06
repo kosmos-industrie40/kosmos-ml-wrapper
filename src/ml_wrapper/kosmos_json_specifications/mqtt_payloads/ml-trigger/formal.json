@@ -4,6 +4,7 @@
   "description": "definition of the payload for the topic kosmos/analysis/<name>/<version>",
   "properties": {
     "body": {
+      "type": "object",
       "properties": {
         "contract": {
           "type": "string",
