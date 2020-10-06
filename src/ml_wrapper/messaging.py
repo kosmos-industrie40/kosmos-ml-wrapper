@@ -393,9 +393,9 @@ class OutgoingMessage:
         from_: str = None,
         model_url: str = None,
         model_tag: str = None,
-        temporary_keyword: str = None,
         base_topic: str = "kosmos/analyses/",
         is_temporary: bool = True,
+        temporary_keyword: str = None,
     ):
         self._payload = None
         self.in_message = in_message
