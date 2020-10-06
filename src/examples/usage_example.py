@@ -31,8 +31,11 @@ class AnalysisTool(MLWrapper):
 
     # Implementation required
     def __init__(self):
-        # Instantiation of super encouraged to explicitly set the result_type
-        super().__init__(result_type=ResultType.TIME_SERIES)
+        # Instantiation of super encouraged to explicitly set the result_type and whether your data
+        # needs to be stored
+        super().__init__(
+            result_type=ResultType.TIME_SERIES, outgoing_message_is_temporary=True
+        )
 
     # Implementation required
     def run(

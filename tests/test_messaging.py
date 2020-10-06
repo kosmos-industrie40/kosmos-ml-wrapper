@@ -151,6 +151,8 @@ class TestInformation(TestCase):
             from_="none",
             model_url="none",
             model_tag="none",
+            is_temporary=True,
+            temporary_keyword="temporary",
         )
         out.payload = JSON_ANALYSE_TEXT
         out.payload = JSON_ANALYSE_TIME_SERIES
@@ -174,6 +176,8 @@ class TestInformation(TestCase):
             model_tag="none",
             model_url="none",
             base_topic="kosmos/analytics",
+            is_temporary=True,
+            temporary_keyword="temporary",
         )
         out.set_results(pd.DataFrame(dict(test=[1, 2, 3])), ResultType.TIME_SERIES)
         with self.assertRaises(NonSchemaConformJsonPayload):

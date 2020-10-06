@@ -394,16 +394,23 @@ class OutgoingMessage:
         model_url: str = None,
         model_tag: str = None,
         base_topic: str = "kosmos/analyses/",
+        is_temporary: bool = True,
+        temporary_keyword: str = None,
     ):
         self._payload = None
         self.in_message = in_message
         self._base_topic = base_topic
+        self.is_temporary = is_temporary
         self.logger = self.in_message.logger
         self._result = None
         self._result_type = None
+        assert (
+            temporary_keyword is not None
+        ), "The variable temporary_keyword has to be set"
         assert from_ is not None, "The variable from_ has to be set"
         assert model_url is not None, "The variable model_url has to be set"
         assert model_tag is not None, "The variable model_tag has to be set"
+        self.temporary_keyword = temporary_keyword
         self.from_ = from_
         self.model_url = model_url
         self.model_tag = model_tag
@@ -418,6 +425,8 @@ class OutgoingMessage:
         topic = "{}/{}".format(self._base_topic, self.in_message.contract).replace(
             "//", "/"
         )
+        if self.is_temporary:
+            topic += ("/" + self.temporary_keyword).replace("//", "/")
         self.logger.debug("Calculated topic is %s", topic)
         return topic
 

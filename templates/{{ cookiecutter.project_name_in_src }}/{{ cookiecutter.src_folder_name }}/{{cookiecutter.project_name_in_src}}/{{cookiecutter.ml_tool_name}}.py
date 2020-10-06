@@ -39,7 +39,10 @@ class {{ cookiecutter.ml_class_name }}(MLWrapper):
             only_react_to_message_type = MessageType.SENSOR_UPDATE,
             {%- elif cookiecutter.only_react_to_message_type == "analyse" -%}
             only_react_to_message_type = MessageType.ANALYSES_Result,
-            {%- endif -%}
+            {%- endif %}
+            outgoing_message_is_temporary = True,
+            # The outgoing_message_is_temporary needs to be changed,
+            # if your results need to be stored!
         )
 
     def run(
