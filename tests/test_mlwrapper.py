@@ -132,6 +132,30 @@ class TestMLWrapper(unittest.TestCase):
         subscriptions = list(map(lambda x: x["topic"], ml_tool.client.subscriptions))
         self.assertIn("kosmos/analytics/test_url/test_tag", subscriptions)
 
+    def test_outgoing_message_is_temporary(self):
+        with self.assertRaises(AssertionError):
+            FFT(outgoing_message_is_temporary=None)
+        true_fft = FFT(outgoing_message_is_temporary=True)
+        false_fft = FFT(outgoing_message_is_temporary=False)
+        true_fft.client.mock_a_message(
+            true_fft.client, json.dumps(JSON_ML_ANALYSE_TIME_SERIES)
+        )
+        false_fft.client.mock_a_message(
+            false_fft.client, json.dumps(JSON_ML_ANALYSE_TIME_SERIES)
+        )
+        while true_fft.async_result is not None and not true_fft.async_result.ready():
+            true_fft.logger.info("Test is still running...")
+            sleep(1)
+        true_fft.logger.info("Done with the Thread work")
+        self.assertTrue(true_fft.last_out_message.is_temporary)
+        self.assertIn("temporary", true_fft.last_out_message.topic)
+        while false_fft.async_result is not None and not false_fft.async_result.ready():
+            false_fft.logger.info("Test is still running...")
+            sleep(1)
+        false_fft.logger.info("Done with the Thread work")
+        self.assertFalse(false_fft.last_out_message.is_temporary)
+        self.assertNotIn("temporary", false_fft.last_out_message.topic)
+
 
 if __name__ == "__main__":
     unittest.main()

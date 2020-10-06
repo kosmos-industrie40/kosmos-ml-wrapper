@@ -75,6 +75,7 @@ class MLWrapper(abc.ABC):
         logger_name=None,
         only_react_to_message_type: MessageType = None,
         only_react_to_previous_result_types: [None, List[ResultType]] = None,
+        outgoing_message_is_temporary: bool = None,
     ):
         """
         Constructor of ML Wrapper.
@@ -108,6 +109,15 @@ class MLWrapper(abc.ABC):
             )
         ), "only_react_to_previous_result_types can only be None or a list of ResultType"
         self._only_react_to_previous_result_types = only_react_to_previous_result_types
+
+        # Handle outgoing persistence settings
+        assert outgoing_message_is_temporary is not None and isinstance(
+            outgoing_message_is_temporary, bool
+        ), (
+            "outgoing_message_is_temporary has to be set by the "
+            "ML Wrapper implementing tool and hast to be boolean type!"
+        )
+        self._outgoing_message_is_temporary = outgoing_message_is_temporary
 
         # Initialize logger
         self.logger_ = logging.getLogger(logger_name or __name__)
@@ -378,6 +388,10 @@ class MLWrapper(abc.ABC):
             model_url=self._config.get("model", "url"),
             base_topic=self._config.get(
                 "messaging", "base_result_topic", default="kosmos/analyses/"
+            ),
+            is_temporary=self._outgoing_message_is_temporary,
+            temporary_keyword=self._config.get(
+                "messaging", "temporary_keyword", default="temporary"
             ),
         )
         result = self.run(out_message)

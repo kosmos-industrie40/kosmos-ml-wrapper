@@ -20,15 +20,31 @@ from src.ml_wrapper.mock_mqtt_client import MockMqttClient
 class FFT(MLWrapper):
     """Mocked FFT class"""
 
-    def __init__(self):
+    def __init__(self, outgoing_message_is_temporary=True):
         """Constructor"""
-        super().__init__(log_level=logging.DEBUG, logger_name="MOCK")
+        self.last_out_message = None
+        super().__init__(
+            outgoing_message_is_temporary=outgoing_message_is_temporary,
+            log_level=logging.DEBUG,
+            logger_name="MOCK",
+        )
         self.logger.debug(type(self))
         self.logger.debug(self.config)
 
     def _init_mqtt(self):
         """ Initialise a mock mqtt client """
         self.client = MockMqttClient(self.logger)
+
+    def resolve_result_data(
+        self,
+        result: Union[pd.DataFrame, List[pd.DataFrame], dict],
+        out_message: OutgoingMessage,
+    ) -> OutgoingMessage:
+        out_message = super(FFT, self).resolve_result_data(
+            result=result, out_message=out_message
+        )
+        self.last_out_message = out_message
+        return out_message
 
     def run(
         self, out_message: OutgoingMessage
@@ -45,14 +61,30 @@ class FFT(MLWrapper):
 class BadTopicTool(MLWrapper):
     """Mocked FFT class"""
 
-    def __init__(self):
+    def __init__(self, outgoing_message_is_temporary=True):
         """Constructor"""
         os.environ["CONFIG_MESSAGING_BASE_RESULT_TOPIC"] = "this/isnotcorrect"
-        super().__init__(log_level=logging.DEBUG, logger_name="MOCK")
+        self.last_out_message = None
+        super().__init__(
+            outgoing_message_is_temporary=outgoing_message_is_temporary,
+            log_level=logging.DEBUG,
+            logger_name="MOCK",
+        )
 
     def _init_mqtt(self):
         """ Initialise a mock mqtt client """
         self.client = MockMqttClient(self.logger)
+
+    def resolve_result_data(
+        self,
+        result: Union[pd.DataFrame, List[pd.DataFrame], dict],
+        out_message: OutgoingMessage,
+    ) -> OutgoingMessage:
+        out_message = super(BadTopicTool, self).resolve_result_data(
+            result=result, out_message=out_message
+        )
+        self.last_out_message = out_message
+        return out_message
 
     def run(
         self, out_message: OutgoingMessage
@@ -70,13 +102,27 @@ class BadTopicTool(MLWrapper):
 class SlowMLTool(MLWrapper):
     """ Mocking a slow ml tool which sleeps for 5 seconds"""
 
-    def __init__(self):
+    def __init__(self, outgoing_message_is_temporary=True):
         """ Constructor """
-        super().__init__()
+        self.last_out_message = None
+        super().__init__(
+            outgoing_message_is_temporary=outgoing_message_is_temporary,
+        )
 
     def _init_mqtt(self):
         """ Inits mock Client """
         self.client = MockMqttClient(self.logger)
+
+    def resolve_result_data(
+        self,
+        result: Union[pd.DataFrame, List[pd.DataFrame], dict],
+        out_message: OutgoingMessage,
+    ) -> OutgoingMessage:
+        out_message = super(SlowMLTool, self).resolve_result_data(
+            result=result, out_message=out_message
+        )
+        self.last_out_message = out_message
+        return out_message
 
     def run(
         self, out_message: OutgoingMessage
@@ -89,9 +135,11 @@ class SlowMLTool(MLWrapper):
 class ResultTypeTool(MLWrapper):
     """ Mock for a Result Type Check """
 
-    def __init__(self):
+    def __init__(self, outgoing_message_is_temporary=True):
         """ Constructor """
+        self.last_out_message = None
         super().__init__(
+            outgoing_message_is_temporary=outgoing_message_is_temporary,
             result_type=ResultType.MULTIPLE_TIME_SERIES,
             log_level=logging.DEBUG,
             logger_name="Result Type Logger",
@@ -100,6 +148,17 @@ class ResultTypeTool(MLWrapper):
     def _init_mqtt(self):
         """ Initialise a mock mqtt client """
         self.client = MockMqttClient(self.logger)
+
+    def resolve_result_data(
+        self,
+        result: Union[pd.DataFrame, List[pd.DataFrame], dict],
+        out_message: OutgoingMessage,
+    ) -> OutgoingMessage:
+        out_message = super(ResultTypeTool, self).resolve_result_data(
+            result=result, out_message=out_message
+        )
+        self.last_out_message = out_message
+        return out_message
 
     def run(
         self, out_message: OutgoingMessage
@@ -111,13 +170,29 @@ class ResultTypeTool(MLWrapper):
 class BadMLTool(MLWrapper):
     """ Mock for a corrupt ML Tool """
 
-    def __init__(self):
+    def __init__(self, outgoing_message_is_temporary=True):
         """ Constructor """
-        super().__init__(logger_name="MOCK", log_level=logging.DEBUG)
+        self.last_out_message = None
+        super().__init__(
+            outgoing_message_is_temporary=outgoing_message_is_temporary,
+            logger_name="MOCK",
+            log_level=logging.DEBUG,
+        )
 
     def _init_mqtt(self):
         """ Initialise a mock mqtt client """
         self.client = MockMqttClient(self.logger)
+
+    def resolve_result_data(
+        self,
+        result: Union[pd.DataFrame, List[pd.DataFrame], dict],
+        out_message: OutgoingMessage,
+    ) -> OutgoingMessage:
+        out_message = super(BadMLTool, self).resolve_result_data(
+            result=result, out_message=out_message
+        )
+        self.last_out_message = out_message
+        return out_message
 
     def run(
         self, out_message: OutgoingMessage
@@ -134,15 +209,30 @@ class RequireCertainInput(MLWrapper):
     Mock for message requirements
     """
 
-    def __init__(self):
+    def __init__(self, outgoing_message_is_temporary=True):
         """ Constructor """
+        self.last_out_message = None
         super().__init__(
-            logger_name="MOCK", log_level=logging.DEBUG, result_type=ResultType.TEXT
+            outgoing_message_is_temporary=outgoing_message_is_temporary,
+            logger_name="MOCK",
+            log_level=logging.DEBUG,
+            result_type=ResultType.TEXT,
         )
 
     def _init_mqtt(self):
         """Initialize a mock mqtt client"""
         self.client = MockMqttClient(self.logger)
+
+    def resolve_result_data(
+        self,
+        result: Union[pd.DataFrame, List[pd.DataFrame], dict],
+        out_message: OutgoingMessage,
+    ) -> OutgoingMessage:
+        out_message = super(RequireCertainInput, self).resolve_result_data(
+            result=result, out_message=out_message
+        )
+        self.last_out_message = out_message
+        return out_message
 
     def run(
         self, out_message: OutgoingMessage
