@@ -135,6 +135,13 @@ class TestInformation(TestCase):
         self.inf_initialized_data.check_retrieved()
         print(self.inf_initialized_data.analyses_message_type, ":")
         print(self.inf_initialized_data.retrieved_data)
+        self.assertIn(
+            "unit",
+            self.inf_initialized_data.column_meta[
+                self.inf_initialized_data.columns[0]["name"]
+            ],
+        )
+        print(self.inf_initialized_data.column_meta)
 
     def test_set_topic(self):
         with self.assertRaises(InvalidTopic):

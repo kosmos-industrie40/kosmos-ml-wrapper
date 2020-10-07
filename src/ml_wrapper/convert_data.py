@@ -2,6 +2,7 @@
 Utility Module to convert data to and from json-usable format.
 """
 import re
+from collections import defaultdict
 from typing import List
 import pandas as pd
 
@@ -46,12 +47,19 @@ def retrieve_sensor_update_data(payload: dict):
     columns = payload.get("columns")
     column_names = [col.get("name") for col in columns]
     column_types = {col.get("name"): JSON_TYPES.get(col.get("type")) for col in columns}
+    column_meta = defaultdict(
+        lambda: {"unit": None, "description": None, "future": None}
+    )
+    for col in columns:
+        for meta, val in col.get("meta").items():
+            column_meta[col.get("name")][meta] = val
+    column_meta = dict(column_meta)
 
     dataframe = pd.DataFrame(data=data, columns=column_names)
     dataframe = dataframe.astype(dtype=column_types)
 
     metadata = payload.get("meta")
-    return dataframe, columns, data, metadata
+    return dataframe, columns, data, metadata, column_meta
 
 
 def resolve_data_frame(dataframe: pd.DataFrame) -> (list, list):

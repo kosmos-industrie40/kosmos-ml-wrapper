@@ -60,6 +60,7 @@ class IncomingMessage:
         self._retrieved_data = None
         self._columns = None
         self._data = None
+        self._column_meta = None
         self._metadata = None
         self._timestamp = None
         self._received = (
@@ -67,6 +68,29 @@ class IncomingMessage:
         )
         self.custom_information_field = None
         self.logger = logger
+
+    @property
+    def column_meta(self):
+        """ Returns the protected property for column_meta """
+        return self._column_meta
+
+    @column_meta.setter
+    def column_meta(self, new_value: dict):
+        """
+        Sets the protected property for column_meta
+        :@param new_value: dict
+        """
+        assert isinstance(
+            new_value, dict
+        ), "The value to be set has to be of type dict, but received {}".format(
+            type(new_value)
+        )
+        self._column_meta = new_value
+
+    @column_meta.deleter
+    def column_meta(self):
+        """ Deletes the protected property for column_meta """
+        del self._column_meta
 
     @property
     def mid(self):
@@ -180,7 +204,13 @@ class IncomingMessage:
                     )
                 )
         elif self._message_type is MessageType.SENSOR_UPDATE:
-            retrieved_data, columns, data, metadata = retrieve_sensor_update_data(msg)
+            (
+                retrieved_data,
+                columns,
+                data,
+                metadata,
+                self.column_meta,
+            ) = retrieve_sensor_update_data(msg)
         else:
             raise NotImplementedError(
                 "The type {} is not yet implemented".format(self._message_type)

@@ -112,7 +112,9 @@ class TestDataRetrievalAndResolve(unittest.TestCase):
 
     def test_dataframe_types_retrieval(self):
         print("Testing with data-example-3.json")
-        data_frame, _, _, _ = retrieve_sensor_update_data(JSON_DATA_EXAMPLE_3["body"])
+        data_frame, _, _, _, _ = retrieve_sensor_update_data(
+            JSON_DATA_EXAMPLE_3["body"]
+        )
         self.assertEqual(
             data_frame.dtypes.tolist(), ["float64", "float64", "datetime64[ns]"]
         )
@@ -120,7 +122,7 @@ class TestDataRetrievalAndResolve(unittest.TestCase):
     def test_sensor_without_metadata(self):
         # test sensor data w/o metadata
         print("Testing with data-example.json")
-        data_frame, columns, data, metadata = retrieve_sensor_update_data(
+        data_frame, columns, data, metadata, column_meta = retrieve_sensor_update_data(
             JSON_DATA_EXAMPLE["body"]
         )
         timestamp = JSON_DATA_EXAMPLE["body"].get("timestamp")
@@ -130,11 +132,15 @@ class TestDataRetrievalAndResolve(unittest.TestCase):
         self.assertTrue(metadata is None)
         print(timestamp)
         self.assertIsInstance(timestamp, str)
+        self.assertIsInstance(column_meta, dict)
+        self.assertIn("unit", column_meta[columns[0]["name"]])
+        self.assertIn("description", column_meta[columns[0]["name"]])
+        self.assertIn("future", column_meta[columns[0]["name"]])
 
     def test_sensor_with_metadata(self):
         # test sensor data w/ metadata
         print("Testing with data-example-2.json")
-        data_frame, columns, data, metadata = retrieve_sensor_update_data(
+        data_frame, columns, data, metadata, column_meta = retrieve_sensor_update_data(
             JSON_DATA_EXAMPLE_2["body"]
         )
         timestamp = JSON_DATA_EXAMPLE_2["body"].get("timestamp")
@@ -144,6 +150,7 @@ class TestDataRetrievalAndResolve(unittest.TestCase):
         self.assertTrue(metadata is not None)
         self.assertIsInstance(metadata, (dict, list))
         self.assertIsInstance(timestamp, str)
+        self.assertIsInstance(column_meta, dict)
 
 
 if __name__ == "__main__":
