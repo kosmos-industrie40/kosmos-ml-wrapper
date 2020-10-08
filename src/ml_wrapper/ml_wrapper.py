@@ -184,9 +184,18 @@ class MLWrapper(abc.ABC):
         """
         return self.logger_
 
-    def _async_ready(self):
+    def async_not_ready(self) -> bool:
         """
-        This method is quite experimental and just intended to be used in testing
+        This method is quite experimental and just intended to be used in testing.
+        When you run a test message, you can check the last async_result if it's ready.
+        This should never be used at production and is only provided for testing.
+        You can use it via
+        ::
+
+            while ml_tool.asnyc_not_ready():
+                time.sleep(1)
+            ...
+
         @return: bool
         """
         ready = self.async_result is not None and not self.async_result.ready()
