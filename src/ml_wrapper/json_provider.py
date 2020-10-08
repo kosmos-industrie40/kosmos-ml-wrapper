@@ -7,38 +7,64 @@ import json
 
 FILE_DIR = dirname(abspath(__file__))
 SCHEMA_DIR = abspath(join(FILE_DIR, "kosmos_json_specifications", "mqtt_payloads"))
+SUB_SCHEMA = lambda x="ml-trigger": join(SCHEMA_DIR, x)
+SUB_SCHEMA_FILE = lambda path, file: join(SUB_SCHEMA(path), file)
 
 FORMAL_REPLACES = {
-    ref: "{}".format("file://{}".format(join(SCHEMA_DIR, ref)))
-    for ref in ["analysis-formal.json", "data-formal.json", "ml-formal.json"]
+    ref: "{}".format("file://{}".format(join(SUB_SCHEMA(key), "formal.json")))
+    for key, ref in {
+        "analysis": "file:analysis/formal.json",
+        "data": "file:data/formal.json",
+        "ml-trigger": "file:ml-trigger/formal.json",
+    }.items()
 }
 
 
-def _replace_file_refs(content_):
-    for key in FORMAL_REPLACES:
-        content_ = content_.replace(key, FORMAL_REPLACES[key])
+def _create_replaces(path):
+    dict_ = {
+        "file:formal.json": "file://{}".format(
+            SUB_SCHEMA_FILE(path=path, file="formal.json")
+        ),
+        "file:data/formal.json": "file://{}".format(
+            SUB_SCHEMA_FILE(path="data", file="formal.json")
+        ),
+        "file:analysis/formal.json": "file://{}".format(
+            SUB_SCHEMA_FILE(path="analysis", file="formal.json")
+        ),
+    }
+    return dict_
+
+
+def _replace_file_refs(content_, path):
+    repl_ = _create_replaces(path)
+    print(repl_)
+    for key in repl_:
+        content_ = content_.replace(key, repl_[key])
     return content_
 
 
-def _read_json(file_):
+def _read_json(file_, path="ml-trigger"):
     result = None
-    with open(join(SCHEMA_DIR, file_)) as file:
-        result = json.loads(_replace_file_refs(file.read()))
+    with open(join(SUB_SCHEMA(path), file_)) as file:
+        # result = json.loads(file.read())
+        result = json.loads(_replace_file_refs(file.read(), path=path))
     return result
 
 
-def _combine_ml_and_example(file_, analyse=True):
+def _combine_ml_and_example(file_, path="ml-trigger", analyse=True):
     result = _read_json(
-        "ml-analysis-example.json" if analyse else "ml-update-example.json"
+        "analysis-example.json" if analyse else "update-example.json", path="ml-trigger"
     )
-    with open(join(SCHEMA_DIR, file_)) as file:
-        result["payload"] = json.loads(file.read())
+    with open(join(SUB_SCHEMA(path), file_)) as file:
+        result["body"]["payload"] = json.loads(
+            _replace_file_refs(file.read(), path=path)
+        )
     return result
 
 
-ANALYSES_FORMAL = _read_json("analysis-formal.json")
-DATA_FORMAL = _read_json("data-formal.json")
-TRIGGER_FORMAL = _read_json("ml-formal.json")
+ANALYSES_FORMAL = _read_json("formal.json", path="analysis")
+DATA_FORMAL = _read_json("formal.json", path="data")
+TRIGGER_FORMAL = _read_json("formal.json", path="ml-trigger")
 
 ANALYSES_FORMAL["$id"] = ""
 DATA_FORMAL["$id"] = ""
@@ -51,21 +77,27 @@ SCHEMA_STORE = {
 }
 
 JSON_ML_ANALYSE_TIME_SERIES = _combine_ml_and_example(
-    "analysis-example-time_series.json"
+    "example-time_series.json", path="analysis"
 )
 JSON_ML_ANALYSE_MULTIPLE_TIME_SERIES = _combine_ml_and_example(
-    "analysis-example-multiple_time_series.json"
+    "example-multiple_time_series.json", path="analysis"
 )
-JSON_ML_ANALYSE_TEXT = _combine_ml_and_example("analysis-example-text.json")
-JSON_ML_DATA_EXAMPLE = _combine_ml_and_example("data-example.json", analyse=False)
-JSON_ML_DATA_EXAMPLE_2 = _combine_ml_and_example("data-example-2.json", analyse=False)
-JSON_ML_DATA_EXAMPLE_3 = _combine_ml_and_example("data-example-3.json", analyse=False)
+JSON_ML_ANALYSE_TEXT = _combine_ml_and_example("example-text.json", path="analysis")
+JSON_ML_DATA_EXAMPLE = _combine_ml_and_example(
+    "example.json", path="data", analyse=False
+)
+JSON_ML_DATA_EXAMPLE_2 = _combine_ml_and_example(
+    "example-2.json", path="data", analyse=False
+)
+JSON_ML_DATA_EXAMPLE_3 = _combine_ml_and_example(
+    "example-3.json", path="data", analyse=False
+)
 
-JSON_ANALYSE_TIME_SERIES = _read_json("analysis-example-time_series.json")
+JSON_ANALYSE_TIME_SERIES = _read_json("example-time_series.json", path="analysis")
 JSON_ANALYSE_MULTIPLE_TIME_SERIES = _read_json(
-    "analysis-example-multiple_time_series.json"
+    "example-multiple_time_series.json", path="analysis"
 )
-JSON_ANALYSE_TEXT = _read_json("analysis-example-text.json")
-JSON_DATA_EXAMPLE = _read_json("data-example.json")
-JSON_DATA_EXAMPLE_2 = _read_json("data-example-2.json")
-JSON_DATA_EXAMPLE_3 = _read_json("data-example-3.json")
+JSON_ANALYSE_TEXT = _read_json("example-text.json", path="analysis")
+JSON_DATA_EXAMPLE = _read_json("example.json", path="data")
+JSON_DATA_EXAMPLE_2 = _read_json("example-2.json", path="data")
+JSON_DATA_EXAMPLE_3 = _read_json("example-3.json", path="data")

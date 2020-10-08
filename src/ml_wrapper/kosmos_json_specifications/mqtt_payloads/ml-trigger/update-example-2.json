@@ -1,0 +1,64 @@
+{
+  "$schema": "file:formal.json",
+  "body": {
+    "contract": "abc",
+    "machine": "mach",
+    "sensor": "abc",
+    "type": "sensor_update",
+    "payload": {
+      "$schema": "data-formal.json",
+      "body": {
+        "timestamp": "2020-08-15T15:33:44.897Z",
+        "columns": [
+          {
+            "name": "id",
+            "type": "string",
+            "meta": {
+              "unit": ""
+            }
+          },
+          {
+            "name": "details",
+            "type": "string",
+            "meta": {
+              "unit": ""
+            }
+          },
+          {
+            "name": "category",
+            "type": "string",
+            "meta": {
+              "unit": ""
+            }
+          },
+          {
+            "name": "timestamp",
+            "type": "string",
+            "meta": {
+              "unit": ""
+            }
+          }
+        ],
+        "data": [
+          [
+            "27900",
+            "27002"
+          ],
+          [
+            "27900\tPROFIBUS DP: SI fault on axis BRK2, code 1798, value 0, time 18833244|DT011|C1.",
+            "27002\tAxis U1 test stop is running"
+          ],
+          [
+            "alarm",
+            "alarm"
+          ],
+          [
+            "2020-02-18T20:00:00",
+            "2020-02-01T20:00:00"
+          ]
+        ]
+      }
+    }
+  },
+  "signature": ""
+}

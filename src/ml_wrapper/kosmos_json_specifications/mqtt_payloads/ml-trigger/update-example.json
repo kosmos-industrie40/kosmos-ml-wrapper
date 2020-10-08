@@ -1,0 +1,31 @@
+{
+  "$schema": "file:formal.json",
+  "body": {
+    "contract": "abc",
+    "machine": "mach",
+    "sensor": "abc",
+    "type": "sensor_update",
+    "payload": {
+      "body": {
+        "timestamp": "2020-08-21T0:00:00.001",
+        "columns": [
+          {
+            "name": "value",
+            "meta": {
+              "unit": "m",
+              "description": "metric"
+            },
+            "type": "number"
+          }
+        ],
+        "data": [
+          [
+            "a",
+            "b",
+            "c"
+          ]
+        ]
+      }
+    }
+  }
+}

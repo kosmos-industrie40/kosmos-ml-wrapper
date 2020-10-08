@@ -251,6 +251,10 @@ class MLWrapper(abc.ABC):
         )
         self.async_result = None
         traceback.print_exception(type(err), err, err.__traceback__)
+        # Close thread
+        self.thread_pool.close()
+        self.thread_pool.join()
+        self.logger.info("Closed and joined thread due to an error")
         raise type(err)(err)
 
     def _check_message_requirements(self, message: IncomingMessage):
@@ -305,7 +309,6 @@ class MLWrapper(abc.ABC):
             raise error from error
         except WrongMessageType as error:
             self.logger.error("%s: \n%s", WrongMessageType.__name__, error)
-            raise error from error
         except Exception as error:
             self.logger.error(
                 "The exception %s has to be handled!\n%s",
@@ -320,7 +323,6 @@ class MLWrapper(abc.ABC):
             callback=self.prompt,
             error_callback=self.error_prompt,
         )
-
         self.logger.debug("closed and joined pool")
 
     # Can be reimplemented by user, and can then gain self-use
@@ -362,9 +364,9 @@ class MLWrapper(abc.ABC):
         .. code-block:: python
 
             out_message = super().resolve_result_data(result, out_message)
-            payload_dict = out_message.payload_as_json_dict
-            payload_dict["results"]["total"] = "tempered result"
-            out_message.payload = payload_dict
+            body_dict = out_message.body_as_json_dict
+            body_dict["results"]["total"] = "tempered result"
+            out_message.body = body_dict
 
         This way you will only change the dictionary where required and make sure you have a
         valid json.
@@ -406,13 +408,13 @@ class MLWrapper(abc.ABC):
         self.logger.debug("End ML tool")
         out_message = self.resolve_result_data(result, out_message)
         try:
-            out_message.payload
+            out_message.body
         except NotInitialized as error:
             self.logger.error(error)
             self.logger.error(
                 "You need to specify the payload. If you overwrite the "
                 "resolve_result_data method, please make sure to provide "
-                "the payload manually!"
+                "the 'body' of the payload manually!"
             )
             return None
         out_message = self._publish_result_message(out_message)

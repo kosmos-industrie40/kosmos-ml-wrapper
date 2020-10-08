@@ -60,6 +60,7 @@ class IncomingMessage:
         self._retrieved_data = None
         self._columns = None
         self._data = None
+        self._column_meta = None
         self._metadata = None
         self._timestamp = None
         self._received = (
@@ -67,6 +68,29 @@ class IncomingMessage:
         )
         self.custom_information_field = None
         self.logger = logger
+
+    @property
+    def column_meta(self):
+        """ Returns the protected property for column_meta """
+        return self._column_meta
+
+    @column_meta.setter
+    def column_meta(self, new_value: dict):
+        """
+        Sets the protected property for column_meta
+        :@param new_value: dict
+        """
+        assert isinstance(
+            new_value, dict
+        ), "The value to be set has to be of type dict, but received {}".format(
+            type(new_value)
+        )
+        self._column_meta = new_value
+
+    @column_meta.deleter
+    def column_meta(self):
+        """ Deletes the protected property for column_meta """
+        del self._column_meta
 
     @property
     def mid(self):
@@ -143,7 +167,7 @@ class IncomingMessage:
         retrieved_data = None
         columns = None
         data = None
-        msg = self.payload
+        msg = self.payload["body"]
         timestamp = msg.get("timestamp")
         if self._message_type is MessageType.ANALYSES_Result:
             try:
@@ -180,7 +204,13 @@ class IncomingMessage:
                     )
                 )
         elif self._message_type is MessageType.SENSOR_UPDATE:
-            retrieved_data, columns, data, metadata = retrieve_sensor_update_data(msg)
+            (
+                retrieved_data,
+                columns,
+                data,
+                metadata,
+                self.column_meta,
+            ) = retrieve_sensor_update_data(msg)
         else:
             raise NotImplementedError(
                 "The type {} is not yet implemented".format(self._message_type)
@@ -316,10 +346,13 @@ class IncomingMessage:
         except JSONDecodeError as error:
             raise error from error
         type_ = None
+        if "body" not in payload:
+            self.logger.error("The 'body' key is required in payload")
+            raise KeyError("The 'body' key is required in payload")
         try:
-            type_ = payload["type"]
+            type_ = payload["body"]["type"]
         except KeyError as error:
-            raise KeyError("The type keyword is required in the payload") from error
+            raise KeyError("The 'type' keyword is required in the payload") from error
         try:
             message_type = MessageType.value2member_map()[type_]
         except KeyError as error:
@@ -335,11 +368,11 @@ class IncomingMessage:
             # validate_formal(payload["payload"])
         except NonSchemaConformJsonPayload as error:
             raise error from error
-        self._machine = payload.get("machine")
-        self._sensor = payload.get("sensor")
-        self._contract = payload.get("contract")
+        self._machine = payload["body"].get("machine")
+        self._sensor = payload["body"].get("sensor")
+        self._contract = payload["body"].get("contract")
         self._message_type = message_type
-        self._payload = payload.get("payload")
+        self._payload = payload["body"].get("payload")
         self.logger.debug("Exit setter of payload")
 
     @payload.deleter
@@ -397,7 +430,7 @@ class OutgoingMessage:
         is_temporary: bool = True,
         temporary_keyword: str = None,
     ):
-        self._payload = None
+        self._body = None
         self.in_message = in_message
         self._base_topic = base_topic
         self.is_temporary = is_temporary
@@ -436,21 +469,41 @@ class OutgoingMessage:
         Returns the calculated payload string as a json dictionary
         @return: dict
         """
-        return json.loads(self._payload)
+        return json.loads(self.payload)
+
+    @staticmethod
+    def _sign_body():
+        return "This has to be done"
+
+    @staticmethod
+    def _make_payload_dict(body: dict) -> dict:
+        return {"body": body, "signature": ""}
 
     @property
     def payload(self) -> str:
+        """ Returns the resulting payload as string """
+        dict_ = self._make_payload_dict(self._body)
+        dict_["signature"] = self._sign_body()
+        return json.dumps(dict_)
+
+    @property
+    def body(self) -> str:
         """ Returns the protected property for payload """
-        if self._payload is None:
+        if self._body is None:
             raise NotInitialized(
                 "The payload of the outgoing message has to be set. "
                 "You can either use the set_results method or set the "
                 "payload directly."
             )
-        return self._payload
+        return self._body
 
-    @payload.setter
-    def payload(self, new_value: Union[str, dict]):
+    @property
+    def body_as_json_dict(self) -> dict:
+        """ Returns the message field body as dictionary """
+        return json.loads(self.body)
+
+    @body.setter
+    def body(self, new_value: Union[str, dict]):
         """
         Sets the protected property for payload
         :@param new_value: str
@@ -463,7 +516,9 @@ class OutgoingMessage:
         if isinstance(new_value, dict):
             new_value = json.dumps(new_value)
         try:
-            validate_formal_single(new_value)
+            validate_formal_single(
+                json.dumps(self._make_payload_dict(json.loads(new_value)))
+            )
         except ValidationError as error:
             raise NonSchemaConformJsonPayload(
                 "This payload cannot be set as outgoing message. "
@@ -472,12 +527,12 @@ class OutgoingMessage:
                     new_value, error.message
                 )
             ) from error
-        self._payload = new_value
+        self._body = new_value
 
-    @payload.deleter
-    def payload(self):
+    @body.deleter
+    def body(self):
         """ Deletes the protected property for payload """
-        del self._payload
+        del self._body
 
     def set_results(
         self, result: Union[pd.DataFrame, list, dict], result_type: ResultType = None
@@ -549,4 +604,4 @@ class OutgoingMessage:
         resolved["timestamp"] = (
             datetime.datetime.utcnow().astimezone(timezone.utc).isoformat(sep="T")
         )
-        self.payload = resolved
+        self.body = resolved

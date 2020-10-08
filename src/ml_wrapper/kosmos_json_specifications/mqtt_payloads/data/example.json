@@ -1,0 +1,34 @@
+{
+  "$schema": "file:data-formal.json",
+  "body": {
+    "timestamp": "2020-08-15T15:33:44.897Z",
+    "machineID": "mach",
+    "columns": [
+      {
+        "name": "value",
+        "type": "number",
+        "meta": {
+          "unit": "",
+          "description": "metric"
+        }
+      },
+      {
+        "name": "quality",
+        "type": "number",
+        "meta": {
+          "description": "quality of the metric",
+          "unit": ""
+        }
+      }
+    ],
+    "data": [
+      [
+        "15"
+      ],
+      [
+        "3"
+      ]
+    ]
+  },
+  "signature": ""
+}

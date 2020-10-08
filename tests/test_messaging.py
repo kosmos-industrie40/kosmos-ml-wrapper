@@ -135,6 +135,13 @@ class TestInformation(TestCase):
         self.inf_initialized_data.check_retrieved()
         print(self.inf_initialized_data.analyses_message_type, ":")
         print(self.inf_initialized_data.retrieved_data)
+        self.assertIn(
+            "unit",
+            self.inf_initialized_data.column_meta[
+                self.inf_initialized_data.columns[0]["name"]
+            ],
+        )
+        print(self.inf_initialized_data.column_meta)
 
     def test_set_topic(self):
         with self.assertRaises(InvalidTopic):
@@ -144,7 +151,7 @@ class TestInformation(TestCase):
             self.inf_uninitialized.topic = "/ksmos/nalytics/abce.def-ghi.jkl.omn/a/v0"
         self.inf_uninitialized.topic = "/kosmos/analytics/abce.def-ghi.jkl.omn/v0"
 
-    def test_set_payload(self):
+    def test_set_body(self):
         self.initialize()
         out = OutgoingMessage(
             self.inf_initialized_analyses_time_series,
@@ -154,19 +161,19 @@ class TestInformation(TestCase):
             is_temporary=True,
             temporary_keyword="temporary",
         )
-        out.payload = JSON_ANALYSE_TEXT
-        out.payload = JSON_ANALYSE_TIME_SERIES
-        out.payload = JSON_ANALYSE_MULTIPLE_TIME_SERIES
+        out.body = JSON_ANALYSE_TEXT["body"]
+        out.body = JSON_ANALYSE_TIME_SERIES["body"]
+        out.body = JSON_ANALYSE_MULTIPLE_TIME_SERIES["body"]
         with self.assertRaises(NonSchemaConformJsonPayload):
-            out.payload = JSON_ML_DATA_EXAMPLE
-            out.payload = JSON_ML_DATA_EXAMPLE_2
-            out.payload = JSON_ML_DATA_EXAMPLE_3
-            out.payload = JSON_ML_ANALYSE_TEXT
-            out.payload = JSON_ML_ANALYSE_TIME_SERIES
-            out.payload = JSON_ML_ANALYSE_MULTIPLE_TIME_SERIES
-            out.payload = JSON_DATA_EXAMPLE
-            out.payload = JSON_DATA_EXAMPLE_2
-            out.payload = JSON_DATA_EXAMPLE_3
+            out.body = JSON_ML_DATA_EXAMPLE["body"]
+            out.body = JSON_ML_DATA_EXAMPLE_2["body"]
+            out.body = JSON_ML_DATA_EXAMPLE_3["body"]
+            out.body = JSON_ML_ANALYSE_TEXT["body"]
+            out.body = JSON_ML_ANALYSE_TIME_SERIES["body"]
+            out.body = JSON_ML_ANALYSE_MULTIPLE_TIME_SERIES["body"]
+            out.body = JSON_DATA_EXAMPLE["body"]
+            out.body = JSON_DATA_EXAMPLE_2["body"]
+            out.body = JSON_DATA_EXAMPLE_3["body"]
 
     def test_set_results(self):
         self.initialize()
