@@ -262,11 +262,8 @@ class IncomingMessage:
         Checks the initialized status and raises an Exception if not properly set
         """
         if not self.is_initialized:
-            raise NotInitialized(
-                "The Information/Messaging object has not been initialized (properly). Please "
-                "initialize by using \n"
-                "information.mqtt_message = <MQTTMessage>"
-            )
+            print("I will now raise the Exception")
+            raise NotInitialized("The Information/Messaging object has not been initialized (properly). Please initialize by using \ninformation.mqtt_message = <MQTTMessage>")
 
     @property
     def analyses_message_type(self):
