@@ -1,62 +1,41 @@
 import json
 import logging
 
+import pandas
 import pytest
-from ml_wrapper import IncomingMessage
+from ml_wrapper import IncomingMessage, ResultType, OutgoingMessage
 from paho.mqtt.client import MQTTMessage
 
 
 @pytest.fixture
-def new_incoming_message():
-    return IncomingMessage(logger=logging.getLogger(__file__))
-
-
-# pylint: disable=super-init-not-called
-class MQTTMessageMock(MQTTMessage):
-    """ Mocking Message """
-
-    def __init__(self, topic, payload):
-        self.topic = topic
-        self.payload = payload
-
-
-@pytest.fixture
-def mqtt_time_series(json_ml_analyse_time_series):
-    return MQTTMessageMock(
-        b"kosmos/analytics/analyse.test-tool/v0.1.-2",
-        json.dumps(json_ml_analyse_time_series),
-    )
-
-
-@pytest.fixture
-def mqtt_multiple_time_series(json_ml_analyse_multiple_time_series):
-    return MQTTMessageMock(
-        b"kosmos/analytics/analyse.test-tool/v0.1.-2",
-        json.dumps(json_ml_analyse_multiple_time_series),
-    )
-
-
-@pytest.fixture
-def mqtt_fixtures(mqtt_text, mqtt_sensor, mqtt_time_series, mqtt_multiple_time_series):
+def expect_retrieve_fixture():
     return {
-        "text": mqtt_text,
-        "sensor": mqtt_sensor,
-        "time_series": mqtt_time_series,
-        "multiple_time_series": mqtt_multiple_time_series,
+        "text": {
+            "result_type": ResultType.TEXT,
+            "type": dict,
+        },
+        "sensor": {
+            "result_type": None,
+            "type": pandas.DataFrame,
+        },
+        "time_series": {
+            "result_type": ResultType.TIME_SERIES,
+            "type": pandas.DataFrame,
+        },
+        "multiple_time_series": {
+            "result_type": ResultType.MULTIPLE_TIME_SERIES,
+            "type": list,
+        },
     }
 
 
 @pytest.fixture
-def mqtt_text(json_ml_analyse_text):
-    return MQTTMessageMock(
-        b"kosmos/analytics/analyse.test-tool/v0.1.-2",
-        json.dumps(json_ml_analyse_text),
-    )
-
-
-@pytest.fixture
-def mqtt_sensor(json_ml_data_example):
-    return MQTTMessageMock(
-        b"kosmos/analytics/analyse.test-tool/v0.1.-2",
-        json.dumps(json_ml_data_example),
+def new_outgoing_message_by_incoming_message():
+    return lambda incoming_message: OutgoingMessage(
+        in_message=incoming_message,
+        from_="none",
+        model_url="none",
+        model_tag="none",
+        is_temporary=True,
+        temporary_keyword="temporary",
     )

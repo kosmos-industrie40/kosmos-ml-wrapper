@@ -18,6 +18,7 @@ from ml_wrapper.json_validator import (
 # Tests for the helper module
 # ----
 
+
 def test_topic_splitter(split_topics):
     with pytest.raises(AssertionError):
         topic_splitter(dict(test=True))
@@ -33,7 +34,10 @@ def test_topic_splitter(split_topics):
 # Tests for the json_validator module
 # ----
 
-def test_validate_formal(json_data_example_3, json_analyse_time_series, json_ml_analyse_text):
+
+def test_validate_formal(
+    json_data_example_3, json_analyse_time_series, json_ml_analyse_text
+):
     assert validate_formal(json_data_example_3) == MessageType.SENSOR_UPDATE
     assert validate_formal(json_analyse_time_series) == MessageType.ANALYSES_Result
     bad_json = json_analyse_time_series
@@ -46,7 +50,13 @@ def test_validate_formal(json_data_example_3, json_analyse_time_series, json_ml_
     with pytest.raises(NonSchemaConformJsonPayload):
         validate_formal(bad_json)
 
-def test_validate_trigger(json_ml_analyse_text, json_ml_data_example, json_analyse_time_series, json_data_example_3):
+
+def test_validate_trigger(
+    json_ml_analyse_text,
+    json_ml_data_example,
+    json_analyse_time_series,
+    json_data_example_3,
+):
     json_ml_analyse_text["body"]["payload"] = json_analyse_time_series
     validate_trigger(json_ml_analyse_text)
     json_ml_data_example["body"]["payload"] = json_data_example_3

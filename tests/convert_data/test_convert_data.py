@@ -16,27 +16,25 @@ from ml_wrapper.convert_data import (
 JSON_PATH = join(dirname(__file__), "..", "docs", "MqttPayloads")
 
 
-
-
 def test_resolve_dataframe(data):
     columns, data = resolve_data_frame(data)
     assert columns == [
-            {"name": "time", "type": "rfctime"},
-            {"name": "value", "type": "number"},
-            {"name": "float_value", "type": "number"},
-        ]
+        {"name": "time", "type": "rfctime"},
+        {"name": "value", "type": "number"},
+        {"name": "float_value", "type": "number"},
+    ]
     assert np.array_equal(
-            data,
-            np.array(
-                [
-                    ["2020-01-20 10:10:00", "1", "0.0"],
-                    ["2020-01-20 10:10:02", "2", "0.1"],
-                    ["2020-01-20 10:10:04", "3", "0.2"],
-                    ["2020-01-20 10:10:05", "4", "0.3"],
-                    ["2020-01-20 10:10:06", "5", "0.4"],
-                ]
-            ),
-        )
+        data,
+        np.array(
+            [
+                ["2020-01-20 10:10:00", "1", "0.0"],
+                ["2020-01-20 10:10:02", "2", "0.1"],
+                ["2020-01-20 10:10:04", "3", "0.2"],
+                ["2020-01-20 10:10:05", "4", "0.3"],
+                ["2020-01-20 10:10:06", "5", "0.4"],
+            ]
+        ),
+    )
 
 
 def test_analysis_time_series(json_analyse_time_series):
@@ -75,9 +73,7 @@ def test_analysis_text(json_analyse_text):
 
 def test_dataframe_types_retrieval(json_data_example_3):
     print("Testing with data-example-3.json")
-    data_frame, _, _, _, _ = retrieve_sensor_update_data(
-        json_data_example_3["body"]
-    )
+    data_frame, _, _, _, _ = retrieve_sensor_update_data(json_data_example_3["body"])
     assert data_frame.dtypes.tolist() == ["float64", "float64", "datetime64[ns]"]
 
 

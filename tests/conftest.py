@@ -2,10 +2,14 @@
 Basic conftest file for root level
 """
 import json
+import logging
+import sys
 
 import pytest
+from ml_wrapper import IncomingMessage, MLWrapper
 
 from ml_wrapper.json_provider import *
+from paho.mqtt.client import MQTTMessage
 
 from tests.mock_ml_tools import (
     FFT,
@@ -19,6 +23,14 @@ from tests.mock_ml_tools import (
 
 def _copy(dict_):
     return json.loads(json.dumps(dict_))
+
+
+def attach_logger(tool: MLWrapper) -> MLWrapper:
+    logger = logging.getLogger("New")
+    # for handler in tool.logger_.handlers:
+    #     logger.addHandler(handler)
+    tool.logger_ = logger
+    return tool
 
 
 @pytest.fixture
@@ -44,7 +56,6 @@ def json_data_example_3():
 @pytest.fixture
 def json_analyse_text():
     return _copy(JSON_ANALYSE_TEXT)
-
 
 
 @pytest.fixture
@@ -78,30 +89,96 @@ def json_ml_data_example():
 
 
 @pytest.fixture
+def json_ml_data_example_2():
+    return _copy(JSON_ML_DATA_EXAMPLE_2)
+
+
+@pytest.fixture
+def json_ml_data_example_3():
+    return _copy(JSON_ML_DATA_EXAMPLE_3)
+
+
+@pytest.fixture
 def ml_mock_fft():
-    return FFT
+    return FFT()
 
 
 @pytest.fixture
 def ml_mock_bad_topic_tool():
-    return BadTopicTool
+    return BadTopicTool()
 
 
 @pytest.fixture
 def ml_mock_slow_mltool():
-    return SlowMLTool
+    return SlowMLTool()
 
 
 @pytest.fixture
 def ml_mock_result_type_tool():
-    return ResultTypeTool
+    return ResultTypeTool()
 
 
 @pytest.fixture
 def ml_mock_bad_mltool():
-    return BadMLTool
+    return BadMLTool()
 
 
 @pytest.fixture
 def ml_mock_require_certain_input():
-    return RequireCertainInput
+    return RequireCertainInput()
+
+
+@pytest.fixture
+def new_incoming_message():
+    return IncomingMessage(logger=logging.getLogger(__file__))
+
+
+# pylint: disable=super-init-not-called
+class MQTTMessageMock(MQTTMessage):
+    """ Mocking Message """
+
+    def __init__(self, topic, payload):
+        self.topic = topic
+        self.payload = payload
+
+
+@pytest.fixture
+def mqtt_time_series(json_ml_analyse_time_series):
+    return MQTTMessageMock(
+        b"kosmos/analytics/analyse.test-tool/v0.1.-2",
+        json.dumps(json_ml_analyse_time_series),
+    )
+
+
+@pytest.fixture
+def mqtt_multiple_time_series(json_ml_analyse_multiple_time_series):
+    return MQTTMessageMock(
+        b"kosmos/analytics/analyse.test-tool/v0.1.-2",
+        json.dumps(json_ml_analyse_multiple_time_series),
+    )
+
+
+@pytest.fixture
+def mqtt_text(json_ml_analyse_text):
+    return MQTTMessageMock(
+        b"kosmos/analytics/analyse.test-tool/v0.1.-2",
+        json.dumps(json_ml_analyse_text),
+    )
+
+
+@pytest.fixture
+def mqtt_sensor(json_ml_data_example):
+    return MQTTMessageMock(
+        b"kosmos/analytics/analyse.test-tool/v0.1.-2",
+        json.dumps(json_ml_data_example),
+    )
+
+
+@pytest.fixture
+def mqtt_fixtures(mqtt_text, mqtt_sensor, mqtt_time_series, mqtt_multiple_time_series):
+    return {
+        "text": mqtt_text,
+        "sensor": mqtt_sensor,
+        "time_series": mqtt_time_series,
+        "multiple_time_series": mqtt_multiple_time_series,
+    }

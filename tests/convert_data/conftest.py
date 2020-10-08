@@ -20,6 +20,7 @@ def data():
     ).astype({"time": "datetime64[ns]", "value": int, "float_value": float})
     return data
 
+
 @pytest.fixture
 def random_df():
     """
