@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from src.ml_wrapper.json_provider import *
+from ml_wrapper.json_provider import *
 
 from tests.mock_ml_tools import (
     FFT,

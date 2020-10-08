@@ -12,12 +12,12 @@ from paho.mqtt.client import MQTTMessage
 
 os.environ["CONFIG_LOGGING_LOG_LEVEL"] = "DEBUG"
 
-from src.ml_wrapper.ml_wrapper import MLWrapper
-from src.ml_wrapper.result_type import ResultType
-from src.ml_wrapper.message_type import MessageType
-from src.ml_wrapper.messaging import IncomingMessage
-from src.ml_wrapper.exceptions import NonSchemaConformJsonPayload
-from src.ml_wrapper.json_provider import (
+from ml_wrapper.ml_wrapper import MLWrapper
+from ml_wrapper.result_type import ResultType
+from ml_wrapper.message_type import MessageType
+from ml_wrapper.messaging import IncomingMessage
+from ml_wrapper.exceptions import NonSchemaConformJsonPayload
+from ml_wrapper.json_provider import (
     JSON_ML_ANALYSE_TIME_SERIES,
     JSON_ML_DATA_EXAMPLE,
     JSON_ML_ANALYSE_TEXT,

@@ -1,62 +1,51 @@
 """
 Unittests for the Messaging/Information class
 """
-
-import json
 import logging
+
 import pytest
-import pandas as pd
+from ml_wrapper import IncomingMessage
 
-
-from paho.mqtt.client import MQTTMessage
-
-from src.ml_wrapper.exceptions import (
+from ml_wrapper.exceptions import (
     NotInitialized,
-    NonSchemaConformJsonPayload,
-    InvalidTopic,
 )
-from src.ml_wrapper.messaging import IncomingMessage, OutgoingMessage
 
 
-# def initialize(self):
-#     """ Initializes messages when required """
-#     self.inf_initialized_data.mqtt_message = self.message_data
-#     self.inf_initialized_analyses_time_series.mqtt_message = (
-#         self.message_analyses_time_series
-#     )
-#     self.inf_initialized_analyses_multiple_time_series.mqtt_message = (
-#         self.message_analyses_multiple_time_series
-#     )
-#     self.inf_initialized_analyses_text.mqtt_message = self.message_analyses_text
+def test_uninitialized():
+    inm = IncomingMessage(logger=logging.getLogger(__file__))
+    with pytest.raises(NotInitialized):
+        inm.check_initialized()
+
+import unittest
+from unittest import TestCase
+
+class TestRaising(TestCase):
+    def test_this(self):
+        inm=IncomingMessage(logger=logging.getLogger(__file__))
+        try:
+            self.assertRaises(NotInitialized, inm.check_initialized)
+        except Exception as err:
+            print(err.__class__)
+
+# @pytest.mark.parametrize(
+#     "message", ["text", "sensor", "time_series", "multiple_time_series"]
+# )
+# def test_messaging(new_incoming_message, mqtt_fixtures, message):
+#     new_incoming_message.mqtt_message = mqtt_fixtures[message]
+#     print(id(new_incoming_message))
+#     print(new_incoming_message.__dict__)
+#
+#
+# @pytest.mark.parametrize(
+#     "message", ["text", "sensor", "time_series", "multiple_time_series"]
+# )
+# def test_initialized(new_incoming_message, mqtt_fixtures, message):
+#     new_incoming_message.mqtt_message = mqtt_fixtures[message]
+#     assert new_incoming_message.is_initialized
+#     new_incoming_message.check_initialized()
+#     print(new_incoming_message.__dict__)
 
 
-@pytest.mark.parametrize(
-    "message", ["text", "sensor", "time_series", "multiple_time_series"]
-)
-def test_messaging(new_incoming_message, mqtt_fixtures, message):
-    new_incoming_message.mqtt_message = mqtt_fixtures[message]
-    print(new_incoming_message.__dict__)
-
-
-def test_uninitialized(new_incoming_message):
-    # assert not new_incoming_message.is_initialized
-    print(new_incoming_message.__dict__)
-    print(new_incoming_message.is_initialized)
-    try:
-        new_incoming_message.check_initialized()
-    except NotInitialized:
-        print("Succeeded")
-    pytest.fail("NotInitialized not thrown")
-
-
-@pytest.mark.parametrize(
-    "message", ["text", "sensor", "time_series", "multiple_time_series"]
-)
-def test_initialized(new_incoming_message, mqtt_fixtures, message):
-    new_incoming_message.mqtt_message = mqtt_fixtures[message]
-    assert new_incoming_message.is_initialized
-    new_incoming_message.check_initialized()
-    print(new_incoming_message.__dict__)
 
 # class TestInformation(TestCase):
 #     """

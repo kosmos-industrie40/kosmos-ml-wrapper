@@ -13,8 +13,8 @@ os.environ["CONFIG_MODEL_URL"] = "test_url"
 os.environ["CONFIG_MODEL_TAG"] = "test_tag"
 os.environ["CONFIG_MODEL_FROM"] = "test_from"
 
-from src.ml_wrapper import MLWrapper, OutgoingMessage, ResultType
-from src.ml_wrapper.mock_mqtt_client import MockMqttClient
+from ml_wrapper import MLWrapper, OutgoingMessage, ResultType
+from ml_wrapper.mock_mqtt_client import MockMqttClient
 
 
 class FFT(MLWrapper):

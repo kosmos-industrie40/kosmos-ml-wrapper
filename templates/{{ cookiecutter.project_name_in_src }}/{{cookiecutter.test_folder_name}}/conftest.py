@@ -22,7 +22,7 @@ from ml_wrapper.json_provider import (
     JSON_ML_DATA_EXAMPLE_2
 )
 
-from src.{{ cookiecutter.project_name_in_src }} import {{ cookiecutter.ml_class_name }}
+from {{ cookiecutter.project_name_in_src }} import {{ cookiecutter.ml_class_name }}
 from {{ cookiecutter.ml_class_name }}Mock import {{ cookiecutter.ml_class_name }}Mock as Mock
 
 @pytest.fixture

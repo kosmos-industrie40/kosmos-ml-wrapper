@@ -3,12 +3,12 @@ This file provides tests for the helper file
 """
 import pytest
 from ml_wrapper import MessageType
-from src.ml_wrapper.helper import topic_splitter
+from ml_wrapper.helper import topic_splitter
 
 
 from unittest import TestCase
 
-from src.ml_wrapper.json_validator import (
+from ml_wrapper.json_validator import (
     NonSchemaConformJsonPayload,
     validate_formal,
     validate_trigger,

@@ -5,7 +5,7 @@ import json
 from paho.mqtt.client import MQTTMessage
 
 from tests.mock_ml_tools import SlowMLTool
-from src.ml_wrapper.json_provider import JSON_ML_ANALYSE_TIME_SERIES
+from ml_wrapper.json_provider import JSON_ML_ANALYSE_TIME_SERIES
 
 
 class TestThreading(unittest.TestCase):
