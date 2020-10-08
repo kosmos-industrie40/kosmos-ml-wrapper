@@ -189,7 +189,9 @@ class MLWrapper(abc.ABC):
         This method is quite experimental and just intended to be used in testing
         @return: bool
         """
-        return self.async_result is not None and not self.async_result.ready()
+        ready = self.async_result is not None and not self.async_result.ready()
+        self.logger.info("Asynchronous task is {}ready".format("not yet " if ready else ""))
+        return ready
 
     def _init_mqtt(self):
         """ Initialise the mqtt client """
