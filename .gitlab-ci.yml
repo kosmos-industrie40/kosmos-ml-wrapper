@@ -5,64 +5,64 @@ stages:
   - templating
   - publish
 
-##pylint:
-##  stage: static
-##  image: "python:3.8"
-##  only:
-##    changes:
-##      - .gitlab-ci.yml
-##      - src/**/*
-##      - tests/*
-##      - .pylintrc
-##  before_script:
-##    - export PATH=$PATH:$(CI_PROJECT_PATH)/src
-##    - python --version
-##    - python setup.py develop
-##    - pip install -r requirements.txt
-##    - pip install pytest pytest-cov
-##    - pip install pylint
-##  tags:
-##    - shared
-##  script:
-##    - pylint src
-##    - pylint --rcfile tests/.pylintrc tests
-##
-##black:
-##  stage: static
-##  image: "python:3.8"
-##  only:
-##    changes:
-##      - .gitlab-ci.yml
-##      - src/**/*
-##      - tests/*
-##  before_script:
-##    - pip install -r requirements.txt
-##    - pip install black
-##  tags:
-##    - shared
-##  script:
-##    - black --check src
-##    - black --check tests
-#
-#test:
-#  stage: test
-#  image: "python:3.8"
-#  needs: []
-#  only:
-#    changes:
-#      - .gitlab-ci.yml
-#      - src/**/*
-#      - tests/*
-#  before_script:
-#    - python setup.py develop
-#  tags:
-#    - shared
-#  artifacts:
-#    reports:
-#      junit: junit.xml
-#      cobertura: coverage.xml
-#  script:
-#    - python setup.py test
+pylint:
+  stage: static
+  image: "python:3.8"
+  only:
+    changes:
+      - .gitlab-ci.yml
+      - src/**/*
+      - tests/*
+      - .pylintrc
+  before_script:
+    - export PATH=$PATH:$(CI_PROJECT_PATH)/src
+    - python --version
+    - python setup.py develop
+    - pip install -r requirements.txt
+    - pip install pytest pytest-cov
+    - pip install pylint
+  tags:
+    - shared
+  script:
+    - pylint src
+    - pylint --rcfile tests/.pylintrc tests
+
+black:
+  stage: static
+  image: "python:3.8"
+  only:
+    changes:
+      - .gitlab-ci.yml
+      - src/**/*
+      - tests/*
+  before_script:
+    - pip install -r requirements.txt
+    - pip install black
+  tags:
+    - shared
+  script:
+    - black --check src
+    - black --check tests
+
+test:
+  stage: test
+  image: "python:3.8"
+  needs: []
+  only:
+    changes:
+      - .gitlab-ci.yml
+      - src/**/*
+      - tests/*
+  before_script:
+    - python setup.py develop
+  tags:
+    - shared
+  artifacts:
+    reports:
+      junit: junit.xml
+      cobertura: coverage.xml
+  script:
+    - python setup.py test
 
 build:
   stage: build
@@ -74,10 +74,10 @@ build:
       - tests/*
       - requirements.txt
       - setup.*
-#  needs:
-#    - test
-#    - black
-#    - pylint
+  needs:
+    - test
+    - black
+    - pylint
   before_script:
     - pip install wheel
   tags:
@@ -87,48 +87,48 @@ build:
       - dist/*
   script:
     - python setup.py sdist bdist_wheel
-#
-#test_template:
-#  stage: templating
-#  image: "python:3.8"
-#  only:
-#    changes:
-#      - .gitlab-ci.yml
-#      - src/**/*
-#      - tests/*
-#      - requirements.txt
-#      - setup.*
-#  tags:
-#    - shared
-#  dependencies:
-#    - build
-#  before_script:
-#    - pip install cookiecutter
-#    - pip install pyscaffold
-#    - pip install ./dist/*.whl
-#    - pip install pytest
-#    - pip install yamllint
-#    - pip install pandas
-#    - git config --global user.email "testing@example.com"
-#    - git config --global user.name "Tester"
-#  script:
-#    - putup simple_ml_tool --no-skeleton
-#    - cookiecutter templates -f --no-input --config-file tests/cookiecutter-template-test.yaml
-#    - cd simple_ml_tool
-#    - ls -la
-#    - python setup.py test
+
+test_template:
+  stage: templating
+  image: "python:3.8"
+  only:
+    changes:
+      - .gitlab-ci.yml
+      - src/**/*
+      - tests/*
+      - requirements.txt
+      - setup.*
+  tags:
+    - shared
+  dependencies:
+    - build
+  before_script:
+    - pip install cookiecutter
+    - pip install pyscaffold
+    - pip install ./dist/*.whl
+    - pip install pytest
+    - pip install yamllint
+    - pip install pandas
+    - git config --global user.email "testing@example.com"
+    - git config --global user.name "Tester"
+  script:
+    - putup simple_ml_tool --no-skeleton
+    - cookiecutter templates -f --no-input --config-file tests/cookiecutter-template-test.yaml
+    - cd simple_ml_tool
+    - ls -la
+    - python setup.py test
 
 publish_pypi:
   stage: publish
   image: "python:3.8"
   tags:
     - shared
-#  only:
-#    refs:
-#      - tags
-#  except:
-#    refs:
-#      - branches
+  only:
+    refs:
+      - tags
+  except:
+    refs:
+      - branches
   dependencies:
     - build
   script:
