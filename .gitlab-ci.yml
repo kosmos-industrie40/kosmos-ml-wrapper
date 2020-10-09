@@ -1,11 +1,12 @@
 stages:
-  - Static Analysis
-  - Unit Test
-  - Build
-  - Templating
+  - static
+  - test
+  - build
+  - templating
+  - publish
 
 pylint:
-  stage: Static Analysis
+  stage: static
   image: "python:3.8"
   only:
     changes:
@@ -27,7 +28,7 @@ pylint:
     - pylint --rcfile tests/.pylintrc tests
 
 black:
-  stage: Static Analysis
+  stage: static
   image: "python:3.8"
   only:
     changes:
@@ -44,7 +45,7 @@ black:
     - black --check tests
 
 test:
-  stage: Unit Test
+  stage: test
   image: "python:3.8"
   needs: []
   only:
@@ -64,7 +65,7 @@ test:
     - python setup.py test
 
 build:
-  stage: Build
+  stage: build
   image: "python:3.8"
   only:
     changes:
@@ -83,12 +84,12 @@ build:
     - shared
   artifacts:
     paths:
-      - dist/*.whl
+      - dist/*
   script:
     - python setup.py sdist bdist_wheel
 
 test_template:
-  stage: Templating
+  stage: templating
   image: "python:3.8"
   only:
     changes:
@@ -116,3 +117,17 @@ test_template:
     - cd simple_ml_tool
     - ls -la
     - python setup.py test
+
+publish_pypi:
+  stage: publish
+  image: "pyhton:3.8"
+  tags:
+    - shared
+#  only:
+#    refs:
+#      - tag
+  dependencies:
+    - build
+  script:
+    - pip install twine
+    - python -m twine upload dist/*
