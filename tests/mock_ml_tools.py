@@ -13,21 +13,26 @@ os.environ["CONFIG_MODEL_URL"] = "test_url"
 os.environ["CONFIG_MODEL_TAG"] = "test_tag"
 os.environ["CONFIG_MODEL_FROM"] = "test_from"
 
-from src.ml_wrapper import MLWrapper, OutgoingMessage, ResultType
-from src.ml_wrapper.mock_mqtt_client import MockMqttClient
+from ml_wrapper import MLWrapper, OutgoingMessage, ResultType
+from ml_wrapper.mock_mqtt_client import MockMqttClient
 
 
 class FFT(MLWrapper):
     """Mocked FFT class"""
 
-    def __init__(self, outgoing_message_is_temporary=True):
+    def __init__(
+        self,
+        outgoing_message_is_temporary=True,
+        last_out_message: OutgoingMessage = None,
+    ):
         """Constructor"""
-        self.last_out_message = None
+        self.last_out_message = last_out_message
         super().__init__(
             outgoing_message_is_temporary=outgoing_message_is_temporary,
             log_level=logging.DEBUG,
-            logger_name="MOCK",
         )
+        logger = logging.getLogger("MOCK")
+        self.logger_ = logger
         self.logger.debug(type(self))
         self.logger.debug(self.config)
 
@@ -61,15 +66,20 @@ class FFT(MLWrapper):
 class BadTopicTool(MLWrapper):
     """Mocked FFT class"""
 
-    def __init__(self, outgoing_message_is_temporary=True):
+    def __init__(
+        self,
+        outgoing_message_is_temporary=True,
+        last_out_message: OutgoingMessage = None,
+    ):
         """Constructor"""
         os.environ["CONFIG_MESSAGING_BASE_RESULT_TOPIC"] = "this/isnotcorrect"
-        self.last_out_message = None
+        self.last_out_message = last_out_message
         super().__init__(
             outgoing_message_is_temporary=outgoing_message_is_temporary,
             log_level=logging.DEBUG,
-            logger_name="MOCK",
         )
+        logger = logging.getLogger("MOCK")
+        self.logger_ = logger
 
     def _init_mqtt(self):
         """ Initialise a mock mqtt client """
@@ -102,12 +112,18 @@ class BadTopicTool(MLWrapper):
 class SlowMLTool(MLWrapper):
     """ Mocking a slow ml tool which sleeps for 5 seconds"""
 
-    def __init__(self, outgoing_message_is_temporary=True):
+    def __init__(
+        self,
+        outgoing_message_is_temporary=True,
+        last_out_message: OutgoingMessage = None,
+    ):
         """ Constructor """
-        self.last_out_message = None
+        self.last_out_message = last_out_message
         super().__init__(
             outgoing_message_is_temporary=outgoing_message_is_temporary,
         )
+        logger = logging.getLogger("MOCK")
+        self.logger_ = logger
 
     def _init_mqtt(self):
         """ Inits mock Client """
@@ -135,15 +151,21 @@ class SlowMLTool(MLWrapper):
 class ResultTypeTool(MLWrapper):
     """ Mock for a Result Type Check """
 
-    def __init__(self, outgoing_message_is_temporary=True):
+    def __init__(
+        self,
+        outgoing_message_is_temporary=True,
+        last_out_message: OutgoingMessage = None,
+    ):
         """ Constructor """
-        self.last_out_message = None
+        self.last_out_message = last_out_message
         super().__init__(
             outgoing_message_is_temporary=outgoing_message_is_temporary,
             result_type=ResultType.MULTIPLE_TIME_SERIES,
             log_level=logging.DEBUG,
             logger_name="Result Type Logger",
         )
+        logger = logging.getLogger("MOCK")
+        self.logger_ = logger
 
     def _init_mqtt(self):
         """ Initialise a mock mqtt client """
@@ -170,14 +192,19 @@ class ResultTypeTool(MLWrapper):
 class BadMLTool(MLWrapper):
     """ Mock for a corrupt ML Tool """
 
-    def __init__(self, outgoing_message_is_temporary=True):
+    def __init__(
+        self,
+        outgoing_message_is_temporary=True,
+        last_out_message: OutgoingMessage = None,
+    ):
         """ Constructor """
-        self.last_out_message = None
+        self.last_out_message = last_out_message
         super().__init__(
             outgoing_message_is_temporary=outgoing_message_is_temporary,
-            logger_name="MOCK",
             log_level=logging.DEBUG,
         )
+        logger = logging.getLogger("MOCK")
+        self.logger_ = logger
 
     def _init_mqtt(self):
         """ Initialise a mock mqtt client """
@@ -209,15 +236,20 @@ class RequireCertainInput(MLWrapper):
     Mock for message requirements
     """
 
-    def __init__(self, outgoing_message_is_temporary=True):
+    def __init__(
+        self,
+        outgoing_message_is_temporary=True,
+        last_out_message: OutgoingMessage = None,
+    ):
         """ Constructor """
-        self.last_out_message = None
+        self.last_out_message = last_out_message
         super().__init__(
             outgoing_message_is_temporary=outgoing_message_is_temporary,
-            logger_name="MOCK",
             log_level=logging.DEBUG,
             result_type=ResultType.TEXT,
         )
+        logger = logging.getLogger("MOCK")
+        self.logger_ = logger
 
     def _init_mqtt(self):
         """Initialize a mock mqtt client"""

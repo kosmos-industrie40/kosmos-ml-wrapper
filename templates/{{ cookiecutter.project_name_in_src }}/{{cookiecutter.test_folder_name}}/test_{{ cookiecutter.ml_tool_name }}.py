@@ -14,8 +14,7 @@ def test_run(mock_tool, payloads_prerendered):
     {% else %}
     mock_tool.client.mock_a_message(mock_tool.client, payloads_prerendered["JSON_ML_ANALYSE_TIME_SERIES"]["json_string"])
     {% endif -%}
-    while mock_tool.async_result is not None and not mock_tool.async_result.ready():
-        mock_tool.logger.info("Test is still running...")
+    while mock_tool.async_not_ready():
         sleep(1)
     mock_tool.logger.info("Done with the Thread work")
     assert mock_tool.last_result is not None
@@ -44,8 +43,7 @@ def test_multiple_runs(mock_tool, payloads_prerendered, json_key):
         mock_tool.client,
         payloads_prerendered[json_key]["json_string"]
     )
-    while mock_tool.async_result is not None and not mock_tool.async_result.ready():
-        mock_tool.logger.info("Test is still running...")
+    while mock_tool.async_not_ready():
         sleep(1)
     mock_tool.logger.info("Done with the Thread work")
     assert mock_tool.last_result is not None

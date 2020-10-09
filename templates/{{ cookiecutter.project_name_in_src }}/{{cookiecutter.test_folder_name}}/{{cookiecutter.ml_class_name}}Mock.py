@@ -6,7 +6,7 @@ from typing import List, Union
 import pandas as pd
 
 from ml_wrapper import OutgoingMessage
-from src.{{ cookiecutter.project_name_in_src }} import {{ cookiecutter.ml_class_name }}
+from {{ cookiecutter.project_name_in_src }} import {{ cookiecutter.ml_class_name }}
 from ml_wrapper.mock_mqtt_client import MockMqttClient
 
 class {{ cookiecutter.ml_class_name }}Mock({{ cookiecutter.ml_class_name }}):

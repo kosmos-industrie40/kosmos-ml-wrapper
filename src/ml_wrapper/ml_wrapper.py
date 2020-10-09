@@ -184,12 +184,23 @@ class MLWrapper(abc.ABC):
         """
         return self.logger_
 
-    def _async_ready(self):
+    def async_not_ready(self) -> bool:
         """
-        This method is quite experimental and just intended to be used in testing
+        This method is quite experimental and just intended to be used in testing.
+        When you run a test message, you can check the last async_result if it's ready.
+        This should never be used at production and is only provided for testing.
+        You can use it via
+        ::
+
+            while ml_tool.asnyc_not_ready():
+                time.sleep(1)
+            ...
+
         @return: bool
         """
-        return self.async_result is not None and not self.async_result.ready()
+        ready = self.async_result is not None and not self.async_result.ready()
+        self.logger.info("Asynchronous task is %s ready", "not yet " if ready else "")
+        return ready
 
     def _init_mqtt(self):
         """ Initialise the mqtt client """
@@ -414,9 +425,9 @@ class MLWrapper(abc.ABC):
             self.logger.error(
                 "You need to specify the payload. If you overwrite the "
                 "resolve_result_data method, please make sure to provide "
-                "the 'body' of the payload manually!"
+                "the 'body' field of the payload manually!"
             )
-            return None
+            raise error
         out_message = self._publish_result_message(out_message)
         return out_message
 

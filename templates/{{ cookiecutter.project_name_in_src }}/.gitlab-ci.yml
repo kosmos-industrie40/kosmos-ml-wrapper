@@ -23,6 +23,7 @@ pylint:
   tags:
     - shared
   script:
+    - export PATH=$PATH:$(CI_PROJECT_PATH)/src
     - pip install pylint
     - pylint src
     - |
