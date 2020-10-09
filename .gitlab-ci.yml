@@ -123,12 +123,12 @@ publish_pypi:
   image: "python:3.8"
   tags:
     - shared
-#  only:
-#    refs:
-#      - tags
-#  except:
-#    refs:
-#      - branches
+  only:
+    refs:
+      - tags
+  except:
+    refs:
+      - branches
   dependencies:
     - build
   script:
