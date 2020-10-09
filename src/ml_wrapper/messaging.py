@@ -491,9 +491,9 @@ class OutgoingMessage:
         """ Returns the protected property for payload """
         if self._body is None:
             raise NotInitialized(
-                "The payload of the outgoing message has to be set. "
+                "The body of the outgoing message has to be set. "
                 "You can either use the set_results method or set the "
-                "payload directly."
+                "field body directly."
             )
         return self._body
 

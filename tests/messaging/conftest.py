@@ -1,10 +1,9 @@
-import json
-import logging
-
-import pandas
+"""
+Conftest to provide messaging fixtures
+"""
 import pytest
-from ml_wrapper import IncomingMessage, ResultType, OutgoingMessage
-from paho.mqtt.client import MQTTMessage
+import pandas
+from ml_wrapper import ResultType, OutgoingMessage
 
 
 @pytest.fixture

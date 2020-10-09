@@ -1,3 +1,6 @@
+"""
+Conftest file to provide fixtures for convert_data
+"""
 import pytest
 
 import pandas as pd
@@ -19,17 +22,3 @@ def data():
         },
     ).astype({"time": "datetime64[ns]", "value": int, "float_value": float})
     return data
-
-
-@pytest.fixture
-def random_df():
-    """
-    Create a time series with random entries.
-    Serves to simulate an external analysis module which publishes results to
-    the MQTT broker.
-    """
-    data1 = np.random.random(5)
-    data2 = np.random.random(5)
-    data3 = np.random.random(5)
-    pdf = pd.DataFrame({"col1": data1, "col2": data2, "col3": data3})
-    return pdf

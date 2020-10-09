@@ -16,6 +16,8 @@ class MessageType(Enum):
         if not hasattr(other, "value"):
             print("Other is different instance")
             return False
+        # Value is a property
+        # pylint: disable=comparison-with-callable
         return self.value == other.value
 
     @classmethod

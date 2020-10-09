@@ -2,9 +2,10 @@
 Unittests for the Messaging/Information class
 """
 import pytest
-from ml_wrapper import ResultType
-
 import pandas as pd
+
+
+from ml_wrapper import ResultType
 
 from ml_wrapper.exceptions import (
     NotInitialized,
@@ -71,10 +72,10 @@ def test_set_topic(new_incoming_message):
     new_incoming_message.topic = "/kosmos/analytics/abce.def-ghi.jkl.omn/v0"
 
 
+# pylint: disable=too-many-arguments,too-many-locals
 def test_set_body(
     new_incoming_message,
     mqtt_time_series,
-    expect_retrieve_fixture,
     new_outgoing_message_by_incoming_message,
     json_analyse_multiple_time_series,
     json_analyse_text,

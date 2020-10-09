@@ -1,27 +1,25 @@
+"""
+Tests the ML Wrapper behaviour
+"""
 from time import sleep
-from unittest import TestCase
+from typing import List
+import json
 
 import pytest
+import pandas as pd
 from ml_wrapper import (
     MLWrapper,
     ResultType,
     NonSchemaConformJsonPayload,
-    JSON_ML_ANALYSE_TIME_SERIES,
     MessageType,
+    Union,
+    OutgoingMessage,
 )
-import logging
-import json
 
-from tests.conftest import (
-    ml_mock_bad_topic_tool,
-    mqtt_time_series,
-    MQTTMessageMock,
-    attach_logger,
-)
-from tests.mock_ml_tools import FFT, BadTopicTool
+from tests.mock_ml_tools import FFT
 
 
-def test_instantiate(ml_mock_fft, mqtt_time_series):
+def test_instantiate(ml_mock_fft):
     assert isinstance(ml_mock_fft, MLWrapper)
 
 
@@ -42,9 +40,7 @@ def test_result_types(ml_mock_result_type_tool):
     assert ml_mock_result_type_tool.result_type == ResultType.MULTIPLE_TIME_SERIES
 
 
-def test_erroneous_run(
-    new_incoming_message, ml_mock_bad_mltool, mqtt_time_series, caplog
-):
+def test_erroneous_run(new_incoming_message, ml_mock_bad_mltool, mqtt_time_series):
     new_incoming_message.mqtt_message = mqtt_time_series
     with pytest.raises(TypeError):
         ml_mock_bad_mltool._run(new_incoming_message)
@@ -74,8 +70,8 @@ def test_reaction_to_message(ml_mock_fft, json_ml_analyse_time_series):
 
 
 def test_wrong_topic(ml_mock_bad_topic_tool, mqtt_time_series, caplog):
-    assert "this/isnotcorrect" == ml_mock_bad_topic_tool._config.get(
-        "base_result_topic"
+    assert (
+        ml_mock_bad_topic_tool._config.get("base_result_topic") == "this/isnotcorrect"
     )
     ml_mock_bad_topic_tool._react_to_message(None, None, mqtt_time_series)
     while ml_mock_bad_topic_tool.async_not_ready():
@@ -132,3 +128,27 @@ def test_outgoing_message_is_temporary(
         sleep(1)
     assert fft.last_out_message.is_temporary == temporary
     assert ("temporary" in fft.last_out_message.topic) == temporary
+
+
+def test_wrong_resolve_function(mqtt_time_series, caplog):
+    class WrongResolve(FFT):
+        """Minimal wrong resolving"""
+
+        def resolve_result_data(
+            self,
+            result: Union[pd.DataFrame, List[pd.DataFrame], dict],
+            out_message: OutgoingMessage,
+        ) -> OutgoingMessage:
+            return out_message
+
+    ml_tool = WrongResolve()
+    ml_tool._react_to_message(None, None, mqtt_time_series)
+    while ml_tool.async_not_ready():
+        sleep(1)
+    assert any(
+        [
+            "You need to specify" in rec.message
+            for rec in caplog.records
+            if rec.levelname in ["ERROR", "WARNING"]
+        ]
+    )

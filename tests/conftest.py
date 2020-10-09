@@ -1,15 +1,28 @@
 """
-Basic conftest file for root level
+Basic conftest file for root level.
+Providing jsons, (mqtt) messages and ml tools as fixtures
 """
 import json
 import logging
-import sys
 
 import pytest
-from ml_wrapper import IncomingMessage, MLWrapper
-
-from ml_wrapper.json_provider import *
 from paho.mqtt.client import MQTTMessage
+
+from ml_wrapper import IncomingMessage
+from ml_wrapper.json_provider import (
+    JSON_ANALYSE_MULTIPLE_TIME_SERIES,
+    JSON_ANALYSE_TEXT,
+    JSON_ANALYSE_TIME_SERIES,
+    JSON_DATA_EXAMPLE,
+    JSON_DATA_EXAMPLE_2,
+    JSON_DATA_EXAMPLE_3,
+    JSON_ML_ANALYSE_MULTIPLE_TIME_SERIES,
+    JSON_ML_ANALYSE_TEXT,
+    JSON_ML_ANALYSE_TIME_SERIES,
+    JSON_ML_DATA_EXAMPLE,
+    JSON_ML_DATA_EXAMPLE_2,
+    JSON_ML_DATA_EXAMPLE_3,
+)
 
 from tests.mock_ml_tools import (
     FFT,
@@ -23,14 +36,6 @@ from tests.mock_ml_tools import (
 
 def _copy(dict_):
     return json.loads(json.dumps(dict_))
-
-
-def attach_logger(tool: MLWrapper) -> MLWrapper:
-    logger = logging.getLogger("New")
-    # for handler in tool.logger_.handlers:
-    #     logger.addHandler(handler)
-    tool.logger_ = logger
-    return tool
 
 
 @pytest.fixture

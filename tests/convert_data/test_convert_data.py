@@ -1,8 +1,6 @@
 """
 This module tests the conversion of the data
 """
-import pytest
-import unittest
 from os.path import dirname, join
 import pandas as pd
 import numpy as np

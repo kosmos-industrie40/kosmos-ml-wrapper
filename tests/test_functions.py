@@ -6,8 +6,6 @@ from ml_wrapper import MessageType
 from ml_wrapper.helper import topic_splitter
 
 
-from unittest import TestCase
-
 from ml_wrapper.json_validator import (
     NonSchemaConformJsonPayload,
     validate_formal,
@@ -35,9 +33,7 @@ def test_topic_splitter(split_topics):
 # ----
 
 
-def test_validate_formal(
-    json_data_example_3, json_analyse_time_series, json_ml_analyse_text
-):
+def test_validate_formal(json_data_example_3, json_analyse_time_series):
     assert validate_formal(json_data_example_3) == MessageType.SENSOR_UPDATE
     assert validate_formal(json_analyse_time_series) == MessageType.ANALYSES_Result
     bad_json = json_analyse_time_series

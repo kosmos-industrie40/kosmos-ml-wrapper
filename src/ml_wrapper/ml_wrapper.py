@@ -199,7 +199,7 @@ class MLWrapper(abc.ABC):
         @return: bool
         """
         ready = self.async_result is not None and not self.async_result.ready()
-        self.logger.info("Asynchronous task is {}ready".format("not yet " if ready else ""))
+        self.logger.info("Asynchronous task is %s ready", "not yet " if ready else "")
         return ready
 
     def _init_mqtt(self):
@@ -425,9 +425,9 @@ class MLWrapper(abc.ABC):
             self.logger.error(
                 "You need to specify the payload. If you overwrite the "
                 "resolve_result_data method, please make sure to provide "
-                "the 'body' of the payload manually!"
+                "the 'body' field of the payload manually!"
             )
-            return None
+            raise error
         out_message = self._publish_result_message(out_message)
         return out_message
 
