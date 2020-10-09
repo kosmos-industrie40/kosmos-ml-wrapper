@@ -74,10 +74,10 @@ build:
       - tests/*
       - requirements.txt
       - setup.*
-  needs:
-    - test
-    - black
-    - pylint
+#  needs:
+#    - test
+#    - black
+#    - pylint
   before_script:
     - pip install wheel
   tags:
