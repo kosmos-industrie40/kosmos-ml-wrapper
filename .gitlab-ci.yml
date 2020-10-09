@@ -17,6 +17,8 @@ pylint:
     - export PATH=$PATH:$(CI_PROJECT_PATH)/src
     - python --version
     - python setup.py develop
+    - pip install -r requirements.txt
+    - pip install pytest pytest-cov
     - pip install pylint
   tags:
     - shared
