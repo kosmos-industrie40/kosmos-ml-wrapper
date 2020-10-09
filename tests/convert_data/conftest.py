@@ -8,6 +8,7 @@ import pandas as pd
 
 @pytest.fixture
 def data():
+    """ Provides an example dataframe """
     data = pd.DataFrame(
         {
             "time": [
