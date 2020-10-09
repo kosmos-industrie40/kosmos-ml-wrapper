@@ -133,6 +133,6 @@ publish_pypi:
     - build
   script:
     - pip install twine
-    - export TWINE_PASSWORD=${gitlab-registry-publish}
-    - export TWINE_USERNAME=gitlab-registry-publish
+    - export TWINE_PASSWORD=${GITLAB_REGISTRY_PUBLISH}
+    - export TWINE_USERNAME=GITLAB_REGISTRY_PUBLISH
     - python -m twine upload --verbose --repository-url https://gitlab.inovex.de/api/v4/projects/${CI_PROJECT_ID}/packages/pypi dist/*
