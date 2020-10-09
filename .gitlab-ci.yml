@@ -136,5 +136,4 @@ publish_pypi:
     - export TWINE_PASSWORD=${GITLAB_REGISTRY_PUBLISH}
     - export TWINE_USERNAME=GITLAB_REGISTRY_PUBLISH
     - echo $TWINE_PASSWORD
-    - python -m twine upload --config-file .pypirc -r inovex dist/*
-#    - python -m twine upload --verbose --repository-url https://gitlab.inovex.de/api/v4/projects/${CI_PROJECT_ID}/packages/pypi dist/*
+    - python -m twine upload --verbose --repository-url https://gitlab.inovex.de/api/v4/projects/${CI_PROJECT_ID}/packages/pypi dist/*
