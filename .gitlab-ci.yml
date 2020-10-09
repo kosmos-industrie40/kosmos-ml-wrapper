@@ -120,12 +120,15 @@ test_template:
 
 publish_pypi:
   stage: publish
-  image: "pyhton:3.8"
+  image: "python:3.8"
   tags:
     - shared
 #  only:
 #    refs:
-#      - tag
+#      - tags
+#  except:
+#    refs:
+#      - branches
   dependencies:
     - build
   script:
