@@ -148,7 +148,9 @@ def test_outgoing_message_is_temporary(
     with pytest.raises(AssertionError):
         with ML_MOCK_FftMockNOT_INITIALIZED(outgoing_message_is_temporary=None) as tool:
             pass
-    with ML_MOCK_FftMockNOT_INITIALIZED(outgoing_message_is_temporary=temporary) as tool:
+    with ML_MOCK_FftMockNOT_INITIALIZED(
+        outgoing_message_is_temporary=temporary
+    ) as tool:
         tool.client.mock_a_message(tool.client, json.dumps(json_ml_analyse_time_series))
         assert all([out.is_temporary for out in tool.out_messages]) == temporary
         assert all(["temporary" in out.topic for out in tool.out_messages]) == temporary
