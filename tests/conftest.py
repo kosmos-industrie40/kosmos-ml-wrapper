@@ -2,13 +2,15 @@
 Basic conftest file for root level.
 Providing jsons, (mqtt) messages and ml tools as fixtures
 """
+import inspect
 import json
 import logging
 
 import pytest
 from paho.mqtt.client import MQTTMessage
 
-from ml_wrapper import IncomingMessage
+from ml_wrapper import IncomingMessage, MLWrapper, ResultType
+from ml_wrapper.mocks import create_mock_tool
 from ml_wrapper.json_provider import (
     JSON_ANALYSE_MULTIPLE_TIME_SERIES,
     JSON_ANALYSE_TEXT,
@@ -31,7 +33,16 @@ from tests.mock_ml_tools import (
     ResultTypeTool,
     BadMLTool,
     RequireCertainInput,
+    WrongResolve,
 )
+
+FftMock = create_mock_tool(FFT)
+ToolMock = create_mock_tool(WrongResolve)
+BttMock = create_mock_tool(BadTopicTool)
+SlowMlToolMock = create_mock_tool(SlowMLTool)
+ResultTypeToolMock = create_mock_tool(ResultTypeTool)
+BadMlToolMock = create_mock_tool(BadMLTool)
+RequireCertainInputMock = create_mock_tool(RequireCertainInput)
 
 
 def _copy(dict_):
@@ -104,33 +115,57 @@ def json_ml_data_example_3():
 
 
 @pytest.fixture
-def ml_mock_fft():
-    return FFT()
+def tool_patch(monkeypatch):
+    monkeypatch.setenv("CONFIG_MODEL_URL", "test_url")
+    monkeypatch.setenv("CONFIG_MODEL_TAG", "test_tag")
+    monkeypatch.setenv("CONFIG_MODEL_FROM", "test_from")
 
 
 @pytest.fixture
-def ml_mock_bad_topic_tool():
-    return BadTopicTool()
+def ML_MOCK_FFT(tool_patch) -> MLWrapper:
+    print(inspect.getsource(FftMock.__init__))
+    return FftMock(outgoing_message_is_temporary=True)
 
 
 @pytest.fixture
-def ml_mock_slow_mltool():
-    return SlowMLTool()
+def ML_MOCK_FftMockNOT_INITIALIZED(tool_patch) -> MLWrapper:
+    print(inspect.getsource(FftMock.__init__))
+    return FftMock
 
 
 @pytest.fixture
-def ml_mock_result_type_tool():
-    return ResultTypeTool()
+def ML_MOCK_WRONG_RESOLVE(tool_patch) -> MLWrapper:
+    return ToolMock(outgoing_message_is_temporary=True)
 
 
 @pytest.fixture
-def ml_mock_bad_mltool():
-    return BadMLTool()
+def ML_MOCK_BAD_TOPIC_TOOL(tool_patch, monkeypatch) -> MLWrapper:
+    monkeypatch.setenv("CONFIG_MESSAGING_BASE_RESULT_TOPIC", "this/isnotcorrect")
+    return BttMock(outgoing_message_is_temporary=True)
 
 
 @pytest.fixture
-def ml_mock_require_certain_input():
-    return RequireCertainInput()
+def ML_MOCK_SLOW_MLTOOL(tool_patch) -> MLWrapper:
+    return SlowMlToolMock(outgoing_message_is_temporary=True)
+
+
+@pytest.fixture
+def ML_MOCK_RESULT_TYPE_TOOL(tool_patch) -> MLWrapper:
+    return ResultTypeToolMock(
+        outgoing_message_is_temporary=True, result_type=ResultType.MULTIPLE_TIME_SERIES
+    )
+
+
+@pytest.fixture
+def ML_MOCK_BAD_MLTOOL(tool_patch) -> MLWrapper:
+    return BadMlToolMock(outgoing_message_is_temporary=True)
+
+
+@pytest.fixture
+def ML_MOCK_REQUIRE_CERTAIN_INPUT(tool_patch) -> MLWrapper:
+    return RequireCertainInputMock(
+        outgoing_message_is_temporary=True, result_type=ResultType.TEXT
+    )
 
 
 @pytest.fixture

@@ -1,150 +1,165 @@
 """
 Tests the ML Wrapper behaviour
 """
-from time import sleep
-from typing import List
 import json
-
 import pytest
-import pandas as pd
 from ml_wrapper import (
     MLWrapper,
     ResultType,
     NonSchemaConformJsonPayload,
     MessageType,
-    Union,
-    OutgoingMessage,
+    NotInitialized,
 )
 
-from tests.mock_ml_tools import FFT
+
+def test_instantiate(ML_MOCK_FFT):
+    with ML_MOCK_FFT as ml_mock_fft:
+        print(id(ml_mock_fft))
+        print(id(ml_mock_fft.async_loop))
+        assert isinstance(ml_mock_fft, MLWrapper)
 
 
-def test_instantiate(ml_mock_fft):
-    assert isinstance(ml_mock_fft, MLWrapper)
+def test_react_to_message(ML_MOCK_FFT, mqtt_time_series):
+    with ML_MOCK_FFT as ml_mock_fft:
+        print(id(ml_mock_fft))
+        print(id(ml_mock_fft.async_loop))
+        ml_mock_fft._react_to_message(None, None, mqtt_time_series)
 
 
-def test_react_to_message(ml_mock_fft, mqtt_time_series):
-    ml_mock_fft._react_to_message(None, None, mqtt_time_series)
+def test_instantiate_2(ML_MOCK_FFT):
+    with ML_MOCK_FFT as ml_mock_fft:
+        print(id(ml_mock_fft))
+        print(id(ml_mock_fft.async_loop))
+        assert isinstance(ml_mock_fft, MLWrapper)
 
 
-def test_run(ml_mock_fft, mqtt_time_series, new_incoming_message):
-    new_incoming_message.mqtt_message = mqtt_time_series
-    new_incoming_message_ = ml_mock_fft.retrieve_payload_data(new_incoming_message)
-    assert new_incoming_message_ == new_incoming_message
-    body = ml_mock_fft._run(new_incoming_message).body_as_json_dict
-    assert body["results"] is not None
-    assert body["timestamp"] is not None
+def test_react_to_message_2(ML_MOCK_FFT, mqtt_time_series):
+    with ML_MOCK_FFT as ml_mock_fft:
+        print(id(ml_mock_fft))
+        print(id(ml_mock_fft.async_loop))
+        ml_mock_fft._react_to_message(None, None, mqtt_time_series)
 
 
-def test_result_types(ml_mock_result_type_tool):
-    assert ml_mock_result_type_tool.result_type == ResultType.MULTIPLE_TIME_SERIES
-
-
-def test_erroneous_run(new_incoming_message, ml_mock_bad_mltool, mqtt_time_series):
-    new_incoming_message.mqtt_message = mqtt_time_series
-    with pytest.raises(TypeError):
-        ml_mock_bad_mltool._run(new_incoming_message)
-    assert ml_mock_bad_mltool.last_out_message is None
-
-
-def test_reaction_to_message(ml_mock_fft, json_ml_analyse_time_series):
-    with pytest.raises(TypeError):
-        ml_mock_fft.client.mock_a_message(ml_mock_fft.client, None)
-    with pytest.raises(KeyError):
-        ml_mock_fft.client.mock_a_message(
-            ml_mock_fft.client, str(json.dumps({"test": "hi"}))
+@pytest.mark.asyncio
+async def test_run(ML_MOCK_FFT, mqtt_time_series, new_incoming_message):
+    with ML_MOCK_FFT as ml_mock_fft:
+        new_incoming_message.mqtt_message = mqtt_time_series
+        new_incoming_message_ = await ml_mock_fft.retrieve_payload_data(
+            new_incoming_message
         )
-    with pytest.raises(NonSchemaConformJsonPayload):
+        assert new_incoming_message_ == new_incoming_message
+        body = await ml_mock_fft._run(new_incoming_message)
+        body = body.body_as_json_dict
+        assert body["results"] is not None
+        assert body["timestamp"] is not None
+
+
+def test_result_types(ML_MOCK_RESULT_TYPE_TOOL):
+    with ML_MOCK_RESULT_TYPE_TOOL as ml_mock_result_type_tool:
+        print(id(ml_mock_result_type_tool.async_loop))
+        assert ml_mock_result_type_tool.result_type == ResultType.MULTIPLE_TIME_SERIES
+
+
+@pytest.mark.asyncio
+async def test_erroneous_run(
+    new_incoming_message, ML_MOCK_BAD_MLTOOL, mqtt_time_series
+):
+    with ML_MOCK_BAD_MLTOOL as ml_mock_bad_mltool:
+        new_incoming_message.mqtt_message = mqtt_time_series
+        with pytest.raises(TypeError):
+            await ml_mock_bad_mltool._run(new_incoming_message)
+        assert len(ml_mock_bad_mltool.out_messages) == 0
+
+
+def test_reaction_to_message(ML_MOCK_FFT, json_ml_analyse_time_series):
+    with ML_MOCK_FFT as ml_mock_fft:
+        with pytest.raises(TypeError):
+            ml_mock_fft.client.mock_a_message(ml_mock_fft.client, None)
+        with pytest.raises(KeyError):
+            ml_mock_fft.client.mock_a_message(
+                ml_mock_fft.client, str(json.dumps({"test": "hi"}))
+            )
+        with pytest.raises(NonSchemaConformJsonPayload):
+            ml_mock_fft.client.mock_a_message(
+                ml_mock_fft.client,
+                str(json.dumps({"body": {"type": "text", "test": "hi"}})),
+            )
         ml_mock_fft.client.mock_a_message(
-            ml_mock_fft.client,
-            str(json.dumps({"body": {"type": "text", "test": "hi"}})),
+            ml_mock_fft.client, json.dumps(json_ml_analyse_time_series)
         )
-    ml_mock_fft.client.mock_a_message(
-        ml_mock_fft.client, json.dumps(json_ml_analyse_time_series)
-    )
-    while ml_mock_fft.async_not_ready():
-        print("Waiting for tool to finish")
-        sleep(1)
-    assert ml_mock_fft.last_out_message is not None
-    print(ml_mock_fft.last_out_message.body)
+        assert len(ml_mock_fft.out_messages) > 0
+        assert ml_mock_fft.out_messages[0] is not None
+        print(ml_mock_fft.out_messages[0].body)
 
 
-def test_wrong_topic(ml_mock_bad_topic_tool, mqtt_time_series, caplog):
-    assert (
-        ml_mock_bad_topic_tool._config.get("base_result_topic") == "this/isnotcorrect"
-    )
-    ml_mock_bad_topic_tool._react_to_message(None, None, mqtt_time_series)
-    while ml_mock_bad_topic_tool.async_not_ready():
-        sleep(1)
-    assert any(
-        ["undefined topic" in msg and "consider" in msg for msg in caplog.messages]
-    )
+def test_wrong_topic(ML_MOCK_BAD_TOPIC_TOOL, mqtt_time_series, caplog):
+    with ML_MOCK_BAD_TOPIC_TOOL as ml_mock_bad_topic_tool:
+        assert (
+            ml_mock_bad_topic_tool._config.get("base_result_topic")
+            == "this/isnotcorrect"
+        )
+        ml_mock_bad_topic_tool._react_to_message(None, None, mqtt_time_series)
+        assert any(
+            ["undefined topic" in msg and "consider" in msg for msg in caplog.messages]
+        )
 
 
 def test_require_message_type(
-    ml_mock_require_certain_input,
+    ML_MOCK_REQUIRE_CERTAIN_INPUT,
     json_ml_data_example,
     json_ml_analyse_text,
     json_ml_analyse_time_series,
     caplog,
 ):
-    ml_tool = ml_mock_require_certain_input
-    ml_tool._only_react_to_message_type = MessageType.SENSOR_UPDATE
-    ml_tool.client.mock_a_message(ml_tool.client, json.dumps(json_ml_data_example))
-    ml_tool._only_react_to_message_type = MessageType.ANALYSES_Result
-    ml_tool.client.mock_a_message(ml_tool.client, json.dumps(json_ml_data_example))
-    assert "WrongMessageType" in " ".join(caplog.messages)
-    ml_tool.client.mock_a_message(
-        ml_tool.client, json.dumps(json_ml_analyse_time_series)
-    )
-    while ml_tool.async_result is not None and not ml_tool.async_result.ready():
-        sleep(1)
-    ml_tool._only_react_to_previous_result_types = [
-        ResultType.TIME_SERIES,
-        ResultType.MULTIPLE_TIME_SERIES,
-    ]
-    ml_tool.client.mock_a_message(
-        ml_tool.client, json.dumps(json_ml_analyse_time_series)
-    )
-    # with self.assertLogs("MOCK", level="ERROR") as log2:
-    ml_tool.client.mock_a_message(ml_tool.client, json.dumps(json_ml_analyse_text))
-    assert "WrongMessageType" in " ".join(caplog.messages)
+    with ML_MOCK_REQUIRE_CERTAIN_INPUT as ml_mock_require_certain_input:
+        ml_tool = ml_mock_require_certain_input
+        ml_tool._only_react_to_message_type = MessageType.SENSOR_UPDATE
+        ml_tool.client.mock_a_message(ml_tool.client, json.dumps(json_ml_data_example))
+        ml_tool._only_react_to_message_type = MessageType.ANALYSES_RESULT
+        ml_tool.client.mock_a_message(ml_tool.client, json.dumps(json_ml_data_example))
+        assert "WrongMessageType" in " ".join(caplog.messages)
+        ml_tool.client.mock_a_message(
+            ml_tool.client, json.dumps(json_ml_analyse_time_series)
+        )
+        ml_tool._only_react_to_previous_result_types = [
+            ResultType.TIME_SERIES,
+            ResultType.MULTIPLE_TIME_SERIES,
+        ]
+        ml_tool.client.mock_a_message(
+            ml_tool.client, json.dumps(json_ml_analyse_time_series)
+        )
+        ml_tool.client.mock_a_message(ml_tool.client, json.dumps(json_ml_analyse_text))
+        assert "WrongMessageType" in " ".join(caplog.messages)
 
 
-def test_subscription(ml_mock_fft):
-    subscriptions = list(map(lambda x: x["topic"], ml_mock_fft.client.subscriptions))
-    assert "kosmos/analytics/test_url/test_tag" in subscriptions
+def test_subscription(ML_MOCK_FFT):
+    with ML_MOCK_FFT as ml_mock_fft:
+        subscriptions = list(
+            map(lambda x: x["topic"], ml_mock_fft.client.subscriptions)
+        )
+        print(subscriptions)
+        assert "kosmos/analytics/test_url/test_tag" in subscriptions
 
 
 @pytest.mark.parametrize("temporary", [True, False])
 def test_outgoing_message_is_temporary(
-    ml_mock_fft, temporary, json_ml_analyse_time_series
+    ML_MOCK_FftMockNOT_INITIALIZED, temporary, json_ml_analyse_time_series
 ):
     with pytest.raises(AssertionError):
-        type(ml_mock_fft)(outgoing_message_is_temporary=None)
-    fft = type(ml_mock_fft)(outgoing_message_is_temporary=temporary)
-    fft.client.mock_a_message(fft.client, json.dumps(json_ml_analyse_time_series))
-    while fft.async_not_ready():
-        sleep(1)
-    assert fft.last_out_message.is_temporary == temporary
-    assert ("temporary" in fft.last_out_message.topic) == temporary
+        with ML_MOCK_FftMockNOT_INITIALIZED(outgoing_message_is_temporary=None) as tool:
+            pass
+    with ML_MOCK_FftMockNOT_INITIALIZED(
+        outgoing_message_is_temporary=temporary
+    ) as tool:
+        tool.client.mock_a_message(tool.client, json.dumps(json_ml_analyse_time_series))
+        assert all([out.is_temporary for out in tool.out_messages]) == temporary
+        assert all(["temporary" in out.topic for out in tool.out_messages]) == temporary
 
 
-def test_wrong_resolve_function(mqtt_time_series, caplog):
-    class WrongResolve(FFT):
-        """Minimal wrong resolving"""
-
-        def resolve_result_data(
-            self,
-            result: Union[pd.DataFrame, List[pd.DataFrame], dict],
-            out_message: OutgoingMessage,
-        ) -> OutgoingMessage:
-            return out_message
-
-    ml_tool = WrongResolve()
-    ml_tool._react_to_message(None, None, mqtt_time_series)
-    while ml_tool.async_not_ready():
-        sleep(1)
+def test_wrong_resolve_function(ML_MOCK_WRONG_RESOLVE, mqtt_time_series, caplog):
+    with pytest.raises(NotInitialized):
+        with ML_MOCK_WRONG_RESOLVE as ml_tool:
+            ml_tool._react_to_message(None, None, mqtt_time_series)
     assert any(
         [
             "You need to specify" in rec.message

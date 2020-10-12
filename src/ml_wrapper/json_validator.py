@@ -48,7 +48,7 @@ def validate_formal(json_object: Union[str, dict]) -> Union[None, MessageType]:
     validation_error = []
     try:
         validate_formal_single(json_object, ANALYSES_FORMAL)
-        validation_type_result = MessageType.ANALYSES_Result
+        validation_type_result = MessageType.ANALYSES_RESULT
     except ValidationError as error:
         validation_error.append(error.message)
     try:

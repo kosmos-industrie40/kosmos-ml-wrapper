@@ -37,7 +37,7 @@ def _create_replaces(path):
 
 def _replace_file_refs(content_, path):
     repl_ = _create_replaces(path)
-    print(repl_)
+    # print(repl_)
     for key in repl_:
         content_ = content_.replace(key, repl_[key])
     return content_

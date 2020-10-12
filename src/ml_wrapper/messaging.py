@@ -169,7 +169,7 @@ class IncomingMessage:
         data = None
         msg = self.payload["body"]
         timestamp = msg.get("timestamp")
-        if self._message_type is MessageType.ANALYSES_Result:
+        if self._message_type is MessageType.ANALYSES_RESULT:
             try:
                 analyses_msg_type = ResultType.value2member_map()[msg.get("type")]
             except KeyError as error:

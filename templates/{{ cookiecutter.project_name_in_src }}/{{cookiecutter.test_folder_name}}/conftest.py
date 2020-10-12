@@ -13,6 +13,8 @@ os.environ["CONFIG_MODEL_FROM"] = "test_from"
 import pytest
 import json
 
+from ml_wrapper.mocks import create_mock_tool
+
 from ml_wrapper.json_provider import (
     JSON_ML_ANALYSE_TEXT,
     JSON_ML_DATA_EXAMPLE,
@@ -23,11 +25,12 @@ from ml_wrapper.json_provider import (
 )
 
 from {{ cookiecutter.project_name_in_src }} import {{ cookiecutter.ml_class_name }}
-from {{ cookiecutter.ml_class_name }}Mock import {{ cookiecutter.ml_class_name }}Mock as Mock
+
+MockTool = create_mock_tool({{ cookiecutter.ml_class_name }})
 
 @pytest.fixture
-def mock_tool():
-    return Mock()
+def MOCK_TOOL():
+    return MockTool()
 
 @pytest.fixture
 def possible_example_json_payloads():

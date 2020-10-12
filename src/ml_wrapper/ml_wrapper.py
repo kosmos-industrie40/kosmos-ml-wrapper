@@ -8,10 +8,10 @@ import logging
 import abc
 import re
 import sys
-from multiprocessing.pool import ThreadPool
+import asyncio
 import os
+import warnings
 from typing import Union, List
-import traceback
 import pandas as pd
 import paho.mqtt.client as mqtt
 from paho.mqtt.client import MQTTMessage, Client
@@ -76,6 +76,8 @@ class MLWrapper(abc.ABC):
         only_react_to_message_type: MessageType = None,
         only_react_to_previous_result_types: [None, List[ResultType]] = None,
         outgoing_message_is_temporary: bool = None,
+        client=None,
+        async_loop=None,
     ):
         """
         Constructor of ML Wrapper.
@@ -144,15 +146,44 @@ class MLWrapper(abc.ABC):
         self._check_config_sanity()
 
         # Init the mqtt and thread specifics
-        self.client = None
-        self.thread_pool = ThreadPool(
-            int(self.config["config"]["threading"]["pool_num"])
-        )
-        self.thread_pool.daemon = True
-        self.async_result = None
+        self.client = client
+        self.async_loop = async_loop
+        self.async_loop_policy = asyncio.get_event_loop_policy()
+
+    def start_up_components(self) -> None:
+        """
+        This method will connect the initialise the mqtt
+        client and start up all components required.
+        """
+        self.logger.info("Starting all components...")
+        self.async_loop = self.async_loop_policy.new_event_loop()
+        asyncio.set_event_loop(self.async_loop)
+        self.async_loop.close_ = self.async_loop.close
+        self.async_loop.close = lambda: None
         self._init_mqtt()
-        self.client.on_message = self._react_to_message
         self._subscribe()
+        self.client.loop_forever()
+        self.logger.info("... all components started")
+
+    def tear_down_components(self) -> None:
+        """
+        This method will tear down all components, like the mqtt client
+        """
+        self.logger.info("Tearing down all components...")
+        self.client.loop_stop()
+        self.client.disconnect()
+        self.async_loop.close_()
+        self.logger.info("... all components torn down")
+
+    def __enter__(self):
+        """
+        Controlled setup
+        """
+        self.start_up_components()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.tear_down_components()
 
     def _check_config_sanity(self):
         """ Checks the sanity of the config file at creation time """
@@ -184,24 +215,6 @@ class MLWrapper(abc.ABC):
         """
         return self.logger_
 
-    def async_not_ready(self) -> bool:
-        """
-        This method is quite experimental and just intended to be used in testing.
-        When you run a test message, you can check the last async_result if it's ready.
-        This should never be used at production and is only provided for testing.
-        You can use it via
-        ::
-
-            while ml_tool.asnyc_not_ready():
-                time.sleep(1)
-            ...
-
-        @return: bool
-        """
-        ready = self.async_result is not None and not self.async_result.ready()
-        self.logger.info("Asynchronous task is %s ready", "not yet " if ready else "")
-        return ready
-
     def _init_mqtt(self):
         """ Initialise the mqtt client """
         self.client = mqtt.Client()
@@ -209,6 +222,7 @@ class MLWrapper(abc.ABC):
             self.config["config"]["mqtt"]["host"],
             port=int(self.config["config"]["mqtt"]["port"]),
         )
+        self.client.on_message = self._react_to_message
 
     # Pylint misclassifies .get of config object as no member.
     # This is wrong and therefore disabled
@@ -235,38 +249,16 @@ class MLWrapper(abc.ABC):
                 topic,
             )
 
+    # DEPRECATED: This method is deprecated!
     def start(self):
         """
         Start an infinite loop to listen to MQTT messages.
         """
-        self.client.loop_forever()
-
-    # pylint: disable=no-self-use
-    # Could ppotentially be reimplemented by user, and can then gain self-use
-    def prompt(self, result):
-        """
-        Callback function for successful execution of run().
-        """
-        if result is not None:
-            self.logger.debug("Finished thread")
-
-    def error_prompt(self, err):
-        """
-        Callback function for erroneous execution of run().
-        """
-        self.logger.error("There was an error while calling the run() method.")
-        self.logger.error(err)
-        self.thread_pool.terminate()
-        self.thread_pool = ThreadPool(
-            int(self.config["config"]["threading"]["pool_num"])
+        warnings.warn(
+            "Start is deprecated and updated to new behaviour of set up. "
+            "Please change to 'with Tool() as tool:' style for better handling"
         )
-        self.async_result = None
-        traceback.print_exception(type(err), err, err.__traceback__)
-        # Close thread
-        self.thread_pool.close()
-        self.thread_pool.join()
-        self.logger.info("Closed and joined thread due to an error")
-        raise type(err)(err)
+        self.start_up_components()
 
     def _check_message_requirements(self, message: IncomingMessage):
         if self._only_react_to_message_type is None:
@@ -279,7 +271,7 @@ class MLWrapper(abc.ABC):
                 )
             )
         if (
-            message.message_type == MessageType.ANALYSES_Result
+            message.message_type == MessageType.ANALYSES_RESULT
             and self._only_react_to_previous_result_types is not None
         ):
             if (
@@ -327,17 +319,16 @@ class MLWrapper(abc.ABC):
                 error,
             )
             raise error from error
-        self.logger.debug("Start the threaded run of the ML Tool")
-        self.async_result = self.thread_pool.apply_async(
-            self._run,
-            [in_message],
-            callback=self.prompt,
-            error_callback=self.error_prompt,
+        self.logger.debug(
+            "Start the async run of the ML Tool for message %s", in_message.mid
         )
-        self.logger.debug("closed and joined pool")
+        self.async_loop.run_until_complete(self._run(in_message))
+        self.logger.debug("Finished tool for message %s", in_message.mid)
 
     # Can be reimplemented by user, and can then gain self-use
-    def retrieve_payload_data(self, in_message: IncomingMessage) -> IncomingMessage:
+    async def retrieve_payload_data(
+        self, in_message: IncomingMessage
+    ) -> IncomingMessage:
         """
         This method allows you to retrieve additional information or to temper with the
         automatically parsed information in the IncomingMessage object.
@@ -354,7 +345,7 @@ class MLWrapper(abc.ABC):
         return in_message
 
     # Can be reimplemented by user, and can then gain self-use
-    def resolve_result_data(
+    async def resolve_result_data(
         self,
         result: Union[pd.DataFrame, List[pd.DataFrame], dict],
         out_message: OutgoingMessage,
@@ -391,7 +382,7 @@ class MLWrapper(abc.ABC):
         out_message.set_results(result, result_type=self.result_type)
         return out_message
 
-    def _run(self, in_message: IncomingMessage) -> OutgoingMessage:
+    async def _run(self, in_message: IncomingMessage) -> OutgoingMessage:
         """
         Wrapper around the actual run method.
         Executes run() and passes its result to a MQTT message.
@@ -399,7 +390,7 @@ class MLWrapper(abc.ABC):
         self.logger.debug(in_message.id_ref)
         self.logger.debug("Start ML tool...")
         out_message = OutgoingMessage(
-            self.retrieve_payload_data(in_message),
+            await self.retrieve_payload_data(in_message),
             from_=self._config.get("model", "from"),
             model_tag=self._config.get("model", "tag"),
             model_url=self._config.get("model", "url"),
@@ -411,13 +402,14 @@ class MLWrapper(abc.ABC):
                 "messaging", "temporary_keyword", default="temporary"
             ),
         )
-        result = self.run(out_message)
+        result = await self.run(out_message)
+        print(result)
         if not any([isinstance(result, dtype) for dtype in [pd.DataFrame, list, dict]]):
             raise TypeError(
                 "The run method has to provide a DataFrame, a list of DataFrames or a dictionary"
             )
         self.logger.debug("End ML tool")
-        out_message = self.resolve_result_data(result, out_message)
+        out_message = await self.resolve_result_data(result, out_message)
         try:
             out_message.body
         except NotInitialized as error:
@@ -428,10 +420,11 @@ class MLWrapper(abc.ABC):
                 "the 'body' field of the payload manually!"
             )
             raise error
-        out_message = self._publish_result_message(out_message)
+        print(out_message.body)
+        out_message = await self._publish_result_message(out_message)
         return out_message
 
-    def _publish_result_message(
+    async def _publish_result_message(
         self,
         out_message: OutgoingMessage,
     ) -> OutgoingMessage:
@@ -455,7 +448,7 @@ class MLWrapper(abc.ABC):
         return out_message
 
     @abc.abstractmethod
-    def run(
+    async def run(
         self, out_message: OutgoingMessage
     ) -> Union[pd.DataFrame, List[pd.DataFrame], dict]:
         """
