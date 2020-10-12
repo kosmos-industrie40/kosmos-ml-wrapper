@@ -143,12 +143,12 @@ def test_subscription(ML_MOCK_FFT):
 
 @pytest.mark.parametrize("temporary", [True, False])
 def test_outgoing_message_is_temporary(
-    ML_MOCK_FFT_NOT_INITIALIZED, temporary, json_ml_analyse_time_series
+    ML_MOCK_FftMockNOT_INITIALIZED, temporary, json_ml_analyse_time_series
 ):
     with pytest.raises(AssertionError):
-        with ML_MOCK_FFT_NOT_INITIALIZED(outgoing_message_is_temporary=None) as tool:
+        with ML_MOCK_FftMockNOT_INITIALIZED(outgoing_message_is_temporary=None) as tool:
             pass
-    with ML_MOCK_FFT_NOT_INITIALIZED(outgoing_message_is_temporary=temporary) as tool:
+    with ML_MOCK_FftMockNOT_INITIALIZED(outgoing_message_is_temporary=temporary) as tool:
         tool.client.mock_a_message(tool.client, json.dumps(json_ml_analyse_time_series))
         assert all([out.is_temporary for out in tool.out_messages]) == temporary
         assert all(["temporary" in out.topic for out in tool.out_messages]) == temporary
