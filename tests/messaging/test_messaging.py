@@ -63,7 +63,6 @@ def test_retrieve(
             assert "future" in new_incoming_message.column_meta[col["name"]]
 
 
-
 def test_set_topic(new_incoming_message):
     with pytest.raises(InvalidTopic):
         new_incoming_message.topic = "/kosmos/analytics/abce.def-ghi.jkl.omn"

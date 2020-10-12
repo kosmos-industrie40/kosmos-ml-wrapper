@@ -16,7 +16,6 @@ from ml_wrapper import MLWrapper, OutgoingMessage
 class FFT(MLWrapper):
     """Mocked FFT class"""
 
-
     async def run(
         self, out_message: OutgoingMessage
     ) -> Union[pd.DataFrame, List[pd.DataFrame], dict]:

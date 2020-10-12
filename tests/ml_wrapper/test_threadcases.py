@@ -2,7 +2,6 @@
 Tests threading use cases
 """
 import json
-from time import sleep
 
 from ml_wrapper import MessageType, ResultType
 

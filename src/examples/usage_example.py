@@ -20,7 +20,7 @@ os.environ["CONFIG_LOGGING_LOG_LEVEL"] = "DEBUG"
 # This is required for you to write in order to create your own ML Tool
 
 from typing import Union, List
-import asyncio
+import asyncio  # pylint: disable=unused-import
 import pandas as pd
 
 

@@ -2,8 +2,8 @@
 import json
 import logging
 from typing import Type, List, Union
-import pandas as pd
 import inspect
+import pandas as pd
 from ml_wrapper import MLWrapper
 from .messaging import OutgoingMessage
 
@@ -46,13 +46,16 @@ class MockMqttClient:
         self.logger.debug("{}:\t{}".format(str(topic), str(payload)))
         self.last_published = payload
 
+
 def _init_mqtt(self: MLWrapper):
     """ Initialises a mock mqtt client """
     self.client = MockMqttClient(self.logger)
     self.client.on_message = self._react_to_message
 
-def create_new_init(original_init: callable):
+
+def _create_new_init(original_init: callable):
     print(inspect.getsource(original_init))
+
     def _new_init_(self: MLWrapper, **kwargs):
         self.out_messages: List[OutgoingMessage] = list()
         print(self.__class__)
@@ -67,25 +70,31 @@ def create_new_init(original_init: callable):
         self.logger_.setLevel(logging.DEBUG)
         self.logger.debug(type(self))
         self.logger.debug(self.config)
+
     return _new_init_
 
 
-def create_resolve_result(original_resolve_function: callable):
-    async def resolve_result_data(self: MLWrapper, result: Union[pd.DataFrame, List[pd.DataFrame], dict],
-            out_message: OutgoingMessage,
-        ) -> OutgoingMessage:
+def _create_resolve_result(original_resolve_function: callable):
+    async def resolve_result_data(
+        self: MLWrapper,
+        result: Union[pd.DataFrame, List[pd.DataFrame], dict],
+        out_message: OutgoingMessage,
+    ) -> OutgoingMessage:
         out_message = await original_resolve_function(self, result, out_message)
         self.logger.info("I saved the result in out_messages for you")
         self.out_messages.append(out_message)
         return out_message
+
     return resolve_result_data
 
 
+# If I want to create a mock, I need to monkeypatch local methods as well.
+# pylint: disable=protected-access
 def create_mock_tool(MLTOOL: Type[MLWrapper]) -> Type[MLWrapper]:
     """
     Creates a mock version of your ML Tool
     """
-    MLTOOL.__init__ = create_new_init(MLTOOL.__init__)
+    MLTOOL.__init__ = _create_new_init(MLTOOL.__init__)
     MLTOOL._init_mqtt = _init_mqtt
-    MLTOOL.resolve_result_data = create_resolve_result(MLTOOL.resolve_result_data)
+    MLTOOL.resolve_result_data = _create_resolve_result(MLTOOL.resolve_result_data)
     return MLTOOL

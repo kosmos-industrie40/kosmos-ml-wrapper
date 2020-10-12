@@ -1,23 +1,15 @@
 """
 Tests the ML Wrapper behaviour
 """
-from time import sleep
-from typing import List
 import json
-import asyncio
 import pytest
-import pandas as pd
 from ml_wrapper import (
     MLWrapper,
     ResultType,
     NonSchemaConformJsonPayload,
     MessageType,
-    Union,
-    OutgoingMessage, NotInitialized,
+    NotInitialized,
 )
-from ml_wrapper.mocks import create_mock_tool
-
-from tests.mock_ml_tools import FFT
 
 
 def test_instantiate(ML_MOCK_FFT):
@@ -33,6 +25,7 @@ def test_react_to_message(ML_MOCK_FFT, mqtt_time_series):
         print(id(ml_mock_fft.async_loop))
         ml_mock_fft._react_to_message(None, None, mqtt_time_series)
 
+
 def test_instantiate_2(ML_MOCK_FFT):
     with ML_MOCK_FFT as ml_mock_fft:
         print(id(ml_mock_fft))
@@ -46,11 +39,14 @@ def test_react_to_message_2(ML_MOCK_FFT, mqtt_time_series):
         print(id(ml_mock_fft.async_loop))
         ml_mock_fft._react_to_message(None, None, mqtt_time_series)
 
+
 @pytest.mark.asyncio
 async def test_run(ML_MOCK_FFT, mqtt_time_series, new_incoming_message):
     with ML_MOCK_FFT as ml_mock_fft:
         new_incoming_message.mqtt_message = mqtt_time_series
-        new_incoming_message_ = await ml_mock_fft.retrieve_payload_data(new_incoming_message)
+        new_incoming_message_ = await ml_mock_fft.retrieve_payload_data(
+            new_incoming_message
+        )
         assert new_incoming_message_ == new_incoming_message
         body = await ml_mock_fft._run(new_incoming_message)
         body = body.body_as_json_dict
@@ -63,8 +59,11 @@ def test_result_types(ML_MOCK_RESULT_TYPE_TOOL):
         print(id(ml_mock_result_type_tool.async_loop))
         assert ml_mock_result_type_tool.result_type == ResultType.MULTIPLE_TIME_SERIES
 
+
 @pytest.mark.asyncio
-async def test_erroneous_run(new_incoming_message, ML_MOCK_BAD_MLTOOL, mqtt_time_series):
+async def test_erroneous_run(
+    new_incoming_message, ML_MOCK_BAD_MLTOOL, mqtt_time_series
+):
     with ML_MOCK_BAD_MLTOOL as ml_mock_bad_mltool:
         new_incoming_message.mqtt_message = mqtt_time_series
         with pytest.raises(TypeError):
@@ -96,7 +95,8 @@ def test_reaction_to_message(ML_MOCK_FFT, json_ml_analyse_time_series):
 def test_wrong_topic(ML_MOCK_BAD_TOPIC_TOOL, mqtt_time_series, caplog):
     with ML_MOCK_BAD_TOPIC_TOOL as ml_mock_bad_topic_tool:
         assert (
-            ml_mock_bad_topic_tool._config.get("base_result_topic") == "this/isnotcorrect"
+            ml_mock_bad_topic_tool._config.get("base_result_topic")
+            == "this/isnotcorrect"
         )
         ml_mock_bad_topic_tool._react_to_message(None, None, mqtt_time_series)
         assert any(
@@ -134,7 +134,9 @@ def test_require_message_type(
 
 def test_subscription(ML_MOCK_FFT):
     with ML_MOCK_FFT as ml_mock_fft:
-        subscriptions = list(map(lambda x: x["topic"], ml_mock_fft.client.subscriptions))
+        subscriptions = list(
+            map(lambda x: x["topic"], ml_mock_fft.client.subscriptions)
+        )
         print(subscriptions)
         assert "kosmos/analytics/test_url/test_tag" in subscriptions
 
@@ -149,7 +151,7 @@ def test_outgoing_message_is_temporary(
     with ML_MOCK_FFT_NOT_INITIALIZED(outgoing_message_is_temporary=temporary) as tool:
         tool.client.mock_a_message(tool.client, json.dumps(json_ml_analyse_time_series))
         assert all([out.is_temporary for out in tool.out_messages]) == temporary
-        assert all(['temporary' in out.topic for out in tool.out_messages]) == temporary
+        assert all(["temporary" in out.topic for out in tool.out_messages]) == temporary
 
 
 def test_wrong_resolve_function(ML_MOCK_WRONG_RESOLVE, mqtt_time_series, caplog):

@@ -11,9 +11,7 @@ import sys
 import asyncio
 import os
 import warnings
-from abc import ABC
-from typing import Union, List, Type
-import traceback
+from typing import Union, List
 import pandas as pd
 import paho.mqtt.client as mqtt
 from paho.mqtt.client import MQTTMessage, Client
@@ -79,7 +77,7 @@ class MLWrapper(abc.ABC):
         only_react_to_previous_result_types: [None, List[ResultType]] = None,
         outgoing_message_is_temporary: bool = None,
         client=None,
-        async_loop=None
+        async_loop=None,
     ):
         """
         Constructor of ML Wrapper.
@@ -256,8 +254,10 @@ class MLWrapper(abc.ABC):
         """
         Start an infinite loop to listen to MQTT messages.
         """
-        warnings.warn("Start is deprecated and updated to new behaviour of set up. "
-                      "Please change to 'with Tool() as tool:' style for better handling")
+        warnings.warn(
+            "Start is deprecated and updated to new behaviour of set up. "
+            "Please change to 'with Tool() as tool:' style for better handling"
+        )
         self.start_up_components()
 
     def _check_message_requirements(self, message: IncomingMessage):
@@ -319,12 +319,16 @@ class MLWrapper(abc.ABC):
                 error,
             )
             raise error from error
-        self.logger.debug("Start the async run of the ML Tool for message %s", in_message.mid)
+        self.logger.debug(
+            "Start the async run of the ML Tool for message %s", in_message.mid
+        )
         self.async_loop.run_until_complete(self._run(in_message))
         self.logger.debug("Finished tool for message %s", in_message.mid)
 
     # Can be reimplemented by user, and can then gain self-use
-    async def retrieve_payload_data(self, in_message: IncomingMessage) -> IncomingMessage:
+    async def retrieve_payload_data(
+        self, in_message: IncomingMessage
+    ) -> IncomingMessage:
         """
         This method allows you to retrieve additional information or to temper with the
         automatically parsed information in the IncomingMessage object.
@@ -462,5 +466,3 @@ class MLWrapper(abc.ABC):
         """
         self.logger.warning("This method needs to be implemented!")
         return NotImplementedError
-
-
