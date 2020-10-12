@@ -1,10 +1,10 @@
 """
 This file provides tests for the helper file
 """
+import pandas
 import pytest
-from ml_wrapper import MessageType
-from ml_wrapper.helper import topic_splitter
-
+from ml_wrapper import MessageType, ResultType, InvalidTopic
+from ml_wrapper.helper import topic_splitter, find_result_type
 
 from ml_wrapper.json_validator import (
     NonSchemaConformJsonPayload,
@@ -25,6 +25,29 @@ def test_topic_splitter(split_topics):
     assert ["a", "b"] == topic_splitter("a,b")
     assert ["a", "b"] == topic_splitter("a|b", sep="|")
     assert ["a/b/c"] == topic_splitter("a/b/c", sep="|")
+    with pytest.raises(InvalidTopic):
+        topic_splitter("invalid///")
+    with pytest.raises(InvalidTopic):
+        topic_splitter("invalid//")
+    with pytest.raises(InvalidTopic):
+        topic_splitter("invalid/on//top/")
+
+
+@pytest.mark.parametrize(
+    "result_input,expected",
+    [
+        [pandas.DataFrame([1, 2, 3]), ResultType.TIME_SERIES],
+        [
+            [pandas.DataFrame([1, 2, 3]), pandas.DataFrame([1, 2, 3])],
+            ResultType.MULTIPLE_TIME_SERIES,
+        ],
+        [{"total": "nothing", "predict": 100}, ResultType.TEXT],
+        [{}, None],
+        ["", None],
+    ],
+)
+def test_find_result_type(result_input, expected):
+    assert find_result_type(result=result_input) == expected
 
 
 # ----
@@ -35,7 +58,7 @@ def test_topic_splitter(split_topics):
 
 def test_validate_formal(json_data_example_3, json_analyse_time_series):
     assert validate_formal(json_data_example_3) == MessageType.SENSOR_UPDATE
-    assert validate_formal(json_analyse_time_series) == MessageType.ANALYSES_Result
+    assert validate_formal(json_analyse_time_series) == MessageType.ANALYSES_RESULT
     bad_json = json_analyse_time_series
     bad_json["body"]["timestamp"] = 12345
     with pytest.raises(NonSchemaConformJsonPayload):
