@@ -87,7 +87,9 @@ starting, consider executing
 
     putup YOURPROJECTNAME --no-skeleton
 
-If you are on the parent directory of YOURPROJECTNAME, simply execute the template by:
+If you are on the parent directory of YOURPROJECTNAME, simply execute the template by the followeing
+code block. **Please be aware, that the following template will change files. So please make sure**
+**to track everything with git before executing.**
 
 
 ::
