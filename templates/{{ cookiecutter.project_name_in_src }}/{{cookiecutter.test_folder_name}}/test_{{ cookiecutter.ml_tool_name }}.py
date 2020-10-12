@@ -8,16 +8,15 @@ import pytest
 
 
 # Test the run of the tool with normal message
-def test_run(mock_tool, payloads_prerendered):
-    {%- if cookiecutter.only_react_to_message_type == "sensor" %}
-    mock_tool.client.mock_a_message(mock_tool.client, payloads_prerendered["JSON_ML_DATA_EXAMPLE"]["json_string"])
-    {% else %}
-    mock_tool.client.mock_a_message(mock_tool.client, payloads_prerendered["JSON_ML_ANALYSE_TIME_SERIES"]["json_string"])
-    {% endif -%}
-    while mock_tool.async_not_ready():
-        sleep(1)
-    mock_tool.logger.info("Done with the Thread work")
-    assert mock_tool.last_result is not None
+def test_run(MOCK_TOOL, payloads_prerendered):
+    with MOCK_TOOL as mock_tool:
+        {%- if cookiecutter.only_react_to_message_type == "sensor" %}
+        mock_tool.client.mock_a_message(mock_tool.client, payloads_prerendered["JSON_ML_DATA_EXAMPLE"]["json_string"])
+        {% else %}
+        mock_tool.client.mock_a_message(mock_tool.client, payloads_prerendered["JSON_ML_ANALYSE_TIME_SERIES"]["json_string"])
+        {% endif -%}
+        mock_tool.logger.info("Done with the work")
+        assert all([out is not None for out in mock_tool.out_messages])
 
 # Parameterize your tests
 @pytest.mark.parametrize("json_key", [
@@ -38,12 +37,11 @@ def test_run(mock_tool, payloads_prerendered):
 "JSON_ML_DATA_EXAMPLE_2",
 {% endif -%}
 ])
-def test_multiple_runs(mock_tool, payloads_prerendered, json_key):
-    mock_tool.client.mock_a_message(
-        mock_tool.client,
-        payloads_prerendered[json_key]["json_string"]
-    )
-    while mock_tool.async_not_ready():
-        sleep(1)
-    mock_tool.logger.info("Done with the Thread work")
-    assert mock_tool.last_result is not None
+def test_multiple_runs(MOCK_TOOL, payloads_prerendered, json_key):
+    with MOCK_TOOL as mock_tool:
+        mock_tool.client.mock_a_message(
+            mock_tool.client,
+            payloads_prerendered[json_key]["json_string"]
+        )
+        mock_tool.logger.info("Done with the work")
+        assert all([out is not None for out in mock_tool.out_messages])
