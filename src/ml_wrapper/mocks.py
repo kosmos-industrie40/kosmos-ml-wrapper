@@ -1,8 +1,9 @@
 """ This module provides a mock for testing of this package """
+import json
 import logging
 from typing import Type, List, Union
 import pandas as pd
-
+import inspect
 from ml_wrapper import MLWrapper
 from .messaging import OutgoingMessage
 
@@ -31,6 +32,8 @@ class MockMqttClient:
         assert (
             self.on_message is not None
         ), "Please overwrite the clients on_message property with your custom function"
+        if isinstance(message, dict):
+            message = json.dumps(message)
         msg = generate_mqtt_message_mock(
             "kosmos/analytics/mock_model/mock_tag", message
         )
@@ -46,17 +49,29 @@ class MockMqttClient:
 def _init_mqtt(self: MLWrapper):
     """ Initialises a mock mqtt client """
     self.client = MockMqttClient(self.logger)
+    self.client.on_message = self._react_to_message
 
-def _new_init_(self: MLWrapper, outgoing_message_is_temporary=True, **kwargs):
-    self.out_messages: List[OutgoingMessage] = list()
-    print(self.__class__)
-    super(self.__class__, self).__init__(outgoing_message_is_temporary=outgoing_message_is_temporary, log_level= logging.DEBUG, **kwargs)
-    self.logger_ = logging.getLogger("MOCK")
-    self.logger.debug(type(self))
-    self.logger.debug(self.config)
+def create_new_init(original_init: callable):
+    print(inspect.getsource(original_init))
+    def _new_init_(self: MLWrapper, **kwargs):
+        self.out_messages: List[OutgoingMessage] = list()
+        print(self.__class__)
+        print("Running")
+        if "outgoing_message_is_temporary" not in kwargs:
+            kwargs["outgoing_message_is_temporary"] = True
+        try:
+            original_init(self, **kwargs)
+        except TypeError:
+            original_init(self)
+        self.logger_ = logging.getLogger("MOCK")
+        self.logger_.setLevel(logging.DEBUG)
+        self.logger.debug(type(self))
+        self.logger.debug(self.config)
+    return _new_init_
+
 
 def create_resolve_result(original_resolve_function: callable):
-    async def resolve_result_data(self:MLWrapper, result: Union[pd.DataFrame, List[pd.DataFrame], dict],
+    async def resolve_result_data(self: MLWrapper, result: Union[pd.DataFrame, List[pd.DataFrame], dict],
             out_message: OutgoingMessage,
         ) -> OutgoingMessage:
         out_message = await original_resolve_function(self, result, out_message)
@@ -65,11 +80,12 @@ def create_resolve_result(original_resolve_function: callable):
         return out_message
     return resolve_result_data
 
+
 def create_mock_tool(MLTOOL: Type[MLWrapper]) -> Type[MLWrapper]:
     """
     Creates a mock version of your ML Tool
     """
-    MLTOOL.__init__ = _new_init_
+    MLTOOL.__init__ = create_new_init(MLTOOL.__init__)
     MLTOOL._init_mqtt = _init_mqtt
     MLTOOL.resolve_result_data = create_resolve_result(MLTOOL.resolve_result_data)
     return MLTOOL
