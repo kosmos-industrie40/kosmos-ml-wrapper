@@ -252,6 +252,7 @@ class MLWrapper(abc.ABC):
     # DEPRECATED: This method is deprecated!
     def start(self):
         """
+        Deprecated
         Start an infinite loop to listen to MQTT messages.
         """
         warnings.warn(
