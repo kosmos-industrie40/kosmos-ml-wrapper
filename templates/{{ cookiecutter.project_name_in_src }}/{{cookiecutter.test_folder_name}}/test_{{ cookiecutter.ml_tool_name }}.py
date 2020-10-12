@@ -1,11 +1,7 @@
 """
 This module test the {{ cookiecutter.ml_class_name }}.
 """
-
-from time import sleep
-
 import pytest
-
 
 # Test the run of the tool with normal message
 def test_run(MOCK_TOOL, payloads_prerendered):
