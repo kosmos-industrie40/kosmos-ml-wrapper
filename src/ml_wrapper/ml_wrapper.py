@@ -362,13 +362,13 @@ class MLWrapper(abc.ABC):
 
         If you want to overwrite this method we encourage you to use the following procedure as
         example for the text result case:
-        .. highlight:: python
-        .. code-block:: python
+        ::
 
-            out_message = super().resolve_result_data(result, out_message)
+            out_message = await super().resolve_result_data(result, out_message)
             body_dict = out_message.body_as_json_dict
             body_dict["results"]["total"] = "tempered result"
             out_message.body = body_dict
+            return out_message
 
         This way you will only change the dictionary where required and make sure you have a
         valid json.
@@ -455,14 +455,14 @@ class MLWrapper(abc.ABC):
         The run method executes your actual ML Logic.
 
         Here you can start your calculations/functions and collect the results.
-        The out_message object is the one that should be returned. You will be able to pass
-        some standard results using the OutgoingMessage Class directly, or if you need to specify
+        The result that you will return has to be of the type DataFrame, a list of DataFrames,
+        or a dictionary, according to the json specifications. If you need to specify
         the outgoing payload more, you can overwrite the resolve_result_data method.
 
         Please note, that you can access the incomingMessage object with out_message.in_message.
 
         @param out_message: OutgoingMessage
-        @return: OutgoingMessage
+        @return: pandas.DataFrame, List[pandas.DataFrame], or dict
         """
         self.logger.warning("This method needs to be implemented!")
         return NotImplementedError
