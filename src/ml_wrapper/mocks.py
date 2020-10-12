@@ -1,4 +1,6 @@
 """ This module provides a mock for testing of this package """
+# If I want to create a mock, I need to monkeypatch local methods as well.
+# pylint: disable=protected-access
 import json
 import logging
 from typing import Type, List, Union
@@ -88,8 +90,6 @@ def _create_resolve_result(original_resolve_function: callable):
     return resolve_result_data
 
 
-# If I want to create a mock, I need to monkeypatch local methods as well.
-# pylint: disable=protected-access
 def create_mock_tool(MLTOOL: Type[MLWrapper]) -> Type[MLWrapper]:
     """
     Creates a mock version of your ML Tool
