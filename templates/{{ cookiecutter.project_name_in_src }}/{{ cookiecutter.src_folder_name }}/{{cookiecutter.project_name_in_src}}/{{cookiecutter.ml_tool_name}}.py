@@ -56,9 +56,9 @@ class {{ cookiecutter.ml_class_name }}(MLWrapper):
         retrieved_data = out_message.in_message.retrieved_data
         print(retrieved_data)
         {%- if cookiecutter.result_type_of_the_tool == "time_series" %}
-        return pd.DataFrame(["I present to you", "the result"])
+        return pd.DataFrame({"message":["I present to you", "the result"]})
         {%- elif cookiecutter.result_type_of_the_tool == "multiple_time_series" %}
-        return [pd.DataFrame(["I present to you", "the results"]), pd.DataFrame([100, 200, 2])]
+        return [pd.DataFrame({"message": ["I present to you", "the results"]}), pd.DataFrame({"result": [100, 200, 2]})]
         {%- elif cookiecutter.result_type_of_the_tool == "text" %}
         return {"total": "This will run", "predict": 97}
         {%- endif %}
