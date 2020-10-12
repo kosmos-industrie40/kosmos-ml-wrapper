@@ -10,7 +10,7 @@ class MessageType(Enum):
     """
 
     SENSOR_UPDATE = "sensor_update"
-    ANALYSES_Result = "analyse_result"
+    ANALYSES_RESULT = "analyse_result"
 
     def __eq__(self, other):
         if not hasattr(other, "value"):

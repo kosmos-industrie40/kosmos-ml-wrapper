@@ -78,6 +78,8 @@ class MLWrapper(abc.ABC):
         only_react_to_message_type: MessageType = None,
         only_react_to_previous_result_types: [None, List[ResultType]] = None,
         outgoing_message_is_temporary: bool = None,
+        client=None,
+        async_loop=None
     ):
         """
         Constructor of ML Wrapper.
@@ -146,26 +148,34 @@ class MLWrapper(abc.ABC):
         self._check_config_sanity()
 
         # Init the mqtt and thread specifics
-        self.client = None
-        self.async_loop = None
+        self.client = client
+        self.async_loop = async_loop
+        self.async_loop_policy = asyncio.get_event_loop_policy()
 
     def start_up_components(self) -> None:
         """
         This method will connect the initialise the mqtt
         client and start up all components required.
         """
-        self.async_loop = asyncio.get_event_loop()
+        self.logger.info("Starting all components...")
+        self.async_loop = self.async_loop_policy.new_event_loop()
+        asyncio.set_event_loop(self.async_loop)
+        self.async_loop.close_ = self.async_loop.close
+        self.async_loop.close = lambda: None
         self._init_mqtt()
         self._subscribe()
         self.client.loop_forever()
+        self.logger.info("... all components started")
 
     def tear_down_components(self) -> None:
         """
         This method will tear down all components, like the mqtt client
         """
+        self.logger.info("Tearing down all components...")
         self.client.loop_stop()
         self.client.disconnect()
-        self.async_loop.close()
+        self.async_loop.close_()
+        self.logger.info("... all components torn down")
 
     def __enter__(self):
         """
@@ -261,7 +271,7 @@ class MLWrapper(abc.ABC):
                 )
             )
         if (
-            message.message_type == MessageType.ANALYSES_Result
+            message.message_type == MessageType.ANALYSES_RESULT
             and self._only_react_to_previous_result_types is not None
         ):
             if (
