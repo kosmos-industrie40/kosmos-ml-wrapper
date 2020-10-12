@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 2.0.0
+=============
+- Major update from threading to asyncio concurrency
+
+
 Version 1.2
 ===========
 - Provide async_not_ready function for testing purposes
