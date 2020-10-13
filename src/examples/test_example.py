@@ -18,8 +18,21 @@ from .usage_example import AnalysisTool
 AnalysisToolMock = create_mock_tool(AnalysisTool)
 
 # This goes in conftest.py
+
+
 @pytest.fixture
-def MOCK():
+def patch_env(monkeypatch):
+    """
+    Patches os settings required for your tool to run
+    """
+    monkeypatch.setenv("CONFIG_MODEL_URL", "test_url")
+    monkeypatch.setenv("CONFIG_MODEL_TAG", "test_tag")
+    monkeypatch.setenv("CONFIG_MODEL_FROM", "test_from")
+
+
+# pylint: disable=unused-argument
+@pytest.fixture
+def MOCK(patch_env):
     """
     Provides a mock instance of your tool
     """
