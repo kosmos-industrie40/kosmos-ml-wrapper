@@ -1,0 +1,143 @@
+{
+  "$schema": "file:formal.json",
+  "body": {
+    "timestamp": "2020-08-15T15:33:44.897Z",
+    "machineID": "2080253",
+    "columns": [
+      {
+        "name": "SValueEx",
+        "type": "number",
+        "meta": {
+          "unit": "mm",
+          "description": "metric"
+        }
+      },
+      {
+        "name": "PValueEx",
+        "type": "number",
+        "meta": {
+          "unit": "",
+          "description": "P value"
+        }
+      },
+      {
+        "name": "direction",
+        "type": "string",
+        "meta": {
+          "unit": "",
+          "description": "positive or negative direction"
+        }
+      }
+    ],
+    "data": [
+      [
+        "-523.346",
+        "87.996",
+        "1445.916",
+        "222.306",
+        "-312.15500000000003"
+      ],
+      [
+        "-550.2564",
+        "-550.248",
+        "-550.1701",
+        "-549.9262",
+        "-549.6038"
+      ],
+      [
+        "positive",
+        "positive",
+        "positive",
+        "positive",
+        "positive"
+      ]
+    ],
+    "meta": [
+      {
+        "name": "dbIdMachine",
+        "type": "number",
+        "description": "The ID of the machine in the sw database",
+        "value": "4756"
+      },
+      {
+        "name": "equabilityTestId",
+        "type": "number",
+        "description": "Test ID",
+        "value": "30128"
+      },
+      {
+        "name": "dbTestSuiteEsecution",
+        "type": "number",
+        "description": "?",
+        "value": "12332"
+      },
+      {
+        "name": "conditionMonitorName",
+        "type": "string",
+        "description": "monitorInformation",
+        "value": "S= 0mm; E= -550 mm; F= 2000 mm/min;"
+      },
+      {
+        "name": "numberInTestSeries",
+        "type": "number",
+        "description": "?",
+        "value": "9"
+      },
+      {
+        "name": "startDate",
+        "type": "rfctime",
+        "description": "Start Date of the test",
+        "value": "2018-05-04T14:44:47.293+00:00"
+      },
+      {
+        "name": "startX",
+        "type": "number",
+        "description": "Start position on X Axis",
+        "value": "0"
+      },
+      {
+        "name": "endX",
+        "type": "number",
+        "description": "End position on X Axis",
+        "value": "-550"
+      },
+      {
+        "name": "axisIndex",
+        "type": "number",
+        "description": "axis indicator",
+        "value": "2"
+      },
+      {
+        "name": "channelNumber",
+        "type": "number",
+        "description": "?",
+        "value": "1"
+      },
+      {
+        "name": "graphicsId",
+        "type": "number",
+        "description": "ID of the graphics test",
+        "value": "167017"
+      },
+      {
+        "name": "graphicsType",
+        "type": "string",
+        "description": "Type of the graphics data",
+        "value": "StressSeriesTotal"
+      },
+      {
+        "name": "graphicsDateCreated",
+        "type": "rfctime",
+        "description": "Date of creation",
+        "value": "2018-05-04T14:45:40.990+00:00"
+      },
+      {
+        "name": "graphicsFile",
+        "type": "string",
+        "description": "Filename of the Graphics Test",
+        "value": "167017-2018-05-04T14-45-40.990Z EquabilityTest StressSeriesTotal.xml"
+      }
+    ]
+  },
+  "signature": ""
+}

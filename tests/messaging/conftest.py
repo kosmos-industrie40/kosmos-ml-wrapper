@@ -17,6 +17,10 @@ def expect_retrieve_fixture():
             "result_type": None,
             "type": pandas.DataFrame,
         },
+        "sensor_axistest": {
+            "result_type": None,
+            "type": pandas.DataFrame,
+        },
         "time_series": {
             "result_type": ResultType.TIME_SERIES,
             "type": pandas.DataFrame,

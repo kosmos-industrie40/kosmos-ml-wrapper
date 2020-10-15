@@ -24,6 +24,7 @@ from ml_wrapper.json_provider import (
     JSON_ML_DATA_EXAMPLE,
     JSON_ML_DATA_EXAMPLE_2,
     JSON_ML_DATA_EXAMPLE_3,
+    JSON_ML_DATA_EXAMPLE_AXISTEST,
 )
 
 from tests.mock_ml_tools import (
@@ -112,6 +113,11 @@ def json_ml_data_example_2():
 @pytest.fixture
 def json_ml_data_example_3():
     return _copy(JSON_ML_DATA_EXAMPLE_3)
+
+
+@pytest.fixture
+def json_ml_data_example_axistest():
+    return _copy(JSON_ML_DATA_EXAMPLE_AXISTEST)
 
 
 @pytest.fixture
@@ -215,10 +221,25 @@ def mqtt_sensor(json_ml_data_example):
 
 
 @pytest.fixture
-def mqtt_fixtures(mqtt_text, mqtt_sensor, mqtt_time_series, mqtt_multiple_time_series):
+def mqtt_sensor_axistest(json_ml_data_example_axistest):
+    return MQTTMessageMock(
+        b"kosmos/analytics/analyse.test-tool/v0.1.-2",
+        json.dumps(json_ml_data_example_axistest),
+    )
+
+
+@pytest.fixture
+def mqtt_fixtures(
+    mqtt_text,
+    mqtt_sensor,
+    mqtt_time_series,
+    mqtt_multiple_time_series,
+    mqtt_sensor_axistest,
+):
     return {
         "text": mqtt_text,
         "sensor": mqtt_sensor,
+        "sensor_axistest": mqtt_sensor_axistest,
         "time_series": mqtt_time_series,
         "multiple_time_series": mqtt_multiple_time_series,
     }

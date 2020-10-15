@@ -92,6 +92,9 @@ JSON_ML_DATA_EXAMPLE_2 = _combine_ml_and_example(
 JSON_ML_DATA_EXAMPLE_3 = _combine_ml_and_example(
     "example-3.json", path="data", analyse=False
 )
+JSON_ML_DATA_EXAMPLE_AXISTEST = _combine_ml_and_example(
+    "example-axistest.json", path="data", analyse=False
+)
 
 JSON_ANALYSE_TIME_SERIES = _read_json("example-time_series.json", path="analysis")
 JSON_ANALYSE_MULTIPLE_TIME_SERIES = _read_json(
@@ -101,3 +104,4 @@ JSON_ANALYSE_TEXT = _read_json("example-text.json", path="analysis")
 JSON_DATA_EXAMPLE = _read_json("example.json", path="data")
 JSON_DATA_EXAMPLE_2 = _read_json("example-2.json", path="data")
 JSON_DATA_EXAMPLE_3 = _read_json("example-3.json", path="data")
+JSON_DATA_EXAMPLE_AXISTEST = _read_json("example-axistest.json", path="data")

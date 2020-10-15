@@ -21,7 +21,8 @@ def test_uninitialized(new_incoming_message):
 
 
 @pytest.mark.parametrize(
-    "message", ["text", "sensor", "time_series", "multiple_time_series"]
+    "message",
+    ["text", "sensor", "sensor_axistest", "time_series", "multiple_time_series"],
 )
 def test_messaging(new_incoming_message, mqtt_fixtures, message):
     new_incoming_message.mqtt_message = mqtt_fixtures[message]
@@ -30,7 +31,8 @@ def test_messaging(new_incoming_message, mqtt_fixtures, message):
 
 
 @pytest.mark.parametrize(
-    "message", ["text", "sensor", "time_series", "multiple_time_series"]
+    "message",
+    ["text", "sensor", "sensor_axistest", "time_series", "multiple_time_series"],
 )
 def test_initialized(new_incoming_message, mqtt_fixtures, message):
     new_incoming_message.mqtt_message = mqtt_fixtures[message]
@@ -40,7 +42,8 @@ def test_initialized(new_incoming_message, mqtt_fixtures, message):
 
 
 @pytest.mark.parametrize(
-    "message", ["text", "sensor", "time_series", "multiple_time_series"]
+    "message",
+    ["text", "sensor", "sensor_axistest", "time_series", "multiple_time_series"],
 )
 def test_retrieve(
     new_incoming_message, mqtt_fixtures, expect_retrieve_fixture, message

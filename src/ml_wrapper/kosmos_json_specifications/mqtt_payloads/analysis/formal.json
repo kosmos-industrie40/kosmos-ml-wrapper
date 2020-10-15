@@ -236,7 +236,8 @@
                 "type": "array",
                 "description": "result made by the sensors",
                 "items": {
-                  "definitions": {
+                  "type": "object",
+                  "properties": {
                     "sensor": {
                       "type": "string",
                       "description": "the id of the sensor"
