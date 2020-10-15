@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 2.0.2
+=============
+- Include sensor update example for axistests
+
 Version 2.0.1
 =============
 - Include warning about template usage
