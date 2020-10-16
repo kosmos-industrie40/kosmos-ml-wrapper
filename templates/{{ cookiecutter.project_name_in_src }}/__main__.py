@@ -5,6 +5,6 @@ from {{ cookiecutter.project_name_in_src }}.{{ cookiecutter.ml_tool_name }} impo
 
 # Usage of Heuristic class
 if __name__ == "__main__":
-    analysis_tool = {{ cookiecutter.ml_class_name }}()  # instantiate
-    analysis_tool.logger.info("Starting the ml tool {{ cookiecutter.ml_tool_name }}")
-    analysis_tool.start()  # start infinite loop to listen to MQTT messages
+    with {{ cookiecutter.ml_class_name }}() as {{ cookiecutter.ml_class_name| lower }}:
+        {{cookiecutter.ml_class_name | lower}}.logger.info("Starting the ml tool {{ cookiecutter.ml_tool_name }}")
+        {{cookiecutter.ml_class_name | lower}}.start()
