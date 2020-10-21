@@ -4,6 +4,52 @@ ml_wrapper
 This Project is intended to provide a mqtt subscription trigger method
 for python projects.
 
+Quick-Start Tutorial
+====================
+Navigate/cd into your dev directory, where you keep all your projects.
+Please pick your tools name first, because it is tideous to change afterwards.
+Hence, fill in the fields encapsuled by < > in the following scripts.
+
+**Please do these things in a standard terminal and not in the pycharm terminal.**
+
+First setup your project (only if you haven't done that before)
+
+::
+
+    putup <test_tool>
+
+Then use the provided template for a quickstart
+
+::
+
+    cookiecutter https://gitlab.inovex.de/proj-kosmos/libraries/python/ml_wrapper/ -f --directory templates
+
+In the questions asked by cookiecutter, you will need to set the field project_name_in_src to <test_tool>.
+
+If you don't have a virtual environment for you tool setup yet, it is now a good time to do so:
+
+::
+
+    cd <test_tool>
+    python3.8 -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
+    pip install pytest pytest-cov
+    python setup.py develop
+
+You can now test your empty ml wrapper, using
+
+::
+
+    python setup.py.test
+
+
+Last but not least:
+
+- Open your project <test_tool> in charm and add an interpreter pointing towards your environment.
+- Right click on src in the Project view and hit *Mark Directory as > Sources root*
+
+
 Overview
 ========
 
