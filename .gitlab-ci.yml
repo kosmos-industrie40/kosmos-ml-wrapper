@@ -7,7 +7,7 @@ stages:
 
 pylint:
   stage: static
-  image: "python:3.8"
+  image: "${HARBOR_PROD}/cache/library/python:3.8"
   only:
     changes:
       - .gitlab-ci.yml
@@ -29,7 +29,7 @@ pylint:
 
 black:
   stage: static
-  image: "python:3.8"
+  image: "${HARBOR_PROD}/cache/library/python:3.8"
   only:
     changes:
       - .gitlab-ci.yml
@@ -46,7 +46,7 @@ black:
 
 test:
   stage: test
-  image: "python:3.8"
+  image: "${HARBOR_PROD}/cache/library/python:3.8"
   needs: []
   only:
     changes:
@@ -66,7 +66,7 @@ test:
 
 build:
   stage: build
-  image: "python:3.8"
+  image: "${HARBOR_PROD}/cache/library/python:3.8"
   only:
     changes:
       - .gitlab-ci.yml
@@ -90,7 +90,7 @@ build:
 
 test_template:
   stage: templating
-  image: "python:3.8"
+  image: "${HARBOR_PROD}/cache/library/python:3.8"
   only:
     changes:
       - .gitlab-ci.yml
@@ -120,7 +120,7 @@ test_template:
 
 publish_pypi:
   stage: publish
-  image: "python:3.8"
+  image: "${HARBOR_PROD}/cache/library/python:3.8"
   tags:
     - shared
   only:
