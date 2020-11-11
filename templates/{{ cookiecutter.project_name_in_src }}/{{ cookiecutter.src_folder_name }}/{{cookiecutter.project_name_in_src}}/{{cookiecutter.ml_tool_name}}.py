@@ -3,8 +3,8 @@ This module provides the implementation of the ML Wrapper for the tool
 {{ cookiecutter.ml_tool_name }}.
 """
 from typing import Union, List
-import pandas as pd
 import asyncio
+import pandas as pd
 
 from ml_wrapper import (
     MLWrapper,
@@ -64,7 +64,7 @@ class {{ cookiecutter.ml_class_name }}(MLWrapper):
         {%- endif %}
 
     {% if cookiecutter.do_you_want_to_retrieve_data == "yes" %}
-    def retrieve_payload_data(self, in_message: IncomingMessage) -> IncomingMessage:
+    async def retrieve_payload_data(self, in_message: IncomingMessage) -> IncomingMessage:
         # FIXME: Provide a docstring
         self.logger.debug("I need to retrieve additional data")
         # This is the data I retrieved somehow:

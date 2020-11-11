@@ -50,6 +50,37 @@ Last but not least:
 - Right click on src in the Project view and hit *Mark Directory as > Sources root*
 
 
+Full Project Setup with pycharm
+===============================
+Execute in terminal:
+
+::
+
+    putup test_tool
+    cookiecutter https://gitlab.inovex.de/proj-kosmos/libraries/python/ml_wrapper/ -f --directory templates
+    charm test_tool # opens pycharm at test_tool
+
+Execute in pycharm terminal:
+
+::
+
+    python3.8 -m venv venv
+
+- Add interpreter
+- Set src as root
+
+
+Execute in pycharm terminal:
+
+::
+
+    pip install -r requirements.txt
+    pip install pytest pytest-cov
+    python setup.py develop
+    python setup.py test
+
+
+
 Overview
 ========
 
