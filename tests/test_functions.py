@@ -4,9 +4,9 @@ This file provides tests for the helper file
 import pandas
 import pytest
 from ml_wrapper import MessageType, ResultType, InvalidTopic
-from ml_wrapper.helper import topic_splitter, find_result_type
+from ml_wrapper.misc import topic_splitter, find_result_type
 
-from ml_wrapper.json_validator import (
+from ml_wrapper.messaging import (
     NonSchemaConformJsonPayload,
     validate_formal,
     validate_trigger,

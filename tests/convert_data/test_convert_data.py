@@ -5,7 +5,7 @@ from os.path import dirname, join
 import pandas as pd
 import numpy as np
 
-from ml_wrapper.convert_data import (
+from ml_wrapper.messaging.json_handling import (
     resolve_data_frame,
     retrieve_dataframe,
     retrieve_sensor_update_data,

@@ -8,8 +8,8 @@ from typing import Union
 import jsonschema
 from jsonschema import ValidationError
 
-from .exceptions import NonSchemaConformJsonPayload
-from .message_type import MessageType
+from ml_wrapper.misc import NonSchemaConformJsonPayload
+from ..message_type import MessageType
 
 from .json_provider import TRIGGER_FORMAL, ANALYSES_FORMAL, DATA_FORMAL, SCHEMA_STORE
 

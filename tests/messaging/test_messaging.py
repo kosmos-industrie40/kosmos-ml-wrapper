@@ -7,7 +7,7 @@ import pandas as pd
 
 from ml_wrapper import ResultType
 
-from ml_wrapper.exceptions import (
+from ml_wrapper.misc.exceptions import (
     NotInitialized,
     InvalidTopic,
     NonSchemaConformJsonPayload,

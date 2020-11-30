@@ -1,15 +1,17 @@
 """ This module provides a mock for testing of this package """
+import inspect
+
 # If I want to create a mock, I need to monkeypatch local methods as well.
 # pylint: disable=protected-access
 import json
 import logging
-from typing import Type, List, Union
-import inspect
+from typing import List, Type, Union
+
 import pandas as pd
 from ml_wrapper import MLWrapper
-from .messaging import OutgoingMessage
 
-from .helper import generate_mqtt_message_mock
+from .messaging import OutgoingMessage
+from .misc import generate_mqtt_message_mock
 
 
 class MockMqttClient:

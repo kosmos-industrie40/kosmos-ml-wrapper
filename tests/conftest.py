@@ -11,7 +11,7 @@ from paho.mqtt.client import MQTTMessage
 
 from ml_wrapper import IncomingMessage, MLWrapper, ResultType
 from ml_wrapper.mocks import create_mock_tool
-from ml_wrapper.json_provider import (
+from ml_wrapper import (
     JSON_ANALYSE_MULTIPLE_TIME_SERIES,
     JSON_ANALYSE_TEXT,
     JSON_ANALYSE_TIME_SERIES,
