@@ -11,7 +11,7 @@ import json
 import pytest
 
 from ml_wrapper.mocks import create_mock_tool
-from ml_wrapper.json_provider import JSON_ML_ANALYSE_TIME_SERIES as ml_time_series
+from ml_wrapper.messaging import JSON_ML_ANALYSE_TIME_SERIES as ml_time_series
 
 from .usage_example import AnalysisTool
 

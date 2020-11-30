@@ -2,7 +2,8 @@
 import inspect
 
 # If I want to create a mock, I need to monkeypatch local methods as well.
-# pylint: disable=protected-access
+# Additionally the args and kwargs allow usage without test specific parameters.
+# pylint: disable=protected-access,unused-argument
 import json
 import logging
 from typing import List, Type, Union
@@ -27,11 +28,11 @@ class MockMqttClient:
         self.loop_stop = lambda: None
         self.disconnect = lambda: None
 
-    def subscribe(self, topic, qos):
+    def subscribe(self, topic, qos, *args, **kwargs):
         """ Cache subscriptions """
         self.subscriptions.append({"topic": topic, "qos": qos})
 
-    def mock_a_message(self, client, message: str):
+    def mock_a_message(self, client, message: str, *args, **kwargs):
         """ This function can be used to inject a mocked message """
         assert (
             self.on_message is not None
@@ -45,7 +46,7 @@ class MockMqttClient:
         # pylint: disable=not-callable
         self.on_message(client, None, msg)
 
-    def publish(self, topic, payload):
+    def publish(self, topic, payload, *args, **kwargs):
         """ Provides a publish function """
         self.logger.debug("{}:\t{}".format(str(topic), str(payload)))
         self.last_published = payload

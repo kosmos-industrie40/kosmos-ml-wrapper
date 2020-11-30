@@ -1,4 +1,6 @@
-import pytest
+"""
+This module tests configurations of the ML Wrapper
+"""
 
 from tests.conftest import FftMock
 

@@ -3,10 +3,10 @@ Init file that organizes the base level imports
 """
 # -*- coding: utf-8 -*-
 
-from pkg_resources import get_distribution, DistributionNotFound
+from pkg_resources import DistributionNotFound, get_distribution
+
 from .messaging import *
 from .misc import *
-from .messaging import *
 from .ml_wrapper import MLWrapper
 
 try:
