@@ -7,6 +7,10 @@ fi
 
 cp ~/.cookiecutter_replay/templates.json ./.cookiecutter_generation_variables.json
 
+mkdir -p deployment/k8s
+
+mv deployment.yaml deployment/k8s/
+
 if ! black --version &> /dev/null
 then
   echo "You will have to reformat using black yourself, because black is not available globally"
