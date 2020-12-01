@@ -2,9 +2,15 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "title": "Topic: kosmos/analysis/<contractId>",
   "description": "definition of the payload for the topic kosmos/analysis/<contractId>",
+  "additionalProperties": false,
   "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "The formal schema reference of the instance"
+    },
     "body": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "from",
         "timestamp",
@@ -155,6 +161,7 @@
     "time_series-result": {
       "type": "object",
       "description": "definition of time series data",
+      "additionalProperties": false,
       "properties": {
         "columns": {
           "type": "array",
@@ -206,6 +213,7 @@
     },
     "text-result": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "total": {
           "type": "string",

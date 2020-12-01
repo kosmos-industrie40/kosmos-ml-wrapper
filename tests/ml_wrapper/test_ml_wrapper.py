@@ -2,6 +2,9 @@
 Tests the ML Wrapper behaviour
 """
 import json
+from unittest import mock
+
+import asyncio
 import pytest
 from ml_wrapper import (
     MLWrapper,
@@ -9,6 +12,7 @@ from ml_wrapper import (
     NonSchemaConformJsonPayload,
     MessageType,
     NotInitialized,
+    ValidationError,
 )
 
 
@@ -167,3 +171,23 @@ def test_wrong_resolve_function(ML_MOCK_WRONG_RESOLVE, mqtt_time_series, caplog)
             if rec.levelname in ["ERROR", "WARNING"]
         ]
     )
+
+
+def test_additional_field_in_result_of_text_function(
+    ML_MOCK_FFT, json_ml_analyse_time_series
+):
+    async def mock_coroutine(fail=True):
+        if fail:
+            return {"total": "Fail", "predict": 100, "error": "Hello"}
+        else:
+            return {"total": "Fail", "predict": 100}
+
+    with ML_MOCK_FFT as tool:
+        tool.result_type = ResultType.TEXT
+        tool.run = mock.Mock(return_value=mock_coroutine(fail=True))
+        with pytest.raises(NonSchemaConformJsonPayload):
+            tool.client.mock_a_message(
+                tool.client, json.dumps(json_ml_analyse_time_series)
+            )
+        tool.run = mock.Mock(return_value=mock_coroutine(fail=False))
+        tool.client.mock_a_message(tool.client, json.dumps(json_ml_analyse_time_series))
