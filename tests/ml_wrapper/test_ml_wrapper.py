@@ -4,15 +4,13 @@ Tests the ML Wrapper behaviour
 import json
 from unittest import mock
 
-import asyncio
 import pytest
 from ml_wrapper import (
-    MLWrapper,
-    ResultType,
-    NonSchemaConformJsonPayload,
     MessageType,
+    MLWrapper,
+    NonSchemaConformJsonPayload,
     NotInitialized,
-    ValidationError,
+    ResultType,
 )
 
 
@@ -179,8 +177,7 @@ def test_additional_field_in_result_of_text_function(
     async def mock_coroutine(fail=True):
         if fail:
             return {"total": "Fail", "predict": 100, "error": "Hello"}
-        else:
-            return {"total": "Fail", "predict": 100}
+        return {"total": "Fail", "predict": 100}
 
     with ML_MOCK_FFT as tool:
         tool.result_type = ResultType.TEXT
