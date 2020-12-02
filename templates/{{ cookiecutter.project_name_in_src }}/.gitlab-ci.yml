@@ -5,7 +5,7 @@ stages:
   - build
   - deploy
 
-image: "python:{{ cookiecutter.python_version }}"
+image: "${HARBOR_PROD}/cache/library/python:{{ cookiecutter.python_version }}"
 
 before_script:
   - python -v
@@ -125,7 +125,7 @@ publish_docker:
     entrypoint: [ "" ]
   cache: { }
   before_script:
-    - echo $CI_DOCKER_CONFIG > /kaniko/.docker/config.json
+    - echo $HARBOR_PROD_PUSH_ANALYSE_PLATFORM_KOSMOS > /kaniko/.docker/config.json
   script:
     - |
       if [ -z $CI_REGISTRY ] || [ -z $CI_REGISTRY_IMAGE ]; then

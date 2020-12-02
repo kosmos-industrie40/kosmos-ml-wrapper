@@ -41,7 +41,7 @@ You can now test your empty ml wrapper, using
 
 ::
 
-    python setup.py.test
+    python setup.py test
 
 
 Last but not least:

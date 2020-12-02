@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd src/ml_wrapper
+cd src/ml_wrapper/messaging/json_handling
 
 rm -rf kosmos_json_specifications
 

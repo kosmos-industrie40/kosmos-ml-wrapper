@@ -45,6 +45,8 @@ def topic_splitter(topic_string: str, sep: str = ",") -> List[str]:
     @return: List[str]
     """
     assert isinstance(topic_string, str), "I can only handle strings"
+    if topic_string == "":
+        return []
     topic_list = topic_string.split(sep)
     for ind, topic in enumerate(topic_list):
         if re.match(r"^/?([^/]+/)*[^/]+/?$", topic) is None:

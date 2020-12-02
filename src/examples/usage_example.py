@@ -72,4 +72,3 @@ class AnalysisTool(MLWrapper):
 if __name__ == "__main__":
     with AnalysisTool() as tool:
         tool.logger.info("Start the tool")
-        tool.start()
