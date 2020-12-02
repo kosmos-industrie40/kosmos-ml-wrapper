@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version 2.0.3
+=============
+- Issue works for better stability
+- Documentation improvement
+- Refactoring
+
 Version 2.0.2
 =============
 - Include sensor update example for axistests
