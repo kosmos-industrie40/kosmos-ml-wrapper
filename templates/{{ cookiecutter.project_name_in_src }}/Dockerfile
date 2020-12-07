@@ -19,7 +19,7 @@ ARG GIT_USER
 COPY . ./app
 RUN git config --global url."https://$GIT_USER:$GIT_TOKEN@gitlab.inovex.de".insteadOf https://gitlab.inovex.de
 WORKDIR ./app
-RUN /venv/bin/pip install -r /requirements.txt
+RUN /venv/bin/pip install -r requirements.txt
 RUN /venv/bin/python setup.py install
 
 # Copy the virtualenv into a distroless image
