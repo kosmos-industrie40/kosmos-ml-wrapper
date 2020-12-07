@@ -3,7 +3,7 @@ import inspect
 
 # If I want to create a mock, I need to monkeypatch local methods as well.
 # Additionally the args and kwargs allow usage without test specific parameters.
-# pylint: disable=protected-access,unused-argument
+# pylint: disable=protected-access,unused-argument,no-self-use
 import json
 import logging
 from typing import List, Type, Union
@@ -50,6 +50,12 @@ class MockMqttClient:
         """ Provides a publish function """
         self.logger.debug("{}:\t{}".format(str(topic), str(payload)))
         self.last_published = payload
+
+    def is_connected(self) -> bool:
+        """
+        Returns true
+        """
+        return True
 
 
 def _init_mqtt(self: MLWrapper):
