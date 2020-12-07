@@ -8,15 +8,19 @@ FROM debian:buster-slim AS build
 RUN apt-get update && \
     apt-get install --no-install-suggests --no-install-recommends --yes python3-venv gcc libpython3-dev git && \
     python3 -m venv /venv && \
-    /venv/bin/pip install --upgrade pip
+    /venv/bin/pip install --upgrade pip && \
+    /venv/bin/pip install wheel
+
 
 # Build the virtualenv as a separate step: Only re-execute this step when requirements.txt changes
 FROM build AS build-venv
 ARG GIT_TOKEN
 ARG GIT_USER
-COPY requirements.txt /requirements.txt
+COPY . ./app
 RUN git config --global url."https://$GIT_USER:$GIT_TOKEN@gitlab.inovex.de".insteadOf https://gitlab.inovex.de
+WORKDIR ./app
 RUN /venv/bin/pip install -r /requirements.txt
+RUN /venv/bin/python setup.py install
 
 # Copy the virtualenv into a distroless image
 FROM gcr.io/distroless/python3-debian10
