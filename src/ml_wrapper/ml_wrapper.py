@@ -19,6 +19,7 @@ from iniparser import Config
 from paho.mqtt.client import Client, MQTTMessage
 
 from .messaging import IncomingMessage, MessageType, OutgoingMessage
+from .messaging.state_message import StateMessage, ToolState
 from .misc import (
     ConfigNotValid,
     EmptyResult,
@@ -148,6 +149,9 @@ class MLWrapper(abc.ABC):
         self.client = client
         self.async_loop = async_loop
         self.async_loop_policy = asyncio.get_event_loop_policy()
+        self.state_topic = self._config.get("status_topic", default="kosmos/status")
+
+        self.state: StateMessage = None
 
     def start_up_components(self) -> None:
         """
@@ -161,14 +165,20 @@ class MLWrapper(abc.ABC):
         self.async_loop.close = lambda: None
         self._init_mqtt()
         self._subscribe()
+        self.state = StateMessage(
+            client=self.client, topic=self.state_topic, logger=self.logger
+        )
         self.client.loop_forever()
+        self.state.state = ToolState.STARTING
         self.logger.info("... all components started")
+        self.state.state = ToolState.ALIVE
 
     def tear_down_components(self) -> None:
         """
         This method will tear down all components, like the mqtt client
         """
         self.logger.info("Tearing down all components...")
+        self.state.state = ToolState.SHUTTING_DOWN
         self.client.loop_stop()
         self.client.disconnect()
         self.async_loop.close_()
@@ -309,15 +319,18 @@ class MLWrapper(abc.ABC):
             self._check_message_requirements(in_message)
         except (EmptyResult, InvalidType, NonSchemaConformJsonPayload) as error:
             self.logger.error("%s:\n%s", error.__class__.__name__, error)
+            self.state.state = ToolState.ERROR
             raise error from error
         except WrongMessageType as error:
             self.logger.error("%s: \n%s", WrongMessageType.__name__, error)
+            self.state.state = ToolState.ERROR
         except Exception as error:
             self.logger.error(
                 "The exception %s has to be handled!\n%s",
                 error.__class__.__name__,
                 error,
             )
+            self.state.state = ToolState.ERROR
             raise error from error
         self.logger.debug(
             "Start the async run of the ML Tool for message %s", in_message.mid
@@ -419,6 +432,7 @@ class MLWrapper(abc.ABC):
                 "resolve_result_data method, please make sure to provide "
                 "the 'body' field of the payload manually!"
             )
+            self.state.state = ToolState.ERROR
             raise error
         print(out_message.body)
         out_message = await self._publish_result_message(out_message)

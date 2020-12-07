@@ -30,6 +30,7 @@ from ml_wrapper import (
 from tests.mock_ml_tools import (
     FFT,
     BadTopicTool,
+    SimpleTool,
     SlowMLTool,
     ResultTypeTool,
     BadMLTool,
@@ -38,6 +39,7 @@ from tests.mock_ml_tools import (
 )
 
 FftMock = create_mock_tool(FFT)
+SimpleMock = create_mock_tool(SimpleTool)
 ToolMock = create_mock_tool(WrongResolve)
 BttMock = create_mock_tool(BadTopicTool)
 SlowMlToolMock = create_mock_tool(SlowMLTool)
@@ -131,6 +133,12 @@ def tool_patch(monkeypatch):
 def ML_MOCK_FFT(tool_patch) -> MLWrapper:
     print(inspect.getsource(FftMock.__init__))
     return FftMock(outgoing_message_is_temporary=True)
+
+
+@pytest.fixture
+def ML_MOCK_SIMPLE(tool_patch) -> MLWrapper:
+    print(inspect.getsource(SimpleMock.__init__))
+    return SimpleMock(outgoing_message_is_temporary=True)
 
 
 @pytest.fixture

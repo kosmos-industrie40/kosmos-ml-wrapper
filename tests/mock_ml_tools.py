@@ -2,7 +2,6 @@
 This module implements a basic ML Wrapper Mock
 """
 # pylint: disable=wrong-import-position
-import time
 from typing import Union, List
 import logging
 
@@ -21,10 +20,23 @@ class FFT(MLWrapper):
     ) -> Union[pd.DataFrame, List[pd.DataFrame], dict]:
         """Simple run step"""
         self.logger.debug("Starting run method")
-        time.sleep(2)
+        await asyncio.sleep(2)
         dataframe = out_message.in_message.retrieved_data
         dataframe["triple"] = dataframe["time"] * 3
         dataframe["time as text"] = dataframe["time"].astype(str)
+        return dataframe
+
+
+class SimpleTool(MLWrapper):
+    """Does Nothing"""
+
+    async def run(
+        self, out_message: OutgoingMessage
+    ) -> Union[pd.DataFrame, List[pd.DataFrame], dict]:
+        """Simple run step"""
+        self.logger.debug("Starting run method")
+        await asyncio.sleep(2)
+        dataframe = out_message.in_message.retrieved_data
         return dataframe
 
 
@@ -51,7 +63,7 @@ class BadTopicTool(MLWrapper):
         """Simple run step"""
         self.logger.debug("Starting run method")
         self.logger.warning("I will now calculate my stuff")
-        time.sleep(2)
+        await asyncio.sleep(2)
         dataframe = out_message.in_message.retrieved_data
         dataframe["triple"] = dataframe["time"] * 3
         dataframe["time as text"] = dataframe["time"].astype(str)
