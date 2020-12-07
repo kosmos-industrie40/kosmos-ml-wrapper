@@ -2,6 +2,9 @@
 Changelog
 #########
 
+Version 2.1.0
+=============
+- Including Status report functionality via mqtt
 
 Version 2.0.3
 =============
