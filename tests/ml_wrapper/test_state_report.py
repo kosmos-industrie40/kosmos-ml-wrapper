@@ -18,8 +18,8 @@ def test_state_report_normal(
     with ML_MOCK_SIMPLE as tool:
         tool.client.mock_a_message(tool.client, json.dumps(json_ml_data_example))
         caps = get_status_messages(caplog)
-        assert "starting" in " ".join(caps) and "alive" in " ".join(caps)
-        assert len(caps) == 2
+        assert "alive" in " ".join(caps)
+        assert len(caps) == 1
     del tool.state.state
     assert tool.state.state is None
 
