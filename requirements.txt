@@ -16,9 +16,13 @@
 # scipy==1.0
 #
 
-config-env-parser==0.0.3
-jsonschema==3.2.0
-numpy==1.19.1
-paho-mqtt==1.5.0
-pandas==1.1.2
-asyncio==3.4.3
+config-env-parser>=0.0.3
+jsonschema>=3.2.0
+numpy>=1.19.1
+paho-mqtt>=1.5.0
+pandas>=1.1.2
+asyncio>=3.4.3
+FastAPI>=0.62.0
+prometheus-client>=0.9.0
+uvicorn==0.13.0
+
