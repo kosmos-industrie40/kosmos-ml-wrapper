@@ -9,7 +9,9 @@ import asyncio
 import logging
 import os
 import re
+import signal
 import sys
+import time
 import warnings
 from typing import List, Union
 
@@ -154,6 +156,13 @@ class MLWrapper(abc.ABC):
 
         self.state: StateMessage = None
 
+        # Miscellaneous
+        self.raise_exceptions = (
+            self._config.get("raise_excpetions", default="False").lower() != "false"
+        )
+        self._save_exit = False
+        self.server: Server = None
+
     def start_up_components(self) -> None:
         """
         This method will connect the initialise the mqtt
@@ -184,6 +193,20 @@ class MLWrapper(abc.ABC):
         self.client.disconnect()
         self.async_loop.close_()
         self.logger.info("... all components torn down")
+
+    def save_exit(self, *args, **kwargs):
+        """
+        Closes the forever loop
+        """
+        self.logger.info("Application was told to shut down. Invoking save exit")
+        self._save_exit = True
+
+    def loop_forever(self):
+        """
+        This loop will run infinitively and keep the main thread alive.
+        """
+        while not self._save_exit:
+            time.sleep(0.1)
 
     def __enter__(self):
         """

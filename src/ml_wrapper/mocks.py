@@ -6,7 +6,9 @@ import inspect
 # pylint: disable=protected-access,unused-argument,no-self-use
 import json
 import logging
+import time
 from typing import List, Type, Union
+from unittest.mock import Mock
 
 import pandas as pd
 from ml_wrapper import MLWrapper
@@ -25,6 +27,7 @@ class MockMqttClient:
         self.subscriptions = list()
         self.last_published = None
         self.loop_forever = lambda: None
+        self.loop_start = lambda: None
         self.loop_stop = lambda: None
         self.disconnect = lambda: None
 
@@ -106,4 +109,5 @@ def create_mock_tool(MLTOOL: Type[MLWrapper]) -> Type[MLWrapper]:
     MLTOOL.__init__ = _create_new_init(MLTOOL.__init__)
     MLTOOL._init_mqtt = _init_mqtt
     MLTOOL.resolve_result_data = _create_resolve_result(MLTOOL.resolve_result_data)
+    MLTOOL.loop_forever = Mock(side_effect=time.sleep(0.2))
     return MLTOOL
