@@ -366,7 +366,6 @@ get request the current state of the ML Tool
 
 
 
-
 .. _jsonschema: src/ml_wrapper/kosmos_json_specifications/mqtt_payloads/analyses-formal.json
 .. _KOSMoS MQTT standards: https://confluence.inovex.de/display/KOSMOS/MQTT-Specification
 .. _env_ml_wrapper.md: src/env_ml_wrapper.md
