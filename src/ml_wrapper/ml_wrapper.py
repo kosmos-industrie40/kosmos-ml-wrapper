@@ -23,6 +23,7 @@ from .messaging.state_message import StateMessage, ToolState
 from .misc import (
     ConfigNotValid,
     EmptyResult,
+    handle_exception,
     InvalidType,
     LOG_LEVEL,
     NonSchemaConformJsonPayload,
@@ -319,19 +320,35 @@ class MLWrapper(abc.ABC):
             self._check_message_requirements(in_message)
         except (EmptyResult, InvalidType, NonSchemaConformJsonPayload) as error:
             self.logger.error("%s:\n%s", error.__class__.__name__, error)
-            self.state.state = ToolState.ERROR
-            raise error from error
+            handle_exception(
+                exception=error,
+                logger=self.logger,
+                state=self.state,
+                raise_further=self.raise_exceptions,
+            )
+            return None
         except WrongMessageType as error:
             self.logger.error("%s: \n%s", WrongMessageType.__name__, error)
-            self.state.state = ToolState.ERROR
+            handle_exception(
+                exception=error,
+                logger=self.logger,
+                state=self.state,
+                raise_further=False,
+            )
+            return None
         except Exception as error:
             self.logger.error(
                 "The exception %s has to be handled!\n%s",
                 error.__class__.__name__,
                 error,
             )
-            self.state.state = ToolState.ERROR
-            raise error from error
+            handle_exception(
+                exception=error,
+                logger=self.logger,
+                state=self.state,
+                raise_further=self.raise_exceptions,
+            )
+            return None
         self.logger.debug(
             "Start the async run of the ML Tool for message %s", in_message.mid
         )
@@ -432,8 +449,13 @@ class MLWrapper(abc.ABC):
                 "resolve_result_data method, please make sure to provide "
                 "the 'body' field of the payload manually!"
             )
-            self.state.state = ToolState.ERROR
-            raise error
+            handle_exception(
+                exception=error,
+                logger=self.logger,
+                state=self.state,
+                raise_further=self.raise_exceptions,
+            )
+            return None
         print(out_message.body)
         out_message = await self._publish_result_message(out_message)
         return out_message
