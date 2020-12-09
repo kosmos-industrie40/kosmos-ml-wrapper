@@ -2,6 +2,12 @@
 Changelog
 #########
 
+Version 2.2.0
+=============
+- Prometheus metrics
+- Fixing issues with threading => main thread is now looping forever
+- FastAPI and uvicorn used to provide Prometheus endpoint
+
 Version 2.1.0
 =============
 - Including Status report functionality via mqtt
