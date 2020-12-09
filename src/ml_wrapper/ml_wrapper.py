@@ -36,9 +36,7 @@ from .misc import (
     WrongMessageType,
 )
 from .misc.fastAPI_server import app, Server
-from .misc.prometheus import (
-    state as prometheus_state,
-)
+from .misc.prometheus import state as prometheus_state, message_issue_counter
 
 FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -213,7 +211,7 @@ class MLWrapper(abc.ABC):
         for signal_ in self._config.get("sigterm_calls", default="SIGINT").split(","):
             signal_ = signal_.strip()
             if hasattr(signal, signal_):
-                self.logger.info(f"Register {signal_} as save exit call")
+                self.logger.info("Register %s as save exit call", signal_)
                 signal.signal(getattr(signal, signal_), self.save_exit)
 
         self.logger.info("... all components started")
@@ -247,6 +245,7 @@ class MLWrapper(abc.ABC):
         self.server.t_end()
         self.logger.info("... all components torn down")
 
+    # pylint: disable=unused-argument
     def save_exit(self, *args, **kwargs):
         """
         Closes the forever loop
@@ -396,13 +395,14 @@ class MLWrapper(abc.ABC):
             self._check_message_requirements(in_message)
         except (EmptyResult, InvalidType, NonSchemaConformJsonPayload) as error:
             self.logger.error("%s:\n%s", error.__class__.__name__, error)
+            message_issue_counter.inc()
             handle_exception(
                 exception=error,
                 logger=self.logger,
                 state=self.state,
                 raise_further=self.raise_exceptions,
             )
-            return None
+            return
         except WrongMessageType as error:
             self.logger.error("%s: \n%s", WrongMessageType.__name__, error)
             handle_exception(
@@ -411,7 +411,7 @@ class MLWrapper(abc.ABC):
                 state=self.state,
                 raise_further=False,
             )
-            return None
+            return
         except Exception as error:
             self.logger.error(
                 "The exception %s has to be handled!\n%s",
@@ -424,7 +424,7 @@ class MLWrapper(abc.ABC):
                 state=self.state,
                 raise_further=self.raise_exceptions,
             )
-            return None
+            return
         self.logger.debug(
             "Start the async run of the ML Tool for message %s", in_message.mid
         )
@@ -531,7 +531,7 @@ class MLWrapper(abc.ABC):
                 state=self.state,
                 raise_further=self.raise_exceptions,
             )
-            return None
+            return
         print(out_message.body)
         out_message = await self._publish_result_message(out_message)
         return out_message

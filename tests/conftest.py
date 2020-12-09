@@ -7,6 +7,7 @@ import json
 import logging
 
 import pytest
+from paho.mqtt.client import MQTTMessage
 from ml_wrapper import (
     IncomingMessage,
     JSON_ANALYSE_MULTIPLE_TIME_SERIES,
@@ -26,7 +27,6 @@ from ml_wrapper import (
     ResultType,
 )
 from ml_wrapper.mocks import create_mock_tool
-from paho.mqtt.client import MQTTMessage
 
 from tests.mock_ml_tools import (
     BadMLTool,

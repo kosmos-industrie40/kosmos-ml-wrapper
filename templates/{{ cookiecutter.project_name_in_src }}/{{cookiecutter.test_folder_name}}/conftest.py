@@ -30,6 +30,8 @@ def patch_env(monkeypatch):
     monkeypatch.setenv("CONFIG_MODEL_URL","test_url")
     monkeypatch.setenv("CONFIG_MODEL_TAG","test_tag")
     monkeypatch.setenv("CONFIG_MODEL_FROM","test_from")
+    monkeypatch.setenv("CONFIG_LOGGING_RAISE_EXCPETIONS", "True")
+
 
 @pytest.fixture
 def MOCK_TOOL(patch_env):

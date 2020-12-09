@@ -1,3 +1,7 @@
+"""
+This module provides logic to handle exceptions dependent on the configuration given
+"""
+
 import traceback
 from logging import Logger
 

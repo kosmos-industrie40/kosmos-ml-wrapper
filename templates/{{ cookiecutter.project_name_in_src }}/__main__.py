@@ -7,4 +7,3 @@ from {{ cookiecutter.project_name_in_src }}.{{ cookiecutter.ml_tool_name }} impo
 if __name__ == "__main__":
     with {{ cookiecutter.ml_class_name }}() as {{ cookiecutter.ml_class_name| lower }}:
         {{cookiecutter.ml_class_name | lower}}.logger.info("Starting the ml tool {{ cookiecutter.ml_tool_name }}")
-        {{cookiecutter.ml_class_name | lower}}.start()

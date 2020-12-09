@@ -5,9 +5,9 @@ import json
 import logging
 
 from paho.mqtt.client import Client
+from ml_wrapper.misc.prometheus import error_counter, state as prometheus_state
 
 from .state_enum import ToolState
-from ml_wrapper.misc.prometheus import state as prometheus_state, error_counter
 
 
 class StateMessage:
