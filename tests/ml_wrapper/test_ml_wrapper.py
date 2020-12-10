@@ -94,6 +94,21 @@ def test_reaction_to_message(ML_MOCK_FFT, json_ml_analyse_time_series):
         print(ml_mock_fft.out_messages[0].body)
 
 
+def test_reaction_to_message_2(ML_MOCK_FFT, json_ml_analyse_time_series, monkeypatch):
+    ML_MOCK_FFT.raise_exceptions = False
+    with ML_MOCK_FFT as ml_mock_fft:
+        ml_mock_fft.client.mock_a_message(ml_mock_fft.client, None)
+        ml_mock_fft.client.mock_a_message(
+            ml_mock_fft.client, str(json.dumps({"test": "hi"}))
+        )
+        ml_mock_fft.client.mock_a_message(
+            ml_mock_fft.client,
+            str(json.dumps({"body": {"type": "text", "test": "hi"}})),
+        )
+        print(ml_mock_fft)
+        assert len(ml_mock_fft.out_messages) == 0
+
+
 def test_wrong_topic(ML_MOCK_BAD_TOPIC_TOOL, mqtt_time_series, caplog):
     with ML_MOCK_BAD_TOPIC_TOOL as ml_mock_bad_topic_tool:
         assert (

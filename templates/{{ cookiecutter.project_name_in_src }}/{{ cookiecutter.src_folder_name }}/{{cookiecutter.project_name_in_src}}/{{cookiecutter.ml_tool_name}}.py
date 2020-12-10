@@ -77,4 +77,3 @@ class {{ cookiecutter.ml_class_name }}(MLWrapper):
 if __name__ == "__main__":
     with {{ cookiecutter.ml_class_name }}() as {{ cookiecutter.ml_class_name|lower }}:
         {{cookiecutter.ml_class_name | lower}}.logger.info("Startup the ml tool")
-        {{cookiecutter.ml_class_name | lower}}.start()

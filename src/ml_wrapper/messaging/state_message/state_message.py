@@ -5,6 +5,7 @@ import json
 import logging
 
 from paho.mqtt.client import Client
+from ml_wrapper.misc.prometheus import error_counter, state as prometheus_state
 
 from .state_enum import ToolState
 
@@ -14,7 +15,12 @@ class StateMessage:
     This class handles the status message logic
     """
 
-    def __init__(self, topic: str, client: Client, logger: logging.Logger):
+    def __init__(
+        self,
+        topic: str,
+        client: Client,
+        logger: logging.Logger,
+    ):
         self._state: ToolState = None
         self.kwargs = dict()
 
@@ -52,10 +58,6 @@ class StateMessage:
         """
         This message publishes the state to the given topic
         """
-        # assert self._state is not None, "state has to be set"
-        # assert (
-        #     self.client.is_connected()
-        # ), "The StateMessage object can only publish, if the client is connected"
         if self.can_publish():
             self.client.publish(self.topic, payload=self._get_message(), qos=0)
             return
@@ -79,6 +81,10 @@ class StateMessage:
         )
         pub_state = new_value is not None and self._state != new_value
         self._state = new_value
+        if new_value == ToolState.ERROR:
+            error_counter.inc()
+        if new_value is not None:
+            prometheus_state.state(new_value.value)
         if pub_state:
             self.publish()
 

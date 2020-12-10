@@ -9,12 +9,15 @@ import asyncio
 import logging
 import os
 import re
+import signal
 import sys
+import time
 import warnings
 from typing import List, Union
 
 import paho.mqtt.client as mqtt
 import pandas as pd
+import uvicorn
 from iniparser import Config
 from paho.mqtt.client import Client, MQTTMessage
 
@@ -23,6 +26,7 @@ from .messaging.state_message import StateMessage, ToolState
 from .misc import (
     ConfigNotValid,
     EmptyResult,
+    handle_exception,
     InvalidType,
     LOG_LEVEL,
     NonSchemaConformJsonPayload,
@@ -31,6 +35,8 @@ from .misc import (
     topic_splitter,
     WrongMessageType,
 )
+from .misc.fastAPI_server import app, Server
+from .misc.prometheus import state as prometheus_state, message_issue_counter
 
 FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -153,25 +159,76 @@ class MLWrapper(abc.ABC):
 
         self.state: StateMessage = None
 
+        # Miscellaneous
+        self.raise_exceptions = (
+            self._config.get("raise_excpetions", default="False").lower() != "false"
+        )
+        self._save_exit = False
+        self.server: Server = None
+
     def start_up_components(self) -> None:
         """
         This method will connect the initialise the mqtt
         client and start up all components required.
         """
         self.logger.info("Starting all components...")
+
+        # Prometheus and asgi server
+        self.logger.info("Starting server and prometheus")
+        config = uvicorn.Config(
+            app,
+            host=self._config.get("prometheus_serve_host", default="0.0.0.0"),
+            port=int(self._config.get("prometheus_serve_port", default="8020")),
+        )
+        self.server = Server(config=config)
+        self.server.t_start()
+
+        prometheus_state.state(ToolState.STARTING.value)
+        self.logger.info("Prometheus running")
+
+        # Async loop setup
+        self.logger.info("Starting async loop")
         self.async_loop = self.async_loop_policy.new_event_loop()
         asyncio.set_event_loop(self.async_loop)
         self.async_loop.close_ = self.async_loop.close
         self.async_loop.close = lambda: None
+        self.logger.info("Asyncloop running")
+
+        # MQTT
+        self.logger.info("Initialize MQTT connection")
         self._init_mqtt()
         self._subscribe()
+        self.client.loop_start()
+        self._wait_for_connection()
         self.state = StateMessage(
             client=self.client, topic=self.state_topic, logger=self.logger
         )
-        self.client.loop_forever()
-        self.state.state = ToolState.STARTING
-        self.logger.info("... all components started")
+        self.logger.info("MQTT running")
         self.state.state = ToolState.ALIVE
+
+        # SIG commands
+        self.logger.info("Register SIG commands for save shutdown")
+        for signal_ in self._config.get("sigterm_calls", default="SIGINT").split(","):
+            signal_ = signal_.strip()
+            if hasattr(signal, signal_):
+                self.logger.info("Register %s as save exit call", signal_)
+                signal.signal(getattr(signal, signal_), self.save_exit)
+
+        self.logger.info("... all components started")
+
+        # Start looping
+        self.loop_forever()
+
+    def _wait_for_connection(self):
+        """
+        This function pauses the main thread until the client is connected or
+        at most for 10 seconds
+        """
+        sleep_time = 0.1
+        sleep_counter = 10
+        while not self.client.is_connected() and sleep_counter > 0:
+            time.sleep(sleep_time)
+            sleep_counter -= sleep_time
 
     def tear_down_components(self) -> None:
         """
@@ -179,10 +236,29 @@ class MLWrapper(abc.ABC):
         """
         self.logger.info("Tearing down all components...")
         self.state.state = ToolState.SHUTTING_DOWN
+        self.logger.info("Tearing down MQTT connection...")
         self.client.loop_stop()
         self.client.disconnect()
+        self.logger.info("Tearing down Aync loop...")
         self.async_loop.close_()
+        self.logger.info("Tearing down server...")
+        self.server.t_end()
         self.logger.info("... all components torn down")
+
+    # pylint: disable=unused-argument
+    def save_exit(self, *args, **kwargs):
+        """
+        Closes the forever loop
+        """
+        self.logger.info("Application was told to shut down. Invoking save exit")
+        self._save_exit = True
+
+    def loop_forever(self):
+        """
+        This loop will run infinitively and keep the main thread alive.
+        """
+        while not self._save_exit:
+            time.sleep(0.1)
 
     def __enter__(self):
         """
@@ -227,7 +303,7 @@ class MLWrapper(abc.ABC):
     def _init_mqtt(self):
         """ Initialise the mqtt client """
         self.client = mqtt.Client()
-        self.client.connect(
+        self.client.connect_async(
             self.config["config"]["mqtt"]["host"],
             port=int(self.config["config"]["mqtt"]["port"]),
         )
@@ -319,19 +395,36 @@ class MLWrapper(abc.ABC):
             self._check_message_requirements(in_message)
         except (EmptyResult, InvalidType, NonSchemaConformJsonPayload) as error:
             self.logger.error("%s:\n%s", error.__class__.__name__, error)
-            self.state.state = ToolState.ERROR
-            raise error from error
+            message_issue_counter.inc()
+            handle_exception(
+                exception=error,
+                logger=self.logger,
+                state=self.state,
+                raise_further=self.raise_exceptions,
+            )
+            return
         except WrongMessageType as error:
             self.logger.error("%s: \n%s", WrongMessageType.__name__, error)
-            self.state.state = ToolState.ERROR
+            handle_exception(
+                exception=error,
+                logger=self.logger,
+                state=self.state,
+                raise_further=False,
+            )
+            return
         except Exception as error:
             self.logger.error(
                 "The exception %s has to be handled!\n%s",
                 error.__class__.__name__,
                 error,
             )
-            self.state.state = ToolState.ERROR
-            raise error from error
+            handle_exception(
+                exception=error,
+                logger=self.logger,
+                state=self.state,
+                raise_further=self.raise_exceptions,
+            )
+            return
         self.logger.debug(
             "Start the async run of the ML Tool for message %s", in_message.mid
         )
@@ -432,8 +525,13 @@ class MLWrapper(abc.ABC):
                 "resolve_result_data method, please make sure to provide "
                 "the 'body' field of the payload manually!"
             )
-            self.state.state = ToolState.ERROR
-            raise error
+            handle_exception(
+                exception=error,
+                logger=self.logger,
+                state=self.state,
+                raise_further=self.raise_exceptions,
+            )
+            return
         print(out_message.body)
         out_message = await self._publish_result_message(out_message)
         return out_message

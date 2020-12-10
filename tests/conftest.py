@@ -8,10 +8,8 @@ import logging
 
 import pytest
 from paho.mqtt.client import MQTTMessage
-
-from ml_wrapper import IncomingMessage, MLWrapper, ResultType
-from ml_wrapper.mocks import create_mock_tool
 from ml_wrapper import (
+    IncomingMessage,
     JSON_ANALYSE_MULTIPLE_TIME_SERIES,
     JSON_ANALYSE_TEXT,
     JSON_ANALYSE_TIME_SERIES,
@@ -25,16 +23,19 @@ from ml_wrapper import (
     JSON_ML_DATA_EXAMPLE_2,
     JSON_ML_DATA_EXAMPLE_3,
     JSON_ML_DATA_EXAMPLE_AXISTEST,
+    MLWrapper,
+    ResultType,
 )
+from ml_wrapper.mocks import create_mock_tool
 
 from tests.mock_ml_tools import (
-    FFT,
+    BadMLTool,
     BadTopicTool,
+    FFT,
+    RequireCertainInput,
+    ResultTypeTool,
     SimpleTool,
     SlowMLTool,
-    ResultTypeTool,
-    BadMLTool,
-    RequireCertainInput,
     WrongResolve,
 )
 
@@ -127,6 +128,7 @@ def tool_patch(monkeypatch):
     monkeypatch.setenv("CONFIG_MODEL_URL", "test_url")
     monkeypatch.setenv("CONFIG_MODEL_TAG", "test_tag")
     monkeypatch.setenv("CONFIG_MODEL_FROM", "test_from")
+    monkeypatch.setenv("CONFIG_LOGGING_RAISE_EXCPETIONS", "True")
 
 
 @pytest.fixture
