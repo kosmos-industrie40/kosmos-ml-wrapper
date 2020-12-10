@@ -177,7 +177,7 @@ class MLWrapper(abc.ABC):
         self.logger.info("Starting server and prometheus")
         config = uvicorn.Config(
             app,
-            host="0.0.0.0",
+            host=self._config.get("prometheus_serve_host", default="0.0.0.0"),
             port=int(self._config.get("prometheus_serve_port", default="8020")),
         )
         self.server = Server(config=config)
