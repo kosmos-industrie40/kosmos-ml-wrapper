@@ -14,4 +14,6 @@ find . -mindepth 2 -type d -not \( -name "analysis" -o -name "data" -o -name "ml
 
 find . -type f -not -name *.json -exec rm -rf {} \;
 
+find . -type d -empty -exec rm -rf {} \;
+
 find . -type d -exec touch {}/__init__.py \;
