@@ -4,6 +4,69 @@ ml_wrapper
 This Project is intended to provide a mqtt subscription trigger method
 for python projects.
 
+ML Tool ENV Vars
+================
+
+The variables that need to be configured for each tool are defined in this block.
+You will find variables that are required and variables that are optional.
+
+The bare minimum you need to provide are the variables
+
++-----------------------+-------------------------------------------------------------+
+| Variable              | Description                                                 |
++=======================+=============================================================+
+| CONFIG_MODEL_URL      | The url of the model. This is referring to the image url.   |
++-----------------------+-------------------------------------------------------------+
+| CONFIG_MODEL_TAG      | The tag of the model. This is referring to the image tag.   |
++-----------------------+-------------------------------------------------------------+
+| CONFIG_MODEL_FROM     | This parameter describes the FROM tag in messages sent.     |
+|                       | You would indicate a link to your tool like                 |
+|                       | "my_special_tool"                                           |
++-----------------------+-------------------------------------------------------------+
+
+Additionally you can manage some MQTT, messaging, logging and other settings.
+
+MQTT and Messaging:
+
++-----------------------------------+---------------------------------------------------------------+
+| Variable                          | Description                                                   |
++===================================+===============================================================+
+| CONFIG_MQTT_HOST                  | The host of the MQTT broker                                   |
++-----------------------------------+---------------------------------------------------------------+
+| CONFIG_MQTT_PORT                  | The port of the MQTT broker                                   |
++-----------------------------------+---------------------------------------------------------------+
+| CONFIG_MESSAGING_ANALYTIC_BASE_URL| The prefix/base of the topic used to subscribe to messages    |
++-----------------------------------+---------------------------------------------------------------+
+| CONFIG_MESSAGING_REQUEST_TOPIC    | Additional request topics to subscribe this model to.         |
+|                                   | Comma separated list of topics.                               |
++-----------------------------------+---------------------------------------------------------------+
+| CONFIG_MESSAGING_TEMPORARY_KEYWORD| The keyword to indicate, whether a result is temporary        |
++-----------------------------------+---------------------------------------------------------------+
+| CONFIG_MESSAGING_BASE_RESULT_TOPIC| The base string of the result topic, the tool will write to   |
++-----------------------------------+---------------------------------------------------------------+
+| CONFIG_MESSAGING_QOS              | The MQTT Quality of Service level                             |
++-----------------------------------+---------------------------------------------------------------+
+| CONFIG_MESSAGING_STATUS_TOPIC     | The MQTT topic to send the tool status messages to.           |
++-----------------------------------+---------------------------------------------------------------+
+
+Logging and Tool settings:
+
++---------------------------------------+---------------------------------------------------------------+
+| Variable                              | Description                                                   |
++=======================================+===============================================================+
+| CONFIG_WRAPPER_PROMETHEUS_SERVE_HOST  | The host of the Prometheus endpoint                           |
++---------------------------------------+---------------------------------------------------------------+
+| CONFIG_WRAPPER_PROMETHEUS_SERVE_PORT  | The port of the Prometheus endpoint                           |
++---------------------------------------+---------------------------------------------------------------+
+| CONFIG_WRAPPER_SIGTERM_CALLS          | A list of SIGNALS that can terminate the TOOL.                |
+|                                       | A comma separated list. Default is SIGINT, SIGTER             |
++---------------------------------------+---------------------------------------------------------------+
+| CONFIG_LOGGING_LOG_LEVEL              | The level of logging. Default is INFO                         |
++---------------------------------------+---------------------------------------------------------------+
+| CONFIG_LOGGING_RAISE_EXCPETIONS       | If not False, the program will raise exceptions and           |
+|                                       |                                   break in case of an error.  |
++---------------------------------------+---------------------------------------------------------------+
+
 Quick-Start Tutorial
 ====================
 Navigate/cd into your dev directory, where you keep all your projects.
