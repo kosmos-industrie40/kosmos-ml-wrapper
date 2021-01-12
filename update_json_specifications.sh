@@ -10,7 +10,7 @@ cd kosmos_json_specifications
 
 rm -rf .git
 
-find . -mindepth 2 -type d -not \( -name "analysis" -o -name "data" -o -name "ml-trigger" \) -exec rm -rf {} \;
+find . -mindepth 2 -type d -not \( -name "analysis" -o -name "data" -o -name "ml-trigger" -o -name "status" \) -exec rm -rf {} \;
 
 find . -type f -not -name *.json -exec rm -rf {} \;
 
