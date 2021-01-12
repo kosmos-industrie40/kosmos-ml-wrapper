@@ -2,6 +2,11 @@
 Changelog
 #########
 
+Version 2.2.1
+=============
+- Update of the status message according to changes in specification repository
+- Fixes in documentation
+
 Version 2.2.0
 =============
 - Prometheus metrics
