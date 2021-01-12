@@ -201,7 +201,10 @@ class MLWrapper(abc.ABC):
         self.client.loop_start()
         self._wait_for_connection()
         self.state = StateMessage(
-            client=self.client, topic=self.state_topic, logger=self.logger
+            client=self.client,
+            topic=self.state_topic,
+            logger=self.logger,
+            from_=self.config["config"]["model"]["from"],
         )
         self.logger.info("MQTT running")
         self.state.state = ToolState.ALIVE
