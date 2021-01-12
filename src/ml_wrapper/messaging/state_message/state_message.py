@@ -20,6 +20,7 @@ class StateMessage:
         topic: str,
         client: Client,
         logger: logging.Logger,
+        from_: str = "",
     ):
         self._state: ToolState = None
         self.kwargs = dict()
@@ -35,9 +36,20 @@ class StateMessage:
         assert topic is not None and isinstance(topic, str), "Topic has to be set"
         self.topic = topic
 
+        assert from_ is not None and isinstance(
+            from_, str
+        ), "From has to be of type string"
+        self.from_ = from_
+
     def _get_message(self):
         """ Returns the message of this objects information """
-        message = dict(status=self.state.value)
+        message = {
+            "$schema": "file:formal.json",
+            "body": {
+                "from": self.from_,
+                "status": self.state.value,
+            },
+        }
         message = {
             **message,
             **{key: value for key, value in self.kwargs if isinstance(value, str)},

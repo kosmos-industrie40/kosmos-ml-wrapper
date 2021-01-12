@@ -1,0 +1,43 @@
+{
+  "$schema": "file:formal.json",
+  "body": {
+	  "timestamp": "2020-12-04T12:55:12+00:00",
+	  "columns": [
+		  {
+			  "name": "id",
+			  "type": "string",
+			  "description": "is the id of the event",
+			  "meta": {
+				  "unit": "foo"
+			  }
+		  },
+		  {
+			  "name": "details",
+			  "type": "string",
+			  "meta": {
+				  "unit": "foo"
+			  }
+		  },
+		  {
+			  "name": "timestamp",
+			  "type": "rfctime",
+			  "meta": {
+				  "unit": "foo"
+			  }
+		  },
+		  {
+			  "name": "type",
+			  "type": "string",
+			  "meta": {
+				  "unit": "foo"
+			  }
+		  }
+	  ],
+	  "data": [
+		  ["750080"],
+		  ["Störung AS-i Kreis: Freigabekreis 41 Sicherheisbestätigung erfoderlich"],
+		  ["2020-12-04T12:55:12+00:00"],
+		  ["EMERGENCY STOP"]
+	  ]
+  }
+}

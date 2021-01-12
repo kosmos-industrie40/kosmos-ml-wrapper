@@ -1,0 +1,41 @@
+{
+  "body": {
+    "contract": "analyse",
+    "type": "sensor_update",
+    "machine": "machine",
+    "sensor": "sensor",
+    "payload": {
+      "$schema": "data-formal.json",
+      "body": {
+        "columns": [
+          {
+            "name": "value",
+            "type": "integer"
+          },
+          {
+            "name": "quality",
+            "type": "integer"
+          }
+        ],
+        "data": [
+          [
+            "15"
+          ],
+          [
+            "2"
+          ]
+        ],
+        "meta": [
+          {
+            "description": "defines the location where the metric is created",
+            "name": "location",
+            "type": "string",
+            "value": "hall 1"
+          }
+        ],
+        "timestamp": ""
+      },
+      "signature": ""
+    }
+  }
+}

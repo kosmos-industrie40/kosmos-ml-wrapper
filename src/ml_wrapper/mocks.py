@@ -1,5 +1,4 @@
 """ This module provides a mock for testing of this package """
-import inspect
 
 # If I want to create a mock, I need to monkeypatch local methods as well.
 # Additionally the args and kwargs allow usage without test specific parameters.
@@ -68,8 +67,6 @@ def _init_mqtt(self: MLWrapper):
 
 
 def _create_new_init(original_init: callable):
-    print(inspect.getsource(original_init))
-
     def _new_init_(self: MLWrapper, **kwargs):
         self.out_messages: List[OutgoingMessage] = list()
         print(self.__class__)
