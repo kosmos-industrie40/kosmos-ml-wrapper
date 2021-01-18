@@ -23,7 +23,7 @@ def handle_exception(
     """
     logger.info(
         "The application caught a wild exception!"
-        f"Your settings tell me {'not' if raise_further else ''} to raise this exception."
+        f"Your settings tell me {'' if raise_further else 'not'} to raise this exception."
     )
     logger.error(exception.__traceback__)
     traceback.print_tb(exception.__traceback__)
