@@ -431,7 +431,22 @@ class MLWrapper(abc.ABC):
         self.logger.debug(
             "Start the async run of the ML Tool for message %s", in_message.mid
         )
-        self.async_loop.run_until_complete(self._run(in_message))
+        # Run sub task in save environment
+        try:
+            self.async_loop.run_until_complete(self._run(in_message))
+        except Exception as error:
+            self.logger.error(
+                "The exception %s has to be handled!\n%s",
+                error.__class__.__name__,
+                error,
+            )
+            handle_exception(
+                exception=error,
+                logger=self.logger,
+                state=self.state,
+                raise_further=self.raise_exceptions,
+            )
+            return
         self.logger.debug("Finished tool for message %s", in_message.mid)
 
     # Can be reimplemented by user, and can then gain self-use

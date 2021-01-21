@@ -2,6 +2,11 @@
 Changelog
 #########
 
+Version 2.2.2
+=============
+- Include results in mock class under mock_tool.results
+- Fix typos
+
 Version 2.2.1
 =============
 - Update of the status message according to changes in specification repository

@@ -69,6 +69,7 @@ def _init_mqtt(self: MLWrapper):
 def _create_new_init(original_init: callable):
     def _new_init_(self: MLWrapper, **kwargs):
         self.out_messages: List[OutgoingMessage] = list()
+        self.results: Union[pd.DataFrame, dict] = list()
         print(self.__class__)
         print("Running")
         if "outgoing_message_is_temporary" not in kwargs:
@@ -91,6 +92,7 @@ def _create_resolve_result(original_resolve_function: callable):
         result: Union[pd.DataFrame, List[pd.DataFrame], dict],
         out_message: OutgoingMessage,
     ) -> OutgoingMessage:
+        self.results.append(result)
         out_message = await original_resolve_function(self, result, out_message)
         self.logger.info("I saved the result in out_messages for you")
         self.out_messages.append(out_message)
