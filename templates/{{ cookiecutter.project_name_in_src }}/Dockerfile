@@ -16,15 +16,16 @@ RUN apt-get update && \
 FROM build AS build-venv
 ARG GIT_TOKEN
 ARG GIT_USER
-COPY . ./app
+COPY . /app
 RUN git config --global url."https://$GIT_USER:$GIT_TOKEN@gitlab.inovex.de".insteadOf https://gitlab.inovex.de
-WORKDIR ./app
+WORKDIR /app
 RUN /venv/bin/pip install -r requirements.txt
 RUN /venv/bin/python setup.py install
 
 # Copy the virtualenv into a distroless image
 FROM gcr.io/distroless/python3-debian10
 USER nonroot:nonroot
+ENV PYTHONUNBUFFERED=1
 COPY --from=build-venv /venv /venv
 COPY ./src /src
 COPY __main__.py /__main__.py
