@@ -117,7 +117,7 @@ def test_wrong_topic(ML_MOCK_BAD_TOPIC_TOOL, mqtt_time_series, caplog):
         )
         ml_mock_bad_topic_tool._react_to_message(None, None, mqtt_time_series)
         assert any(
-            ["undefined topic" in msg and "consider" in msg for msg in caplog.messages]
+            "undefined topic" in msg and "consider" in msg for msg in caplog.messages
         )
 
 
@@ -169,8 +169,8 @@ def test_outgoing_message_is_temporary(
         outgoing_message_is_temporary=temporary
     ) as tool:
         tool.client.mock_a_message(tool.client, json.dumps(json_ml_analyse_time_series))
-        assert all([out.is_temporary for out in tool.out_messages]) == temporary
-        assert all(["temporary" in out.topic for out in tool.out_messages]) == temporary
+        assert all(out.is_temporary for out in tool.out_messages) == temporary
+        assert all("temporary" in out.topic for out in tool.out_messages) == temporary
 
 
 def test_wrong_resolve_function(ML_MOCK_WRONG_RESOLVE, mqtt_time_series, caplog):
@@ -178,11 +178,9 @@ def test_wrong_resolve_function(ML_MOCK_WRONG_RESOLVE, mqtt_time_series, caplog)
         with ML_MOCK_WRONG_RESOLVE as ml_tool:
             ml_tool._react_to_message(None, None, mqtt_time_series)
     assert any(
-        [
-            "You need to specify" in rec.message
-            for rec in caplog.records
-            if rec.levelname in ["ERROR", "WARNING"]
-        ]
+        "You need to specify" in rec.message
+        for rec in caplog.records
+        if rec.levelname in ["ERROR", "WARNING"]
     )
 
 

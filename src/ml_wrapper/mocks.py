@@ -17,7 +17,7 @@ from .misc import generate_mqtt_message_mock
 
 
 class MockMqttClient:
-    """ Mock of a mqtt client """
+    """Mock of a mqtt client"""
 
     def __init__(self, logger):
         self.logger = logger
@@ -31,11 +31,12 @@ class MockMqttClient:
         self.disconnect = lambda: None
 
     def subscribe(self, topic, qos, *args, **kwargs):
-        """ Cache subscriptions """
+        """Cache subscriptions"""
         self.subscriptions.append({"topic": topic, "qos": qos})
+        return 0, -1
 
     def mock_a_message(self, client, message: str, *args, **kwargs):
-        """ This function can be used to inject a mocked message """
+        """This function can be used to inject a mocked message"""
         assert (
             self.on_message is not None
         ), "Please overwrite the clients on_message property with your custom function"
@@ -49,7 +50,7 @@ class MockMqttClient:
         self.on_message(client, None, msg)
 
     def publish(self, topic, payload, *args, **kwargs):
-        """ Provides a publish function """
+        """Provides a publish function"""
         self.logger.debug("{}:\t{}".format(str(topic), str(payload)))
         self.last_published = payload
 
@@ -61,7 +62,7 @@ class MockMqttClient:
 
 
 def _init_mqtt(self: MLWrapper):
-    """ Initialises a mock mqtt client """
+    """Initialises a mock mqtt client"""
     self.client = MockMqttClient(self.logger)
     self.client.on_message = self._react_to_message
 

@@ -114,10 +114,8 @@ class MLWrapper(abc.ABC):
         assert only_react_to_previous_result_types is None or (
             isinstance(only_react_to_previous_result_types, list)
             and all(
-                [
-                    isinstance(constraint, ResultType)
-                    for constraint in only_react_to_previous_result_types
-                ]
+                isinstance(constraint, ResultType)
+                for constraint in only_react_to_previous_result_types
             )
         ), "only_react_to_previous_result_types can only be None or a list of ResultType"
         self._only_react_to_previous_result_types = only_react_to_previous_result_types
@@ -230,7 +228,7 @@ class MLWrapper(abc.ABC):
         sleep_counter = 0
         while not self.client.is_connected():
             time.sleep(sleep_time)
-            self.logger.debug(f'MQTT connection retry. counter: {sleep_counter}')
+            self.logger.debug("MQTT connection retry. Counter: %d", sleep_counter)
             sleep_counter += 1
 
     def tear_down_components(self) -> None:
@@ -242,7 +240,7 @@ class MLWrapper(abc.ABC):
         self.logger.info("Tearing down MQTT connection...")
         self.client.loop_stop()
         self.client.disconnect()
-        self.logger.info("Tearing down Aync loop...")
+        self.logger.info("Tearing down Async loop...")
         self.async_loop.close_()
         self.logger.info("Tearing down server...")
         self.server.t_end()
@@ -274,7 +272,7 @@ class MLWrapper(abc.ABC):
         self.tear_down_components()
 
     def _check_config_sanity(self):
-        """ Checks the sanity of the config file at creation time """
+        """Checks the sanity of the config file at creation time"""
         assert (
             "url" in self.config["config"]["model"]
         ), "url needs to be set in the configuration file"
@@ -304,7 +302,7 @@ class MLWrapper(abc.ABC):
         return self.logger_
 
     def _init_mqtt(self):
-        """ Initialise the mqtt client """
+        """Initialise the mqtt client"""
         self.client = mqtt.Client()
         self.client.connect_async(
             self.config["config"]["mqtt"]["host"],
@@ -328,14 +326,14 @@ class MLWrapper(abc.ABC):
     def _subscribe(self):
         topics = self._get_topics()
         for topic in topics:
-            (response, mid) = self.client.subscribe(
+            (response, _) = self.client.subscribe(
                 topic=topic,
                 qos=int(self.config["config"]["messaging"]["qos"]),
             )
             if response != 0:
-                self.logger.error(f'Error subscribing to topic\t {topic}')
+                self.logger.error("Error subscribing to topic\t %s", topic)
             else:
-                self.logger.info(f'Subscribed to topic\t {topic}')
+                self.logger.info("Subscribed to topic\t %s", topic)
 
     # DEPRECATED: This method is deprecated!
     def start(self):
@@ -388,7 +386,7 @@ class MLWrapper(abc.ABC):
     def _react_to_message(
         self, client: Client, user_data: Union[None, str], message: MQTTMessage
     ):
-        """ This method is the entry point when a message is received. """
+        """This method is the entry point when a message is received."""
         self.logger.debug("Message received: %s", format(str(message.payload)))
         in_message = IncomingMessage(logger=self.logger)
         self.logger.debug("Message is now referenced by %s", in_message.mid)
@@ -528,7 +526,7 @@ class MLWrapper(abc.ABC):
         )
         result = await self.run(out_message)
         print(result)
-        if not any([isinstance(result, dtype) for dtype in [pd.DataFrame, list, dict]]):
+        if not any(isinstance(result, dtype) for dtype in [pd.DataFrame, list, dict]):
             raise TypeError(
                 "The run method has to provide a DataFrame, a list of DataFrames or a dictionary"
             )

@@ -191,7 +191,7 @@ def new_incoming_message():
 
 # pylint: disable=super-init-not-called
 class MQTTMessageMock(MQTTMessage):
-    """ Mocking Message """
+    """Mocking Message"""
 
     def __init__(self, topic, payload):
         self.topic = topic

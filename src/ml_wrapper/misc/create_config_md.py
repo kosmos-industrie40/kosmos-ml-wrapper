@@ -8,7 +8,7 @@ FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def create_config_markdown():
-    """ Creates the config script """
+    """Creates the config script"""
     config = Config(mode="all_allowed").scan(FILE_DIR, True).read()
     config.to_env("./env_ml_wrapper.md")
 

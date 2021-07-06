@@ -8,7 +8,7 @@ This module presents an example of a possible ML Tool Unittest using the ML Wrap
 # This is required for you to write in order to create your own ML Tool
 import json
 
-import pytest
+import pytest  # pylint: disable=import-error
 
 from ml_wrapper.mocks import create_mock_tool
 from ml_wrapper.messaging import JSON_ML_ANALYSE_TIME_SERIES as ml_time_series
@@ -16,6 +16,7 @@ from ml_wrapper.messaging import JSON_ML_ANALYSE_TIME_SERIES as ml_time_series
 from .usage_example import AnalysisTool
 
 AnalysisToolMock = create_mock_tool(AnalysisTool)
+
 
 # This goes in conftest.py
 
@@ -57,4 +58,4 @@ def test_my_ml_logic(MOCK, JSON_ML_ANALYSE_TIME_SERIES, caplog):
         mock.client.mock_a_message(mock.client, JSON_ML_ANALYSE_TIME_SERIES)
     print(caplog.messages)
     assert "Starting all components..." in " ".join(caplog.messages)
-    assert all([out is not None for out in mock.out_messages])
+    assert all(out is not None for out in mock.out_messages)
