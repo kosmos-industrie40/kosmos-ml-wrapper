@@ -29,9 +29,9 @@ def find_result_type(result) -> ResultType:
         return None
     if checks[0]:
         return ResultType.TIME_SERIES
-    elif checks[1] and all([isinstance(res, pd.DataFrame) for res in result]):
+    elif checks[1] and all(isinstance(res, pd.DataFrame) for res in result):
         return ResultType.MULTIPLE_TIME_SERIES
-    elif checks[2] and all([key in result.keys() for key in ["total", "predict"]]):
+    elif checks[2] and all(key in result.keys() for key in ["total", "predict"]):
         return ResultType.TEXT
     else:
         return None

@@ -71,7 +71,7 @@ class BadTopicTool(MLWrapper):
 
 
 class SlowMLTool(MLWrapper):
-    """ Mocking a slow ml tool which sleeps for 5 seconds"""
+    """Mocking a slow ml tool which sleeps for 5 seconds"""
 
     async def run(
         self, out_message: OutgoingMessage
@@ -82,7 +82,7 @@ class SlowMLTool(MLWrapper):
 
 
 class ResultTypeTool(MLWrapper):
-    """ Mock for a Result Type Check """
+    """Mock for a Result Type Check"""
 
     async def run(
         self, out_message: OutgoingMessage
@@ -92,7 +92,7 @@ class ResultTypeTool(MLWrapper):
 
 
 class BadMLTool(MLWrapper):
-    """ Mock for a corrupt ML Tool """
+    """Mock for a corrupt ML Tool"""
 
     async def run(
         self, out_message: OutgoingMessage

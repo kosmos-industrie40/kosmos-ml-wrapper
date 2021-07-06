@@ -42,7 +42,7 @@ class StateMessage:
         self.from_ = from_
 
     def _get_message(self):
-        """ Returns the message of this objects information """
+        """Returns the message of this objects information"""
         message = {
             "$schema": "file:formal.json",
             "body": {
@@ -77,7 +77,7 @@ class StateMessage:
 
     @property
     def state(self) -> ToolState:
-        """ Returns the protected property for state """
+        """Returns the protected property for state"""
         return self._state
 
     @state.setter
@@ -102,5 +102,5 @@ class StateMessage:
 
     @state.deleter
     def state(self):
-        """ Deletes the protected property for state """
+        """Deletes the protected property for state"""
         self._state = None

@@ -28,7 +28,7 @@ from ml_wrapper import MLWrapper, IncomingMessage, OutgoingMessage, ResultType
 
 # Create child class of MLWrappers
 class AnalysisTool(MLWrapper):
-    """ My wonderful analysis tool """
+    """My wonderful analysis tool"""
 
     # Implementation required => Specifies variables required in the ML Wrapper class
     def __init__(self):
@@ -41,7 +41,7 @@ class AnalysisTool(MLWrapper):
     async def run(
         self, out_message: OutgoingMessage
     ) -> Union[pd.DataFrame, List[pd.DataFrame], dict]:
-        """ This is the main logic routine executed by the ML Wrapper """
+        """This is the main logic routine executed by the ML Wrapper"""
         # perform your ML magic here
         self.logger.info(
             "Here you can find the seperately retrieved information. Just call "
@@ -59,7 +59,7 @@ class AnalysisTool(MLWrapper):
     async def retrieve_payload_data(
         self, in_message: IncomingMessage
     ) -> IncomingMessage:
-        """ This will be executed before the run method """
+        """This will be executed before the run method"""
         # retrieve data from payload
         # or request historical data from database
         # based on the present information in the payload

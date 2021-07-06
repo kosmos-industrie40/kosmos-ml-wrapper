@@ -71,7 +71,7 @@ class IncomingMessage:
 
     @property
     def column_meta(self):
-        """ Returns the protected property for column_meta """
+        """Returns the protected property for column_meta"""
         return self._column_meta
 
     @column_meta.setter
@@ -89,7 +89,7 @@ class IncomingMessage:
 
     @column_meta.deleter
     def column_meta(self):
-        """ Deletes the protected property for column_meta """
+        """Deletes the protected property for column_meta"""
         del self._column_meta
 
     @property
@@ -109,52 +109,52 @@ class IncomingMessage:
 
     @property
     def sensor(self):
-        """ The sensor of the triggering message """
+        """The sensor of the triggering message"""
         return self._sensor
 
     @property
     def model(self):
-        """ The model of the triggering message """
+        """The model of the triggering message"""
         return self._model
 
     @property
     def machine(self):
-        """ The machine of the triggering message """
+        """The machine of the triggering message"""
         return self._machine
 
     @property
     def contract(self):
-        """ The contract of the triggering message """
+        """The contract of the triggering message"""
         return self._contract
 
     @property
     def message_type(self):
-        """ Returns the retrieved message type """
+        """Returns the retrieved message type"""
         return self._message_type
 
     @property
     def retrieved_data(self):
-        """ Returns the retrieved data from the message """
+        """Returns the retrieved data from the message"""
         return self._retrieved_data
 
     @property
     def columns(self):
-        """ Returns the columns field from the message """
+        """Returns the columns field from the message"""
         return self._columns
 
     @property
     def data(self):
-        """ Returns the data field from the message """
+        """Returns the data field from the message"""
         return self._data
 
     @property
     def metadata(self):
-        """ Returns the metadata field from the message """
+        """Returns the metadata field from the message"""
         return self._metadata
 
     @property
     def timestamp(self):
-        """ Returns the timestamp field from the message """
+        """Returns the timestamp field from the message"""
         return self._timestamp
 
     def _retrieve(self):
@@ -228,13 +228,11 @@ class IncomingMessage:
         return: bool
         """
         return any(
-            [
-                field is not None
-                for field in [
-                    self._retrieved_data,
-                    self._columns,
-                    self._data,
-                ]
+            field is not None
+            for field in [
+                self._retrieved_data,
+                self._columns,
+                self._data,
             ]
         )
 
@@ -270,7 +268,7 @@ class IncomingMessage:
 
     @property
     def analyses_message_type(self):
-        """ Returns the protected property for message_data_type """
+        """Returns the protected property for message_data_type"""
         return self._message_data_type
 
     @analyses_message_type.setter
@@ -288,12 +286,12 @@ class IncomingMessage:
 
     @analyses_message_type.deleter
     def analyses_message_type(self):
-        """ Deletes the protected property for message_data_type """
+        """Deletes the protected property for message_data_type"""
         del self._message_data_type
 
     @property
     def mqtt_message(self):
-        """ Returns the protected property for mqtt_message """
+        """Returns the protected property for mqtt_message"""
         return self._mqtt_message
 
     @mqtt_message.setter
@@ -317,7 +315,7 @@ class IncomingMessage:
 
     @mqtt_message.deleter
     def mqtt_message(self):
-        """ Deletes the protected property for mqtt_message """
+        """Deletes the protected property for mqtt_message"""
         del self._mqtt_message
 
     def _initialize_with_message(self):
@@ -331,7 +329,7 @@ class IncomingMessage:
 
     @property
     def payload(self):
-        """ Returns the protected property for payload """
+        """Returns the protected property for payload"""
         return self._payload
 
     @payload.setter
@@ -377,12 +375,12 @@ class IncomingMessage:
 
     @payload.deleter
     def payload(self):
-        """ Deletes the protected property for payload """
+        """Deletes the protected property for payload"""
         del self._payload
 
     @property
     def topic(self):
-        """ Returns the protected property for topic """
+        """Returns the protected property for topic"""
         return self._topic
 
     @topic.setter
@@ -411,7 +409,7 @@ class IncomingMessage:
 
     @topic.deleter
     def topic(self):
-        """ Deletes the protected property for topic """
+        """Deletes the protected property for topic"""
         del self._topic
 
 
@@ -481,14 +479,14 @@ class OutgoingMessage:
 
     @property
     def payload(self) -> str:
-        """ Returns the resulting payload as string """
+        """Returns the resulting payload as string"""
         dict_ = self._make_payload_dict(self._body)
         dict_["signature"] = self._sign_body()
         return json.dumps(dict_)
 
     @property
     def body(self) -> str:
-        """ Returns the protected property for payload """
+        """Returns the protected property for payload"""
         if self._body is None:
             raise NotInitialized(
                 "The body of the outgoing message has to be set. "
@@ -499,7 +497,7 @@ class OutgoingMessage:
 
     @property
     def body_as_json_dict(self) -> dict:
-        """ Returns the message field body as dictionary """
+        """Returns the message field body as dictionary"""
         return json.loads(self.body)
 
     @body.setter
@@ -531,7 +529,7 @@ class OutgoingMessage:
 
     @body.deleter
     def body(self):
-        """ Deletes the protected property for payload """
+        """Deletes the protected property for payload"""
         del self._body
 
     def set_results(
@@ -582,7 +580,7 @@ class OutgoingMessage:
             resolved["results"] = dict(data=data, columns=columns)
         elif result_type == ResultType.MULTIPLE_TIME_SERIES:
             assert isinstance(result, list) and all(
-                [isinstance(res, pd.DataFrame) for res in result]
+                isinstance(res, pd.DataFrame) for res in result
             ), "The {} type can only be set with a list of DataFrame objects".format(
                 result_type
             )

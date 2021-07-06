@@ -21,5 +21,5 @@ def test_multiple_messages_with_failing_in_between(
         tool.client.mock_a_message(tool.client, json.dumps(json_ml_analyse_time_series))
         tool.client.mock_a_message(tool.client, json.dumps(json_ml_analyse_text))
         tool.client.mock_a_message(tool.client, json.dumps(json_ml_analyse_time_series))
-    assert any(["WrongMessageType" in msg for msg in caplog.messages])
+    assert any("WrongMessageType" in msg for msg in caplog.messages)
     print(caplog.messages)
