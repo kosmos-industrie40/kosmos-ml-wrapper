@@ -197,9 +197,9 @@ class MLWrapper(abc.ABC):
         # MQTT
         self.logger.info("Initialize MQTT connection")
         self._init_mqtt()
-        self._subscribe()
         self.client.loop_start()
         self._wait_for_connection()
+        self._subscribe()
         self.state = StateMessage(
             client=self.client,
             topic=self.state_topic,
@@ -224,14 +224,14 @@ class MLWrapper(abc.ABC):
 
     def _wait_for_connection(self):
         """
-        This function pauses the main thread until the client is connected or
-        at most for 10 seconds
+        This function pauses the main thread until the client is connected
         """
-        sleep_time = 0.1
-        sleep_counter = 10
-        while not self.client.is_connected() and sleep_counter > 0:
+        sleep_time = 1
+        sleep_counter = 0
+        while not self.client.is_connected():
             time.sleep(sleep_time)
-            sleep_counter -= sleep_time
+            self.logger.debug(f'MQTT connection retry. counter: {sleep_counter}')
+            sleep_counter += 1
 
     def tear_down_components(self) -> None:
         """
@@ -328,14 +328,14 @@ class MLWrapper(abc.ABC):
     def _subscribe(self):
         topics = self._get_topics()
         for topic in topics:
-            self.client.subscribe(
+            (response, mid) = self.client.subscribe(
                 topic=topic,
                 qos=int(self.config["config"]["messaging"]["qos"]),
             )
-            self.logger.info(
-                "Subscribed to topic\t %s",
-                topic,
-            )
+            if response != 0:
+                self.logger.error(f'Error subscribing to topic\t {topic}')
+            else:
+                self.logger.info(f'Subscribed to topic\t {topic}')
 
     # DEPRECATED: This method is deprecated!
     def start(self):
