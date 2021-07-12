@@ -10,7 +10,7 @@ import re
 import uuid
 from datetime import timezone
 from json.decoder import JSONDecodeError
-from typing import Union
+from typing import Union, Optional, Dict
 import pandas as pd
 
 from jsonschema import ValidationError
@@ -428,7 +428,7 @@ class OutgoingMessage:
         is_temporary: bool = True,
         temporary_keyword: str = None,
     ):
-        self._body = None
+        self._body: Optional[str] = None
         self.in_message = in_message
         self._base_topic = base_topic
         self.is_temporary = is_temporary
@@ -474,13 +474,13 @@ class OutgoingMessage:
         return "This has to be done"
 
     @staticmethod
-    def _make_payload_dict(body: dict) -> dict:
+    def _make_payload_dict(body: Dict) -> Dict:
         return {"body": body, "signature": ""}
 
     @property
     def payload(self) -> str:
         """Returns the resulting payload as string"""
-        dict_ = self._make_payload_dict(self._body)
+        dict_ = self._make_payload_dict(self.body_as_json_dict)
         dict_["signature"] = self._sign_body()
         return json.dumps(dict_)
 
@@ -496,7 +496,7 @@ class OutgoingMessage:
         return self._body
 
     @property
-    def body_as_json_dict(self) -> dict:
+    def body_as_json_dict(self) -> Dict:
         """Returns the message field body as dictionary"""
         return json.loads(self.body)
 
