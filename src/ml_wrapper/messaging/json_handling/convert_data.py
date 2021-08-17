@@ -76,7 +76,10 @@ def resolve_data_frame(dataframe: pd.DataFrame) -> (list, list):
             zip(dataframe.dtypes.keys(), [str(a) for a in dataframe.dtypes.values])
         )
     ]
-    data = dataframe.astype(str).values.tolist()
+    data_accumulator = []
+    data = dataframe.astype(str)
+    for col_dict in column:
+        data_accumulator += [data[col_dict["name"]].to_list()]
     for col_dict_i, col_dict in enumerate(column):
         type_ = col_dict["type"]
         if re.findall("(int.*)|(float.*)", type_):
@@ -87,4 +90,4 @@ def resolve_data_frame(dataframe: pd.DataFrame) -> (list, list):
             type_ = "string"
         column[col_dict_i]["type"] = type_
 
-    return column, data
+    return column, data_accumulator

@@ -2,8 +2,9 @@
 This module tests the conversion of the data
 """
 from os.path import dirname, join
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 
 from ml_wrapper.messaging.json_handling import (
     resolve_data_frame,
@@ -25,11 +26,15 @@ def test_resolve_dataframe(data):
         data,
         np.array(
             [
-                ["2020-01-20 10:10:00", "1", "0.0"],
-                ["2020-01-20 10:10:02", "2", "0.1"],
-                ["2020-01-20 10:10:04", "3", "0.2"],
-                ["2020-01-20 10:10:05", "4", "0.3"],
-                ["2020-01-20 10:10:06", "5", "0.4"],
+                [
+                    "2020-01-20 10:10:00",
+                    "2020-01-20 10:10:02",
+                    "2020-01-20 10:10:04",
+                    "2020-01-20 10:10:05",
+                    "2020-01-20 10:10:06",
+                ],
+                ["1", "2", "3", "4", "5"],
+                ["0.0", "0.1", "0.2", "0.3", "0.4"],
             ]
         ),
     )
