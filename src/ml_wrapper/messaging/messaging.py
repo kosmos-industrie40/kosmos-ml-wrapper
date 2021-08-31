@@ -189,9 +189,9 @@ class IncomingMessage:
                 results = msg.get("results")
                 if results is None:
                     raise EmptyResult("The result of a message cannot be empty")
-                columns = list()
-                retrieved_data = list()
-                data = list()
+                columns = []
+                retrieved_data = []
+                data = []
                 for result in results:
                     data_frame_, columns_, data_ = retrieve_dataframe(result)
                     columns.append(columns_)
@@ -556,7 +556,7 @@ class OutgoingMessage:
         assert isinstance(
             result_type, ResultType
         ), "I can only handle ResultType for the result_type"
-        resolved = dict()
+        resolved = {}
         resolved["type"] = result_type.value
 
         # Derive ml tool specific values
@@ -584,7 +584,7 @@ class OutgoingMessage:
             ), "The {} type can only be set with a list of DataFrame objects".format(
                 result_type
             )
-            resolved["results"] = list()
+            resolved["results"] = []
             for res in result:
                 columns, data = resolve_data_frame(res)
                 resolved["results"].append(dict(columns=columns, data=data))

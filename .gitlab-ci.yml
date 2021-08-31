@@ -54,6 +54,8 @@ test:
       - src/**/*
       - tests/*
   before_script:
+    - pip install -r requirements.txt
+    - pip install pytest pytest-cov
     - python setup.py develop
   tags:
     - shared
@@ -104,7 +106,7 @@ test_template:
     - build
   before_script:
     - pip install cookiecutter
-    - pip install pyscaffold
+    - pip install pyscaffold==3.3.1
     - pip install ./dist/*.whl
     - pip install pytest
     - pip install yamllint

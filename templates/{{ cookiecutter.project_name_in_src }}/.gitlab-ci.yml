@@ -75,7 +75,7 @@ build_docker:
     GIT_SUBMODULE_STRATEGY: recursive
   except:
     refs:
-      - master
+      - main
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [ "" ]
@@ -87,7 +87,7 @@ build_docker:
       if [ -z $CI_REGISTRY ] || [ -z $CI_REGISTRY_IMAGE ]; then
         echo "missing parameters please add the entries for"
         echo "CI_REGISTRY, CI_REGISTRY_IMAGE"
-        echo "This will fail on master or tag"
+        echo "This will fail on main or tag"
       fi
     - |
       if [ -z $CI_COMMIT_TAG ]; then
@@ -117,7 +117,7 @@ publish_docker:
   only:
     refs:
       - tags
-      - master
+      - main
     variables:
       - $CI_COMMIT_MESSAGE =~ /[.\n]*\[publish\s?image\][.\n]*/
   image:
