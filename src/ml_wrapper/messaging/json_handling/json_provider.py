@@ -45,6 +45,7 @@ def _replace_file_refs(content_, path):
 
 def _read_json(file_, path="ml-trigger"):
     result = None
+    # pylint: disable=unspecified-encoding
     with open(join(SUB_SCHEMA(path), file_)) as file:
         # result = json.loads(file.read())
         result = json.loads(_replace_file_refs(file.read(), path=path))
@@ -55,6 +56,7 @@ def _combine_ml_and_example(file_, path="ml-trigger", analyse=True):
     result = _read_json(
         "analysis-example.json" if analyse else "update-example.json", path="ml-trigger"
     )
+    # pylint: disable=unspecified-encoding
     with open(join(SUB_SCHEMA(path), file_)) as file:
         result["body"]["payload"] = json.loads(
             _replace_file_refs(file.read(), path=path)

@@ -23,7 +23,7 @@ class StateMessage:
         from_: str = "",
     ):
         self._state: ToolState = None
-        self.kwargs = dict()
+        self.kwargs = {}
 
         # assert isinstance(client, Client), "I can only accept paho Client"
         self.client = client

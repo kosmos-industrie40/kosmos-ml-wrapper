@@ -23,7 +23,7 @@ class MockMqttClient:
         self.logger = logger
         self.on_message = None
         self.connect = lambda *args, **kwargs: None
-        self.subscriptions = list()
+        self.subscriptions = []
         self.last_published = None
         self.loop_forever = lambda: None
         self.loop_start = lambda: None
@@ -69,8 +69,8 @@ def _init_mqtt(self: MLWrapper):
 
 def _create_new_init(original_init: callable):
     def _new_init_(self: MLWrapper, **kwargs):
-        self.out_messages: List[OutgoingMessage] = list()
-        self.results: Union[pd.DataFrame, dict] = list()
+        self.out_messages: List[OutgoingMessage] = []
+        self.results: Union[pd.DataFrame, dict] = []
         print(self.__class__)
         print("Running")
         if "outgoing_message_is_temporary" not in kwargs:
