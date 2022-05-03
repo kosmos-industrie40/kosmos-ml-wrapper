@@ -118,6 +118,8 @@ test_template:
     - cookiecutter templates -f --no-input --config-file tests/cookiecutter-template-test.yaml
     - cd simple_ml_tool
     - ls -la
+    - pip show jsonschema
+    - pip install jsonschema==3.2.0
     - python setup.py test
 
 publish_pypi:
