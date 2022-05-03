@@ -80,7 +80,7 @@ class MLWrapper(abc.ABC):
         log_level=LOG_LEVEL,
         logger_name=None,
         only_react_to_message_type: MessageType = None,
-        only_react_to_previous_result_types: [None, List[ResultType]] = None,
+        only_react_to_previous_result_types: Union[None, List[ResultType]] = None,
         outgoing_message_is_temporary: bool = None,
         client=None,
         async_loop=None,
