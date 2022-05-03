@@ -120,6 +120,7 @@ test_template:
     - ls -la
     - python setup.py test
 
+
 publish_pypi:
   stage: publish
   image: "${HARBOR_PROD}/cache/library/python:3.8"
