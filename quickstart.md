@@ -27,16 +27,16 @@ You will receive every MQTT Message from every Topic. To subscribe to a specific
 
 ## Simple Usecase
 
-We will use an [Example Analysis Tool](https://gitlab.inovex.de/proj-kosmos/libraries/python/ml_wrapper/-/blob/master/src/examples/usage_example.py). It listens to Messages to the topic `kosmos/analytics/model-test/tag-test`. When it gets a message on this topic it will return  an dict with the key `ind` containing the list [0,1,2,3,4,5,6,7,8,9] on the topic `kosmos/analyses/abc`
+We will use an [Example Analysis Tool](https://github.com/kosmos-industrie40/kosmos-ml-wrapper/blob/master/src/examples/usage_example.py). It listens to Messages to the topic `kosmos/analytics/model-test/tag-test`. When it gets a message on this topic it will return  an dict with the key `ind` containing the list [0,1,2,3,4,5,6,7,8,9] on the topic `kosmos/analyses/abc`
 
-After inspecting [example.py](https://gitlab.inovex.de/proj-kosmos/libraries/python/ml_wrapper/-/blob/master/src/examples/usage_example.py) you can then start the Analysis Tool with: 
+After inspecting [example.py](hhttps://github.com/kosmos-industrie40/kosmos-ml-wrapper/blob/master/src/examples/usage_example.py) you can then start the Analysis Tool with: 
 
 ```python
 python example.py
 ```
 To send a MQTT Message to the topic `kosmos/analytics/model-test/tag-test` you can use following command:
 
-You can inspect the [Example Json Files](https://gitlab.inovex.de/proj-kosmos/libraries/python/ml_wrapper/-/tree/master/src/ml_wrapper/messaging/json_handling/kosmos_json_specifications/mqtt_payloads/ml-trigger) - if needed. 
+You can inspect the [Example Json Files](https://github.com/kosmos-industrie40/kosmos-ml-wrapper/blob/master/src/ml_wrapper/messaging/json_handling/kosmos_json_specifications/mqtt_payloads/ml-trigger/analysis-example.json) - if needed. 
 
 ```
  mosquitto_pub -t "kosmos/analytics/model-test/tag-test" -h 0.0.0.0 -p 1883 -f src/ml_wrapper/messaging/json_handling/kosmos_json_specifications/mqtt_payloads/ml-trigger/analysis-example.json 
