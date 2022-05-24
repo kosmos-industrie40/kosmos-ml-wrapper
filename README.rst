@@ -8,7 +8,7 @@ ML Tool ENV Vars
 ================
 
 The variables that need to be configured for each tool are defined in this block.
-You will find variables that are required and variables that are optional.
+You will find variables that are required and variables that are opKtional.
 
 The bare minimum you need to provide are the variables
 
@@ -180,7 +180,7 @@ You can install the ML Wrapper package from this repository directly:
 
 ::
 
-   pip install git+https://gitlab.inovex.de/proj-kosmos/libraries/python/ml_wrapper.git
+   pip install git+https://github.com/kosmos-industrie40/kosmos-ml-wrapper.git
 
 After the installation - assuming you are using a virtualenv ``env`` -
 you can execute
@@ -234,7 +234,7 @@ code block. **Please be aware, that the following template will change files. So
 
 ::
 
-    cookiecutter https://gitlab.inovex.de/proj-kosmos/libraries/python/ml_wrapper/ -f --directory templates
+    cookiecutter https://github.com/kosmos-industrie40/kosmos-ml-wrapper/ -f --directory templates
 
 Make sure to enter the same value in the project_name_in_src field as in putup with YOURPROJECTNAME.
 
@@ -342,47 +342,6 @@ token that is saved in gopass. Simply use
 ``gopass gitlab.inovex.de/deploytoken/gitlab-ci-token`` to retrieve the
 deploy token for this project. If that doesn’t work, you will have to
 find the token in your correct gopass group.
-
-Create a Gitlab Group Deploy Token
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-For this step you require ownership rights on the gitlab proj-kosmos
-group. If you have a group token already, skip this step and go to the
-next heading. - Go to
-https://gitlab.inovex.de/groups/proj-kosmos/-/settings/repository and
-click the **Expand** Button besides ``Deploy Tokens``. - Enter a Name
-and the username ``gitlab-ci-token`` - Click *Create deploy token* -
-Copy and save the created token in your private password safe
-
-Set the token as Environment Variable for your pipeline
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
--  Go to your project page (repository)
--  In the menu on the left click on ``Settings>CI/CD``
--  Click the **Expand** Button next to **Variables**
--  Click **Add Variable**
--  As key enter ``GIT_TOKEN``
--  As value you enter the token you created / copied earlier Repeat this
-   step for the Username ``GIT_USER`` with value ``gitlab-ci-token``
-
-Set up your gitlab pipeline
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
--  Edit your .gitlab-ci.yml
--  In every job, that needs to install / clone from another internal
-   repository, enter the following two lines in the beginning.
-
-::
-
-   - git config --global url."https://$GIT_USER:$GIT_TOKEN@gitlab.inovex.de".insteadOf https://gitlab.inovex.de
-
-Then your pipeline before_script might look like this:
-
-::
-
-   - before_script:
-       - git config --global url."https://$GIT_USER:$GIT_TOKEN@gitlab.inovex.de".insteadOf https://gitlab.inovex.de
-       - pip install -r requirements.txt
 
 Dockerfile
 ~~~~~~~~~~
