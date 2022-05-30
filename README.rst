@@ -378,7 +378,7 @@ get request the current state of the ML Tool
 
 .. _jsonschema: src/ml_wrapper/kosmos_json_specifications/mqtt_payloads/analyses-formal.json
 .. _KOSMoS MQTT standards: src/ml_wrapper/messaging/json_handling/kosmos_json_specifications/mqtt_payloads
-.. _env_ml_wrapper.md: src/env_ml_wrapper.md
+.. _env_ml_wrapper.md: env_ml_wrapper.md
 .. _usage_example.py: src/examples/usage_example.py
 .. _test_example.py: src/examples/test_example.py
 .. _quickstart.md: quickstart.md
