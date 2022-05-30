@@ -4,11 +4,13 @@ ml_wrapper
 This Project is intended to provide a mqtt subscription trigger method
 for python projects.
 
+**Note**: This project is tested only on Linux.
+
 ML Tool ENV Vars
 ================
 
 The variables that need to be configured for each tool are defined in this block.
-You will find variables that are required and variables that are opKtional.
+You will find variables that are required and variables that are optional.
 
 The bare minimum you need to provide are the variables
 
@@ -112,6 +114,8 @@ Last but not least:
 - Open your project <test_tool> in charm and add an interpreter pointing towards your environment.
 - Right click on src in the Project view and hit *Mark Directory as > Sources root*
 
+
+You find a quickstart tutorial at `quickstart.md`_ . 
 
 Full Project Setup with pycharm
 ===============================
@@ -326,25 +330,9 @@ following:
 In the main program, self.start() shall be used to start an infinite
 loop and react to incoming MQTT messages.
 
-How to use in your project with gitlab CI CD
---------------------------------------------
-
-In order to be able to build your project, you will need to install this
-project via your requirements.txt
-
-Locally that is no issue, but it gets a bit more tricky in the
-``.gitlab-ci.yml`` Pipeline.
-
-In order to set up your Pipeline properly, you will need to have a group
-deploy Token. ### Get your Group Deploy Token #### Gopass If you are not
-an owner of the proj-kosmos group in gitlab, you will need to use the
-token that is saved in gopass. Simply use
-``gopass gitlab.inovex.de/deploytoken/gitlab-ci-token`` to retrieve the
-deploy token for this project. If that doesn’t work, you will have to
-find the token in your correct gopass group.
 
 Dockerfile
-~~~~~~~~~~
+-------------
 
 If you are providing a docker build and push step, e.g. using kaniko,
 then it’s recommended to provide the environment variables
@@ -393,3 +381,4 @@ get request the current state of the ML Tool
 .. _env_ml_wrapper.md: src/env_ml_wrapper.md
 .. _usage_example.py: src/examples/usage_example.py
 .. _test_example.py: src/examples/test_example.py
+.. _quickstart.md: quickstart.md

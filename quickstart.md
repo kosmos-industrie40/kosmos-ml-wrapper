@@ -27,12 +27,12 @@ You will receive every MQTT Message from every Topic. To subscribe to a specific
 
 ## Simple Usecase
 
-We will use an [Example Analysis Tool](https://github.com/kosmos-industrie40/kosmos-ml-wrapper/blob/master/src/examples/usage_example.py). It listens to Messages to the topic `kosmos/analytics/model-test/tag-test`. When it gets a message on this topic it will return  an dict with the key `ind` containing the list [0,1,2,3,4,5,6,7,8,9] on the topic `kosmos/analyses/abc`
+We will use an [Example Analysis Tool](https://github.com/kosmos-industrie40/kosmos-ml-wrapper/blob/master/src/examples/usage_example.py). When it receives a message on this topic, the tool will publish a dict that maps the key `ind` to the list `[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]` on `kosmos/analyses/abc` .
 
 After inspecting [example.py](hhttps://github.com/kosmos-industrie40/kosmos-ml-wrapper/blob/master/src/examples/usage_example.py) you can then start the Analysis Tool with: 
 
 ```python
-python example.py
+python usage_example.py
 ```
 To send a MQTT Message to the topic `kosmos/analytics/model-test/tag-test` you can use following command:
 
@@ -98,16 +98,16 @@ An instance of this class needs to be provided with information
     should be given upon instantiation (defaults to `"time_series"`).
 
 As an ML Engineer, a child class of MLWrapper needs to be implemented
-    and the run() method needs to be overwritten.
+    and the `run()` method needs to be overwritten.
     Here, the main workload of your ML analysis module should be implemented.
 
-The arguments of the run() method need to conform
-    to the outputs of retreive_payload_data() and to the inputs
-    of the resolve_payload_data() method.
+The arguments of the `run()` method need to conform
+    to the outputs of `retreive_payload_data()` and to the inputs
+    of the `resolve_payload_data()` method.
     The latter two can also be customized as needed.
     (The current implementation takes the sensor or analysis data from an
     incoming message, converts them to a pandas dataframe and passes is to
-    the run() method.)
+    the `run()` method.)
 
 In simplified terms, the main analysis workflow looks like the following:
 
@@ -118,7 +118,7 @@ message_payload = self.resolve_payload_data(result).
 ```
 
 
-In the main program, self.start() shall be used to start an
+In the main program, `self.start()` shall be used to start an
 infinite loop and react to incoming MQTT messages.
 
 ### Arguments
@@ -127,12 +127,12 @@ Every AnalysisTool inherits from MLWrapper. You can specify The following argume
 
 Argument | Description | Default Value
 -------- | -------- | --------
-result_type   | Result of analysis tool. Can be ResultType.TIME_SERIES,ResultType.TEXT or ResultType.MULTIPLE_TIME_SERIES   | ResultType.TIME_SERIES,
+result_type   | result of analysis tool. Can be ResultType.TIME_SERIES,ResultType.TEXT or ResultType.MULTIPLE_TIME_SERIES   | ResultType.TIME_SERIES,
 log_level   | optional from logging enum (e.g. logging.INFO)   | LOG_LEVEL
-logger_name | Optional Name for Logger | None
-only_react_to_message_type | Only React to SENSOR_UPDATE or ANALYSES_RESULT | None
+logger_name | optional name for logger | None
+only_react_to_message_type | only react to SENSOR_UPDATE or ANALYSES_RESULT | None
 only_react_to_previous_result_types | optional to set previous result_type required | None
-outgoing_message_is_temporary |Required to define whether your result should be stored (False) or just used for following steps (True) | None
+outgoing_message_is_temporary |required to define whether your result should be stored (False) or just used for following steps (True) | None
 
 
 ### Getting retreived information
