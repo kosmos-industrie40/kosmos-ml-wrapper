@@ -87,7 +87,7 @@ Then use the provided template for a quickstart
 
 ::
 
-    cookiecutter https://gitlab.inovex.de/proj-kosmos/libraries/python/ml_wrapper/ -f --directory templates
+    cookiecutter https://github.com/kosmos-industrie40/kosmos-ml-wrapper/  -f --directory templates
 
 In the questions asked by cookiecutter, you will need to set the field project_name_in_src to <test_tool>.
 
@@ -124,7 +124,7 @@ Execute in terminal:
 ::
 
     putup test_tool
-    cookiecutter https://gitlab.inovex.de/proj-kosmos/libraries/python/ml_wrapper/ -f --directory templates
+    cookiecutter https://github.com/kosmos-industrie40/kosmos-ml-wrapper/ -f --directory templates
     charm test_tool # opens pycharm at test_tool
 
 Execute in pycharm terminal:
