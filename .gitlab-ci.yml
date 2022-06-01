@@ -8,12 +8,6 @@ stages:
 pylint:
   stage: static
   image: "${HARBOR_PROD}/cache/library/python:3.8"
-  only:
-    changes:
-      - .gitlab-ci.yml
-      - src/**/*
-      - tests/*
-      - .pylintrc
   before_script:
     - export PATH=$PATH:$(CI_PROJECT_PATH)/src
     - python --version
@@ -30,11 +24,6 @@ pylint:
 black:
   stage: static
   image: "${HARBOR_PROD}/cache/library/python:3.8"
-  only:
-    changes:
-      - .gitlab-ci.yml
-      - src/**/*
-      - tests/*
   before_script:
     - pip install -r requirements.txt
     - pip install black
@@ -48,11 +37,6 @@ test:
   stage: test
   image: "${HARBOR_PROD}/cache/library/python:3.8"
   needs: []
-  only:
-    changes:
-      - .gitlab-ci.yml
-      - src/**/*
-      - tests/*
   before_script:
     - pip install -r requirements.txt
     - pip install pytest pytest-cov
@@ -69,13 +53,6 @@ test:
 build:
   stage: build
   image: "${HARBOR_PROD}/cache/library/python:3.8"
-  only:
-    changes:
-      - .gitlab-ci.yml
-      - src/**/*
-      - tests/*
-      - requirements.txt
-      - setup.*
   needs:
     - test
     - black
@@ -93,13 +70,6 @@ build:
 test_template:
   stage: templating
   image: "${HARBOR_PROD}/cache/library/python:3.8"
-  only:
-    changes:
-      - .gitlab-ci.yml
-      - src/**/*
-      - tests/*
-      - requirements.txt
-      - setup.*
   tags:
     - shared
   dependencies:
