@@ -87,7 +87,7 @@ Then use the provided template for a quickstart
 
 ::
 
-    cookiecutter https://gitlab.inovex.de/proj-kosmos/libraries/python/ml_wrapper/ -f --directory templates
+    cookiecutter https://github.com/kosmos-industrie40/kosmos-ml-wrapper/  -f --directory templates
 
 In the questions asked by cookiecutter, you will need to set the field project_name_in_src to <test_tool>.
 
@@ -124,7 +124,7 @@ Execute in terminal:
 ::
 
     putup test_tool
-    cookiecutter https://gitlab.inovex.de/proj-kosmos/libraries/python/ml_wrapper/ -f --directory templates
+    cookiecutter https://github.com/kosmos-industrie40/kosmos-ml-wrapper/ -f --directory templates
     charm test_tool # opens pycharm at test_tool
 
 Execute in pycharm terminal:
@@ -377,8 +377,7 @@ get request the current state of the ML Tool
 
 
 .. _jsonschema: src/ml_wrapper/kosmos_json_specifications/mqtt_payloads/analyses-formal.json
-.. _KOSMoS MQTT standards: src/ml_wrapper/messaging/json_handling/kosmos_json_specifications/mqtt_payloads
-.. _env_ml_wrapper.md: env_ml_wrapper.md
+.. _env_ml_wrapper.md: src/env_ml_wrapper.md
 .. _usage_example.py: src/examples/usage_example.py
 .. _test_example.py: src/examples/test_example.py
 .. _quickstart.md: quickstart.md
