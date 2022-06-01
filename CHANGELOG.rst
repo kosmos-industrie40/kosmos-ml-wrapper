@@ -2,6 +2,11 @@
 Changelog
 #########
 
+Version 2.3.0
+=============
+- Refactoring for opensourcing
+- Added documentation with quickstart tutorial
+
 Version 2.2.2
 =============
 - Include results in mock class under mock_tool.results

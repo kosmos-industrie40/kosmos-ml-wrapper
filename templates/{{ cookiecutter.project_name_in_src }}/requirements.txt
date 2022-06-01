@@ -1,3 +1,3 @@
-git+https://gitlab.inovex.de/proj-kosmos/libraries/python/ml_wrapper.git
+git+https://github.com/kosmos-industrie40/kosmos-ml-wrapper.git
 asyncio
 pandas
