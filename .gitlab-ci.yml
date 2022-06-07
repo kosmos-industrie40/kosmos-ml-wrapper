@@ -46,9 +46,14 @@ test:
   artifacts:
     reports:
       junit: junit.xml
-      cobertura: coverage.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
   script:
     - python setup.py test
+    - coverage report
+    - coverage xml
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
 
 build:
   stage: build
