@@ -2,7 +2,7 @@
 
 # If I want to create a mock, I need to monkeypatch local methods as well.
 # Additionally the args and kwargs allow usage without test specific parameters.
-# pylint: disable=protected-access,unused-argument,no-self-use
+# pylint: disable=protected-access,unused-argument
 import json
 import logging
 import time
