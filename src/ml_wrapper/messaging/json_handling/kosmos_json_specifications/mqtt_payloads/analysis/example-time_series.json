@@ -1,0 +1,48 @@
+{
+  "$schema": "file:formal.json",
+  "body": {
+    "calculated": {
+      "received": "2020-08-15T15:47:55.789Z",
+      "message": {
+        "machine": "abc",
+        "sensor": "134wdsf"
+      }
+    },
+    "timestamp": "2020-08-15T15:46:55.789Z",
+    "model": {
+      "url": "abc",
+      "tag": "ab"
+    },
+    "from": "ml-0",
+    "type": "time_series",
+    "results": {
+      "columns": [
+        {
+          "name": "time",
+          "type": "number"
+        },
+        {
+          "name": "oil pressure",
+          "type": "number"
+        }
+      ],
+      "data": [
+        [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        [
+          "55",
+          "66",
+          "77",
+          "88",
+          "99"
+        ]
+      ]
+    }
+  },
+  "signature": ""
+}

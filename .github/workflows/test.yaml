@@ -1,0 +1,78 @@
+name: Static Code Analysis and Tests
+on: push
+
+jobs:
+  pylint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v2
+
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - name: Install dependencies
+        run: |
+          python setup.py develop
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+          pip install pylint
+
+      - name: Run pylint
+        run: |
+          pylint src
+          pylint --rcfile tests/.pylintrc tests
+
+  black:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v2
+
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - name: Install black
+        run: |
+          pip install black
+
+      - name: Run black
+        run: |
+          black --check src
+          black --check tests
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v2
+
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+          python setup.py develop
+
+      - name: Run tests
+        run: python setup.py test
+
+      - name: Publish Test Reports
+        uses: mikepenz/action-junit-report@v3
+        if: always() # always run even if the previous step fails
+        with:
+          report_paths: "/home/runner/work/kosmos-ml-wrapper/kosmos-ml-wrapper/junit.xml"

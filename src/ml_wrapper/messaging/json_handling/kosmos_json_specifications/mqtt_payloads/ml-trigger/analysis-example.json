@@ -1,0 +1,31 @@
+{
+  "$schema": "file:formal.json",
+  "body": {
+    "contract": "abc",
+    "machine": "mach",
+    "sensor": "abc",
+    "type": "analyse_result",
+    "payload": {
+      "body": {
+        "from": "creator",
+        "timestamp": "2020-08-12T15:40:22.879Z",
+        "type": "text",
+        "model": {
+          "url": "abvc",
+          "tag": "a"
+        },
+        "calculated": {
+          "message": {
+            "machine": "mach",
+            "sensor": "abc"
+          },
+          "received": "2020-08-12T15:41:22.879Z"
+        },
+        "results": {
+          "total": "stop",
+          "predict": 11
+        }
+      }
+    }
+  }
+}

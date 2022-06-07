@@ -1,0 +1,41 @@
+name: Templating
+on:
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v2
+
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - name: Install dependencies
+        run: |
+          pip install cookiecutter
+          pip install pyscaffold==3.3.1
+          pip install wheel
+          python setup.py sdist bdist_wheel
+          pip install ./dist/*.whl
+          pip install pytest
+          pip install yamllint
+          pip install pandas
+          git config --global user.email "testing@example.com"
+          git config --global user.name "Tester"
+
+      - name: Create template
+        run: |
+          putup simple_ml_tool --no-skeleton
+          cookiecutter templates -f --no-input --config-file tests/cookiecutter-template-test.yaml
+          cd simple_ml_tool
+          ls -la
+          python setup.py test

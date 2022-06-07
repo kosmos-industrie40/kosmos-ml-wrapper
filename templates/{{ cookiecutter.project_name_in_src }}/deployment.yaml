@@ -1,0 +1,50 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ cookiecutter.ml_tool_name | replace(" ", "-") | replace("_", "-") | lower }}
+  labels:
+    apps: {{ cookiecutter.ml_tool_name | replace(" ", "-") | replace("_", "-") | lower }}
+    classname: {{ cookiecutter.ml_class_name | replace(" ", "-") | replace("_", "-") | lower }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ cookiecutter.ml_tool_name | replace(" ", "-") | replace("_", "-") | lower }}
+      classname: {{ cookiecutter.ml_class_name | replace(" ", "-") | replace("_", "-") | lower }}
+  template:
+    metadata:
+      labels:
+        app: {{ cookiecutter.ml_tool_name | replace(" ", "-") | replace("_", "-") | lower }}
+        classname: {{ cookiecutter.ml_class_name | replace(" ", "-") | replace("_", "-") | lower }}
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+      - name: persist
+#        TODO: Update image
+#        image: harbor.kosmos.idcp.inovex.io/analyse-platform-kosmos/TOOL
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        env:
+          - name: CONFIG_MODEL_URL
+#            TODO: Doublecheck
+            # The url of this model to identify itself
+            value: {{ cookiecutter.ml_tool_name | replace(" ", "-") | replace("_", "-") | lower }}
+          - name: CONFIG_MODEL_TAG
+#            TODO: Doublecheck
+            # The tag of this model to identify itself
+            value: 0.1.0
+          - name: CONFIG_MODEL_FROM
+#            TODO: Doublecheck
+            # The sender id to identify this tool. So far it seems not to be used by the mediator though.
+            value: "id-of-this-model"
+          - name: CONFIG_MQTT_HOST
+            value: mosquitto-service.messaging.svc.cluster.local
+          - name: CONFIG_MQTT_PORT
+            value: "1883"
+          - name: CONFIG_MESSAGING_REQUEST_TOPIC
+            # Additionally to the model and tag specific topic, the ml wrapper can subscribe to additional
+            # topics. These can be specified here, seperated by commas
+            value: ""

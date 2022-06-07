@@ -1,0 +1,36 @@
+{
+"$schema": "data-formal.json",
+  "body": {
+    "columns": [
+      {
+        "name": "value",
+        "type": "number",
+	"meta": {},
+	"unit": {}
+      },
+      {
+        "name": "quality",
+        "type": "number",
+	"meta": {},
+	"unit": {}
+      }
+    ],
+    "data": [
+      [
+        "15"
+      ],
+      [
+        "2"
+      ]
+    ],
+    "meta": [
+      {
+        "description": "defines the location where the metric is created",
+        "name": "location",
+        "type": "string",
+        "value": "hall 1"
+      }
+    ],
+    "timestamp": ""
+  }
+}

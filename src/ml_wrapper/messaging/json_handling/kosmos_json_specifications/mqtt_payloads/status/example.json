@@ -1,0 +1,7 @@
+{
+	"$schema": "file:formal.json",
+	"body": {
+		"from": "mach/sens",
+		"status": "starting"
+	}
+}

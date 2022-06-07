@@ -1,0 +1,55 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"title": "Status Schema",
+	"description": "Structure of a status update message",
+	"additionalProperties": false,
+	"properties": {
+		"$schema": {
+			"type": "string",
+			"description": "contains the used schema"
+		},
+		"body": {
+			"description": "contains the message",
+			"type": "object",
+			"required": ["status", "from"],
+			"properties": {
+				"from": {
+					"type": "string",
+					"description": "defines who sends this message"
+				},
+				"status": {
+					"type": "string",
+					"enum": ["alive","error","starting","shutting down"],
+					"title": "Servicestatus",
+					"description": "Represents the status of a service"
+				}
+			}
+		},
+		"signature": {
+			"description": "contins the signature of this message",
+			"additionalProperties": false,
+			"properties": {
+				"signature": {
+					"description": "is the signature",
+					"type":"string"
+				},
+				"meta": {
+					"description": "contains meta information about the signature",
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"date": {
+							"description": "contins the date, when the message is signed",
+							"type": "string",
+							"format": "date-time"
+						},
+						"algorithm": {
+							"description": "contains the used algorithm, which is used to create the signature",
+							"type": "string"
+						}
+					}
+				}
+			}
+		}
+	}
+}
