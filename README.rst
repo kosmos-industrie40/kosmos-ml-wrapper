@@ -69,7 +69,7 @@ Logging and Tool settings:
 |                                       |                                   break in case of an error.  |
 +---------------------------------------+---------------------------------------------------------------+
 
-Quick-Start Tutorial
+Quick-Start Usage-Tutorial
 ====================
 Navigate/cd into your dev directory, where you keep all your projects.
 Please pick your tools name first, because it is tideous to change afterwards.
@@ -114,7 +114,8 @@ Last but not least:
 - Open your project <test_tool> in charm and add an interpreter pointing towards your environment.
 - Right click on src in the Project view and hit *Mark Directory as > Sources root*
 
-
+Quick-Start Development-Tutorial
+====================
 You find a quickstart tutorial at `quickstart.md`_ . 
 
 Full Project Setup with pycharm
